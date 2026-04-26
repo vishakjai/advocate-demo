@@ -1,0 +1,51 @@
+# Synthetic healthcare app catalog — demo data, not real
+# Replace with sanitized customer data when available
+apps:
+  - id: app:emr-core
+    name: Electronic Medical Records (core)
+    criticality: tier-1
+    owner_team: Clinical Systems
+    depends_on: [app:hl7-gateway, svc:active-directory, svc:oracle-ehr-db]
+    runs_on_vms: [vm:emr-web-01, vm:emr-web-02, vm:emr-app-cluster-*]
+    network_segments: [seg:clinical-prod]
+    compliance: [hipaa, hitrust]
+  - id: app:hl7-gateway
+    name: HL7 Integration Gateway
+    criticality: tier-1
+    owner_team: Integration Platform
+    depends_on: [svc:rabbitmq-prod]
+    runs_on_vms: [vm:hl7-gw-prod-01, vm:hl7-gw-prod-02]
+    network_segments: [seg:clinical-prod, seg:external-partner-dmz]
+    compliance: [hipaa]
+  - id: app:patient-portal
+    name: Patient Portal
+    criticality: tier-2
+    owner_team: Digital Experience
+    depends_on: [app:emr-core, svc:identity-provider]
+    runs_on_vms: [vm:portal-web-*, vm:portal-api-*]
+    network_segments: [seg:public-dmz, seg:clinical-prod]
+    compliance: [hipaa]
+  - id: app:billing
+    name: Revenue Cycle / Billing
+    criticality: tier-1
+    owner_team: Finance Systems
+    depends_on: [app:emr-core, svc:payment-gateway, svc:oracle-fin-db]
+    runs_on_vms: [vm:billing-app-*, vm:billing-batch-01]
+    network_segments: [seg:finance-prod]
+    compliance: [hipaa, pci-dss]
+  - id: app:pacs-imaging
+    name: PACS Imaging System
+    criticality: tier-1
+    owner_team: Radiology IT
+    depends_on: [svc:storage-san, app:emr-core]
+    runs_on_vms: [vm:pacs-server-*, vm:pacs-archive-01]
+    network_segments: [seg:clinical-prod, seg:imaging-storage]
+    compliance: [hipaa]
+  - id: app:lab-integration
+    name: Lab Results Integration
+    criticality: tier-1
+    owner_team: Lab Systems
+    depends_on: [app:hl7-gateway, svc:lab-vendor-api]
+    runs_on_vms: [vm:lab-int-01, vm:lab-int-02]
+    network_segments: [seg:clinical-prod, seg:external-partner-dmz]
+    compliance: [hipaa, clia]

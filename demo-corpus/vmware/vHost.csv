@@ -1,0 +1,17 @@
+Host,Cluster,Datacenter,CPU Model,# Cores,# Memory,ESX Version,Vendor,Model
+esx-clinical-01.advh.local,Clinical-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-clinical-02.advh.local,Clinical-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-clinical-03.advh.local,Clinical-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-clinical-04.advh.local,Clinical-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-clinical-05.advh.local,Clinical-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-core-01.advh.local,Core-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-core-02.advh.local,Core-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-db-01.advh.local,DB-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-dmz-01.advh.local,DMZ-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-dmz-02.advh.local,DMZ-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-finance-01.advh.local,Finance-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-finance-02.advh.local,Finance-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-integ-01.advh.local,Integration-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-integ-02.advh.local,Integration-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-integ-03.advh.local,Integration-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740
+esx-integ-04.advh.local,Integration-Prod,Advocate-East-DC,Intel(R) Xeon(R) Gold 6248R,48,524288,7.0.3,Dell Inc.,PowerEdge R740

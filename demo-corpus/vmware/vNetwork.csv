@@ -1,0 +1,26 @@
+VM,Network,IPv4 Address,MAC Address,Switch,Connected
+emr-web-01,clinical-prod,2.128.0.21,00:50:56:aa:45:1e983bae9eac3a,dvSwitch-Prod,True
+emr-web-02,clinical-prod,2.128.0.22,00:50:56:aa:39:5ca29fe60de7f3,dvSwitch-Prod,True
+emr-app-01,clinical-prod,2.128.0.31,00:50:56:aa:4d:22b75b40634e46,dvSwitch-Prod,True
+emr-app-02,clinical-prod,2.128.0.32,00:50:56:aa:cc:2f0a377f05eeca,dvSwitch-Prod,True
+emr-app-03,clinical-prod,2.128.0.33,00:50:56:aa:95:26bef76a9548c3,dvSwitch-Prod,True
+hl7-gw-prod-01,clinical-prod,2.128.0.41,00:50:56:aa:6b:753ddaf956e444,dvSwitch-Prod,True
+hl7-gw-prod-02,clinical-prod,2.128.0.42,00:50:56:aa:79:32f90a9a51adee,dvSwitch-Prod,True
+portal-web-01,dmz-prod,2.128.1.11,00:50:56:aa:2f:398e37128a52a2,dvSwitch-Prod,True
+portal-web-02,dmz-prod,2.128.1.101,00:50:56:aa:e9:36fb0e5b72fa0,dvSwitch-Prod,True
+portal-api-01,clinical-prod,2.128.0.51,00:50:56:aa:94:7196fe05c71c3e,dvSwitch-Prod,True
+billing-app-01,finance-prod,2.128.2.21,00:50:56:aa:e8:77ba8c9ca773be,dvSwitch-Prod,True
+billing-app-02,finance-prod,2.128.2.22,00:50:56:aa:58:4c29ca5b7df39f,dvSwitch-Prod,True
+billing-batch-01,finance-prod,2.128.2.31,00:50:56:aa:e7:d09e4d44f209a,dvSwitch-Prod,True
+pacs-server-01,clinical-prod,2.128.0.61,00:50:56:aa:9e:1373346b64b6f5,dvSwitch-Prod,True
+pacs-server-02,clinical-prod,2.128.0.62,00:50:56:aa:df:61db8818aded2f,dvSwitch-Prod,True
+pacs-archive-01,clinical-prod,2.128.0.63,00:50:56:aa:98:74b24a406a077d,dvSwitch-Prod,True
+lab-int-01,clinical-prod,2.128.0.71,00:50:56:aa:9a:5ea88a225a469,dvSwitch-Prod,True
+lab-int-02,clinical-prod,2.128.0.72,00:50:56:aa:37:1bba1d07f2dbed,dvSwitch-Prod,True
+ad-dc-01,core-infra,2.128.255.11,00:50:56:aa:0f:45e35065841799,dvSwitch-Prod,True
+ad-dc-02,core-infra,2.128.255.12,00:50:56:aa:4f:6591fdf6b6a094,dvSwitch-Prod,True
+oracle-ehr-db,db-prod,2.128.3.11,00:50:56:aa:38:1f45fdeb8ea806,dvSwitch-Prod,True
+oracle-fin-db,db-prod,2.128.3.12,00:50:56:aa:38:55e86ddad1347b,dvSwitch-Prod,True
+rabbitmq-prod-01,clinical-prod,2.128.0.81,00:50:56:aa:60:6ec4fb55a1886c,dvSwitch-Prod,True
+mirth-connect-01,clinical-prod,2.128.0.82,00:50:56:aa:fa:3355349156fe64,dvSwitch-Prod,True
+old-edi-gw-01,clinical-prod,2.128.0.199,00:50:56:aa:09:34ce5acff524ad,dvSwitch-Prod,True
