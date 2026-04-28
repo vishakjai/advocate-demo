@@ -1,0 +1,14 @@
+groups:
+- name: postgresql.rules
+  rules:
+  - record: postgres:pg_replication_lag_bytes
+    expr: >
+      label_replace(
+        (pg_xlog_position_bytes{env="gprd"} and pg_replication_is_replica{env="gprd"} == 0),
+        "primary", "$1", "instance", "(.*)"
+      )
+      - ignoring (fqdn,instance,primary) group_right (primary) (
+        pg_xlog_position_bytes{env="gprd"} and pg_replication_is_replica{env="gprd"} == 1
+      )
+
+# Additional alerts will come back here when https://gitlab.com/gitlab-com/gl-infra/production-engineering/-/issues/25280 is completed.

@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    HDRHistogram (0.1.11)
+    domain_name (0.6.20240107)
+    http (6.0.2)
+      http-cookie (~> 1.0)
+      llhttp (~> 0.6.1)
+    http-cookie (1.1.3)
+      domain_name (~> 0.5)
+    llhttp (0.6.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  HDRHistogram
+  http
+
+BUNDLED WITH
+  4.0.6

@@ -1,0 +1,807 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1469,
+  "links": [
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "page timings"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "page summary"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "site summary"
+      ],
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "text": ""
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 0,
+        "y": 0
+      },
+      "id": 62,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "asPercent(countSeries(currentBelow($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function, 2500)), countSeries($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function))",
+          "textEditor": true
+        }
+      ],
+      "title": "Routes with good LCP (<2.5s)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "text": ""
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 5,
+        "y": 0
+      },
+      "id": 64,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "countSeries($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function)",
+          "textEditor": true
+        }
+      ],
+      "title": "Measured Routes",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "text": ""
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 2500
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 10,
+        "y": 0
+      },
+      "id": 66,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "averageSeries($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function)",
+          "textEditor": true
+        }
+      ],
+      "title": "Average LCP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "LCP of all monitored routes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "target": {
+                  "text": "a"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 10000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 2500
+              },
+              {
+                "color": "red",
+                "value": 4000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 44,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 60,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "text": {},
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "LCP Leaderboard",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "LCP History of all monitored routes",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 19,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 67,
+      "options": {
+        "alertThreshold": true
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "LCP History",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "LCP History of all monitored routes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "cellOptions": {
+              "mode": "gradient",
+              "type": "color-background"
+            },
+            "filterable": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "target": {
+                  "text": "a"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 10000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 2500
+              },
+              {
+                "color": "red",
+                "value": 4000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Field"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Difference"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "light-blue",
+                      "value": 0
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 500
+                    },
+                    {
+                      "color": "dark-orange",
+                      "value": 1000
+                    },
+                    {
+                      "color": "dark-red",
+                      "value": 1500
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 44,
+        "w": 24,
+        "x": 0,
+        "y": 70
+      },
+      "id": 68,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "LCP Numbers",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "reducers": [
+              "mean",
+              "firstNotNull",
+              "lastNotNull",
+              "diff"
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "target": {
+                  "text": "Target"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 3000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 750
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 41,
+        "w": 24,
+        "x": 0,
+        "y": 114
+      },
+      "id": 30,
+      "options": {
+        "displayMode": "lcd",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "text": {}
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.pageTimings.serverResponseTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "Time to First Byte (BE Duration)",
+      "type": "bargauge"
+    }
+  ],
+  "preload": false,
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "tags": [
+    "leaderboard",
+    "pages",
+    "unmanaged"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "sitespeed_io",
+          "value": "sitespeed_io"
+        },
+        "hide": 2,
+        "label": "sitespeed_io",
+        "name": "namespace",
+        "query": "sitespeed_io",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": [
+            "desktop"
+          ],
+          "value": [
+            "desktop"
+          ]
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.*",
+        "includeAll": false,
+        "label": "path",
+        "multi": true,
+        "name": "path",
+        "options": [],
+        "query": "$namespace.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "gitlab",
+          "value": "gitlab"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.*",
+        "includeAll": false,
+        "name": "testname",
+        "options": [],
+        "query": "$namespace.$path.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": [
+            "gitlab_com"
+          ],
+          "value": [
+            "gitlab_com"
+          ]
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.*",
+        "includeAll": true,
+        "label": "domains",
+        "multi": true,
+        "name": "domains",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.$domains.*",
+        "includeAll": true,
+        "label": "pages",
+        "multi": true,
+        "name": "pages",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.$domains.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "chrome",
+          "value": "chrome"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.$domains.$pages.*",
+        "includeAll": false,
+        "label": "browser",
+        "name": "browser",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.$domains.$pages.*",
+        "refresh": 1,
+        "regex": "(chrome||firefox)",
+        "type": "query"
+      },
+      {
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "text": "median",
+          "value": "median"
+        },
+        "name": "function",
+        "options": [
+          {
+            "selected": false,
+            "text": "min",
+            "value": "min"
+          },
+          {
+            "selected": false,
+            "text": "mean",
+            "value": "mean"
+          },
+          {
+            "selected": true,
+            "text": "median",
+            "value": "median"
+          },
+          {
+            "selected": false,
+            "text": "p90",
+            "value": "p90"
+          },
+          {
+            "selected": false,
+            "text": "max",
+            "value": "max"
+          }
+        ],
+        "query": "min,mean,median,p90,max",
+        "refresh": 2,
+        "type": "interval"
+      },
+      {
+        "current": {
+          "text": "cable",
+          "value": "cable"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.$domains.$pages.$browser.*",
+        "includeAll": false,
+        "name": "connectivity",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.$domains.$pages.$browser.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Sitespeed - LCP Leaderboard",
+  "uid": "sftijGFMz",
+  "version": 14
+}

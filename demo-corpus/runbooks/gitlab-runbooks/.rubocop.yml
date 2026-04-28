@@ -1,0 +1,66 @@
+---
+inherit_from: .rubocop_todo.yml
+
+inherit_gem:
+  gitlab-styles:
+    - rubocop-bundler.yml
+    - rubocop-gemspec.yml
+    - rubocop-layout.yml
+    - rubocop-lint.yml
+    - rubocop-metrics.yml
+    - rubocop-naming.yml
+    - rubocop-style.yml
+
+AllCops:
+  TargetRubyVersion: 3.2
+  SuggestExtensions: false
+  Exclude:
+    - "**/vendor/**/*"
+
+# This project doesn't use ActiveRecord, so these will all be false
+# positives.
+CodeReuse/ActiveRecord:
+  Enabled: false
+
+# We often have long strings in this project and breaking those across
+# multiple lines does not really improve readability.
+Layout/LineLength:
+  Enabled: false
+
+# In many cases, indentation following the first argument makes it harder to
+# read.
+Layout/FirstArgumentIndentation:
+  Enabled: false
+
+Lint/HashCompareByIdentity:  # (new in 0.93)
+  Enabled: true
+Lint/RedundantSafeNavigation:  # (new in 0.93)
+  Enabled: true
+Style/ClassEqualityComparison:  # (new in 0.93)
+  Enabled: true
+RSpec/StubbedMock:  # (new in 1.44)
+  Enabled: false
+
+# Json serialization does not pose a security treat within test files.
+GitlabSecurity/JsonSerialization:
+  Exclude:
+    - 'spec/**/*.rb'
+# Public send does not pose a security treat within test files.
+GitlabSecurity/PublicSend:
+  Exclude:
+    - 'spec/**/*.rb'
+
+InternalAffairs/MissingCopDepartment:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+RSpec/RailsControllerTesting:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/ZeroLengthPredicate:
+  Enabled: false

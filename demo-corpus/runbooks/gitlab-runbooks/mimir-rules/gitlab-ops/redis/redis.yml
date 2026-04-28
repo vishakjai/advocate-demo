@@ -1,0 +1,47 @@
+groups:
+- name: redis.rules
+  rules:
+  - record: cmd:redis_command_call_duration_seconds_count:irate1m
+    expr: >
+      sum by (cmd,environment) (
+        irate(redis_command_call_duration_seconds_count{env="ops"}[1m])
+      )
+  - record: redis:keyspace_hits:irate1m
+    expr: irate(redis_keyspace_hits_total{env="ops"}[1m])
+  - record: redis:keyspace_misses:irate1m
+    expr: irate(redis_keyspace_misses_total{env="ops"}[1m])
+  - record: redis:net_input_bytes:irate1m
+    expr: irate(redis_net_input_bytes_total{env="ops"}[1m])
+  - record: redis:net_output_bytes:irate1m
+    expr: irate(redis_net_output_bytes_total{env="ops"}[1m])
+  - record: redis:expired_keys:irate1m
+    expr: irate(redis_expired_keys_total{env="ops"}[1m])
+  - record: redis:evicted_keys:irate1m
+    expr: irate(redis_evicted_keys_total{env="ops"}[1m])
+  - record: redis:commands_processed:irate1m
+    expr: irate(redis_commands_processed_total{env="ops"}[1m])
+  - record: redis:connections_received:irate1m
+    expr: irate(redis_connections_received_total{env="ops"}[1m])
+  - record: gitlab:redis_disconnected_slaves
+    expr: >
+      count without (fqdn, instance, job, zone) (redis_connected_slaves{env="ops"}) -
+      sum without (fqdn, instance, job, zone) (redis_connected_slaves{env="ops"}) -
+      1
+  - record: gitlab:redis_cluster_nodes:count
+    expr: count without (fqdn,instance, zone) (up{job="scrapeConfig/monitoring/prometheus-agent-redis", env="ops"})
+  - record: gitlab:redis_master
+    expr: redis_connected_slaves{env="ops"} > 1
+  - record: instance:redis_cpu_usage:rate1m
+    expr: >
+      sum by (env, environment, type, fqdn, instance, pod) (
+        rate(namedprocess_namegroup_thread_cpu_seconds_total{type=~"redis.*", groupname="redis-server", threadname="redis-server", env="ops"}[1m]) or rate(container_cpu_usage_seconds_total:labeled{type=~"redis.*", env="ops"}[1m])
+      )
+  - record: gitlab:redis_rdb_last_save_in_seconds
+    expr: min(time() - redis_rdb_last_save_timestamp_seconds{env="ops"}) by (env,environment,type)
+  - record: gitlab:redis_cluster_redirections:irate1m
+    labels:
+      type: redis_cluster_ratelimiting
+    expr: >
+      sum by (environment, redirection_type) (
+        rate(gitlab_redis_client_redirections_total{storage="cluster_rate_limiting", env="ops"}[1m])
+      )

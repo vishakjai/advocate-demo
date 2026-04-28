@@ -1,0 +1,26 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+java_binary(
+    name = "allinone_main",
+    main_class = "org.batfish.allinone.Main",
+    runtime_deps = [
+        "//projects/allinone/src/main/java/org/batfish/allinone",
+        "//projects/minesweeper",
+        "//projects/question/src/main/java/org/batfish/question",
+        "@maven//:org_apache_logging_log4j_log4j_core",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
+    ],
+)
+
+# Deprecated
+alias(
+    name = "allinone_with_minesweeper_main",
+    actual = ":allinone_main",
+)
+
+alias(
+    name = "allinone",
+    actual = "//projects/allinone/src/main/java/org/batfish/allinone",
+)

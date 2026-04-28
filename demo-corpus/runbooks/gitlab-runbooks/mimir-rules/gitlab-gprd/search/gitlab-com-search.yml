@@ -1,0 +1,77 @@
+groups:
+  - name: gitlab-com-search.rules
+    rules:
+      - alert: gitlab_search_initial_indexing_queue_backing_up
+        expr: >
+          avg by (env, environment, stage) (
+            search_advanced_bulk_cron_initial_queue_size{env="gprd"}
+          ) > 50000
+          unless on (env, environment, stage)
+          search_advanced_boolean_settings{name="elasticsearch_pause_indexing", env="gprd"} == 1
+        for: 15m
+        labels:
+          severity: s4
+          alert_type: symptom
+          feature_category: "global_search"
+          team: global_search
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Inital queue: Large number of documents waiting to be indexed by Elasticsearch"
+          environment: "{{ $labels.environment }}"
+          grafana_dashboard_id: stage-groups-global_search/stage-groups-group-dashboard-enablement-global-search
+          grafana_panel_id: "3943274755" # stableId=global-search-queue-size-overall
+          grafana_dashobard_link: >
+            https://dashboards.gitlab.net/d/stage-groups-global_search/stage-groups-group-dashboard-enablement-global-search?orgId=1&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+          description: >
+            There are over {{ $value }} documents on {{ $labels.environment }} in the initial queue waiting to be indexed for the last
+            15 minutes. This could indicate that Elasticsearch is failing. Or Sidekiq
+            cannot keep up with the number of elements being enqueued. Reach out to  #g_global_search to see what is causing this.
+      - alert: gitlab_search_incremental_indexing_queue_backing_up
+        expr: >
+          avg by (env, environment, stage) (
+            search_advanced_bulk_cron_queue_size{env="gprd"}
+          ) > 50000
+          unless on (env, environment, stage)
+          search_advanced_boolean_settings{name="elasticsearch_pause_indexing", env="gprd"} == 1
+        for: 15m
+        labels:
+          severity: s4
+          alert_type: symptom
+          feature_category: "global_search"
+          team: global_search
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Incremental queue: Large number of documents waiting to be indexed by Elasticsearch"
+          environment: "{{ $labels.environment }}"
+          grafana_dashboard_id: stage-groups-global_search/stage-groups-group-dashboard-enablement-global-search
+          grafana_panel_id: "499025569" # stableId=global-search-queue-size-overall
+          grafana_dashobard_link: >
+            https://dashboards.gitlab.net/d/stage-groups-global_search/stage-groups-group-dashboard-enablement-global-search?orgId=1&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+          description: >
+            There are over {{ $value }} documents on {{ $labels.environment }} in the incremental queue waiting to be indexed for the last
+            15 minutes. This could indicate that Elasticsearch is failing. Or Sidekiq
+            cannot keep up with the number of elements being enqueued. Reach out to  #g_global_search to see what is causing this.
+      - alert: gitlab_search_dead_queue_backing_up
+        expr: >
+          avg by (env, environment, stage) (
+            search_advanced_bulk_cron_dead_queue_size{env="gprd"}
+          ) > 50
+          unless on (env, environment, stage)
+          search_advanced_boolean_settings{name="elasticsearch_pause_indexing", env="gprd"} == 1
+        for: 15m
+        labels:
+          severity: s4
+          alert_type: symptom
+          feature_category: "global_search"
+          team: global_search
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Dead queue: Large number of documents moved to dead queue"
+          environment: "{{ $labels.environment }}"
+          grafana_dashboard_id: stage-groups-global_search/stage-groups-group-dashboard-enablement-global-search
+          grafana_panel_id: "2469854659"
+          grafana_dashobard_link: >
+            https://dashboards.gitlab.net/d/stage-groups-global_search/stage-groups-group-dashboard-enablement-global-search?orgId=1&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+          description: >
+            There are over {{ $value }} documents on {{ $labels.environment }} in the dead queue failed to be indexed for the last
+            15 minutes. This could indicate that Indexing is failing. Reach out to #g_global_search to see what is causing this.

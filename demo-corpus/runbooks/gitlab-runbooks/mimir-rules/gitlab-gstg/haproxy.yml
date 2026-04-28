@@ -1,0 +1,55 @@
+groups:
+- name: haproxy availability
+  interval: 60s
+  rules:
+  - record: instance:haproxy_availability:ratio
+    expr: >
+      sgn(avg_over_time(haproxy_process_uptime_seconds{env="gstg"}[1m]))
+  - record: backend:haproxy_backend_availability:ratio
+    expr: >
+      avg without (fqdn, instance, zone) (
+        avg_over_time(haproxy_backend_status{state="UP", env="gstg"}[1m])
+      )
+  - record: server:haproxy_server_availability:ratio
+    expr: >
+      avg without (fqdn, instance, zone, backend) (
+        avg_over_time(haproxy_server_status{state="UP", env="gstg"}[1m])
+      )
+
+- name: haproxy traffic
+  rules:
+  - record: backend_code:haproxy_server_http_responses_total:irate1m
+    expr: >
+      sum without (fqdn, instance, server, zone) (
+        irate(haproxy_server_http_responses_total{env="gstg"}[1m])
+      )
+  - record: backend_code:haproxy_server_http_responses_total:rate5m
+    expr: >
+      sum without (fqdn, instance, server, zone) (
+        rate(haproxy_server_http_responses_total{env="gstg"}[5m])
+      )
+  - record: frontend_code:haproxy_frontend_http_responses_total:irate1m
+    expr: >
+      sum without (fqdn, instance, zone) (
+        irate(haproxy_frontend_http_responses_total{env="gstg"}[1m])
+      )
+  - record: job_frontend:haproxy_frontend_bytes_in_total:irate1m
+    expr: >
+      sum without (fqdn, instance, zone) (
+        irate(haproxy_frontend_bytes_in_total{env="gstg"}[1m])
+      )
+  - record: job_frontend:haproxy_frontend_bytes_out_total:irate1m
+    expr: >
+      sum without (fqdn, instance, zone) (
+        irate(haproxy_frontend_bytes_out_total{env="gstg"}[1m])
+      )
+  - record: job_backend:haproxy_backend_response_errors_total:irate1m
+    expr: >
+      sum without (fqdn, instance, zone) (
+        irate(haproxy_backend_response_errors_total{env="gstg"}[1m])
+      )
+  - record: job_frontend:haproxy_frontend_request_errors_total:irate1m
+    expr: >
+      sum without (fqdn, instance, zone) (
+        irate(haproxy_frontend_request_errors_total{env="gstg"}[1m])
+      )

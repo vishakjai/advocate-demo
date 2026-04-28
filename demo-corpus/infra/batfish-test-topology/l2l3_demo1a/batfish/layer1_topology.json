@@ -1,0 +1,224 @@
+{
+  "edges": [
+    {
+      "node1": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/1"
+      },
+      "node2": {
+        "hostname": "host11",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host11",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/1"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/2"
+      },
+      "node2": {
+        "hostname": "host12",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host12",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/2"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/3"
+      },
+      "node2": {
+        "hostname": "host13",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host13",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/3"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/4"
+      },
+      "node2": {
+        "hostname": "host14",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host14",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/4"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/5"
+      },
+      "node2": {
+        "hostname": "host21",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host21",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/5"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/6"
+      },
+      "node2": {
+        "hostname": "host22",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host22",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/6"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/7"
+      },
+      "node2": {
+        "hostname": "host23",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host23",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/7"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/8"
+      },
+      "node2": {
+        "hostname": "host24",
+        "interfaceName": "eth0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "host24",
+        "interfaceName": "eth0"
+      },
+      "node2": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/8"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/24"
+      },
+      "node2": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/24"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/24"
+      },
+      "node2": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/24"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "router1",
+        "interfaceName": "FastEthernet1/0"
+      },
+      "node2": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/11"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch1",
+        "interfaceName": "GigabitEthernet1/0/11"
+      },
+      "node2": {
+        "hostname": "router1",
+        "interfaceName": "FastEthernet1/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "router1",
+        "interfaceName": "FastEthernet1/1"
+      },
+      "node2": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/11"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "switch2",
+        "interfaceName": "GigabitEthernet1/0/11"
+      },
+      "node2": {
+        "hostname": "router1",
+        "interfaceName": "FastEthernet1/1"
+      }
+    }
+  ]
+}

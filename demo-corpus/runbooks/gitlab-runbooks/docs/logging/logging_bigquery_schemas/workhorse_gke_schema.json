@@ -1,0 +1,427 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "archive",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "client_mode",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "content_type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "copied_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "correlation_id",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "container_id",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "docker",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "duration_ms",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "encoding",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "entry",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "environment",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "error",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "file",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "ForceQuery",
+        "type": "BOOLEAN"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "Fragment",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "Host",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "Opaque",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "Path",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "RawFragment",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "RawPath",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "RawQuery",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "Scheme",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "geoProxyBackend",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "host",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "imageresizer_content_type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "imageresizer_original_filesize",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "imageresizer_status",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "imageresizer_target_width",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "is_local",
+    "type": "BOOLEAN"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "is_multipart",
+    "type": "BOOLEAN"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "is_remote",
+    "type": "BOOLEAN"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "container_image",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "container_image_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "container_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "host",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "app",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "chart",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "deployment",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "gitlab_com_webservice_name",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "heritage",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "pod_template_hash",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "release",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "shard",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "stage",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "tier",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "type",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "master_url",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "namespace_id",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "name",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "namespace_labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "namespace_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "pod_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "pod_name",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "kubernetes",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "kubernetes_region",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "level",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "method",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "msg",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "path",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "proto",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "referrer",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_addr",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_id",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_ip",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_temp_object",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "route",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "shard",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "stage",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "status",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "subsystem",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "system",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "tag",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "temp_file_prefix",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "tier",
+    "type": "STRING"
+  },
+  {
+    "mode": "REQUIRED",
+    "name": "time",
+    "type": "TIMESTAMP"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "ttfb_ms",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "uri",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "url",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "user_agent",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "written_bytes",
+    "type": "INTEGER"
+  }
+]

@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+
+set -euf -o pipefail
+
+_BRED='\033[1;31m'
+_NORM='\033[0m'
+_CYN='\033[0;36m'
+_BCYN='\033[1;36m'
+_YEL='\033[0;33m'
+_WHT='\033[0;37m'
+_BBLK='\033[1;30m'
+_BWHT='\033[1;37m'
+
+# check if gcloud is installed
+command -v gcloud >/dev/null 2>&1 || {
+  echo >&2 "This script requires gcloud but it's not installed."
+  exit 1
+}
+
+desc="Deny all traffic for a simulated zone failure - added by $USER"
+
+usage() {
+  cat <<EOF
+Usage: $0 [-e <environment> (gstg|pre) -a <action> (deny|allow) -z <zone> -d]
+
+  -e : Environment to target, must be a non-prod env
+  -a : deny or allow traffic for the specified zone
+  -z : availability zone to target
+  -d (optional): run in dry-run mode
+
+Examples:
+
+  # Use the dry-run option to see what infra will be denied
+  $0 -e pre -z us-east1-b -a deny -d
+
+  # Deny both ingress and egress traffic in us-east1-b in PreProd
+  $0 -e pre -z us-east1-b -a deny
+
+  # Revert the deny to allow traffic
+  $0 -e pre -z us-east1-b -a allow
+EOF
+}
+
+ruleExists() {
+  local ruleName="$1"
+  local rule
+  rule=$($gcloudCmdNoDryRun compute firewall-rules list --filter="name=$ruleName" --format "value(name)")
+  [[ $rule == "" ]] && return 1 || return 0
+}
+
+networkTagExists() {
+  local instanceName="$1"
+  local tagged
+
+  tagged=$($gcloudCmdNoDryRun compute instances list --filter="tags:$networkTag AND name=$instanceName" --format "value(name)")
+  [[ $tagged == "" ]] && return 1 || return 0
+}
+
+removeFirewallRules() {
+  for rule in "$ingressRuleName" "$egressRuleName"; do
+    if ruleExists "$rule"; then
+      echo -e "${_WHT}--> Deleting firewall rule '$ingressRuleName'${_NORM}"
+      $gcloudCmd --no-user-output-enabled compute firewall-rules delete "$rule"
+    fi
+  done
+}
+
+createFirewallRules() {
+  local ruleName="$1"
+  local direction="$2"
+
+  if ! ruleExists "$ruleName"; then
+    echo -e "${_WHT}--> Creating firewall rule '$ruleName' ...${_NORM}"
+    $gcloudCmd --no-user-output-enabled compute firewall-rules create "$ruleName" --network "$networkName" --action deny --rules tcp --description="$desc" --direction="$direction" --priority=10 --target-tags="$networkTag"
+  fi
+}
+
+isExcluded() {
+  local instanceName="$1"
+  for prefix in "${prefixExclusions[@]}"; do
+    if [[ $instanceName == "${prefix}"* ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+onInstances() {
+  local instanceAction="$1"
+  local opts=("compute" "instances" "list" "--format=csv[no-heading](name,zone.basename())")
+  local instanceName instanceZone
+  $gcloudCmdNoDryRun "${opts[@]}" | while read -r line; do
+    instanceName=$(echo "$line" | cut -f1 -d,)
+    instanceZone=$(echo "$line" | cut -f2 -d,)
+
+    if [[ $instanceZone != "$zone" ]]; then
+      continue
+    fi
+
+    if isExcluded "$instanceName"; then
+      continue
+    fi
+
+    case "${instanceAction:-}" in
+    addTag)
+      networkTag "$instanceName" "$instanceZone" "add-tags"
+      ;;
+    removeTag)
+      networkTag "$instanceName" "$instanceZone" "remove-tags"
+      ;;
+    *)
+      echo "Invalid action: $instanceAction"
+      exit 1
+      ;;
+    esac
+  done
+}
+
+networkTag() {
+  local instanceName="$1"
+  local instanceZone="$2"
+  local action="$3"
+
+  case "${action:-}" in
+  add-tags)
+    if networkTagExists "$instanceName"; then
+      return
+    fi
+    ;;
+  remove-tags)
+    if ! networkTagExists "$instanceName"; then
+      return
+    fi
+    ;;
+  *)
+    echo -e "${_BRED}Invalid action: $action!${_NORM}"
+    exit 1
+    ;;
+  esac
+
+  echo -e "${_WHT}--> Running ${_BCYN}$action${_WHT} '$networkTag' on ${instanceName}${_NORM}"
+  $gcloudCmd --no-user-output-enabled compute instances "$action" --tags "$networkTag" --zone "$instanceZone" "$instanceName"
+}
+
+deny() {
+  createFirewallRules "$ingressRuleName" "INGRESS"
+  createFirewallRules "$egressRuleName" "EGRESS"
+
+  onInstances addTag
+}
+
+allow() {
+  removeFirewallRules
+  onInstances removeTag
+}
+
+main() {
+  case "${env:-}" in
+  gstg)
+    project="gitlab-staging-1"
+    prefixExclusions=(
+      "blackbox-"
+      "console-"
+      "deploy-"
+      "file-"
+      "geo-secondary-"
+      "packer-gitaly-"
+      "packer-verify-"
+      "qa-tests-runner-"
+      "runner-"
+      "sd-exporter-"
+      "teleport-"
+      "thanos-compact-"
+      "ubuntu"
+    )
+    networkName="gstg"
+    ;;
+  pre)
+    project="gitlab-pre"
+    prefixExclusions=(
+      "bastion-"
+      "console-"
+      "consul-"
+      "deploy-"
+      "fe-"
+      "gitaly-"
+      "prometheus-"
+      "sd-exporter-"
+      "thanos-compact-"
+    )
+    networkName="pre"
+    ;;
+  *)
+    echo -e "${_BRED}Invalid env: ${env:-not set}!${_NORM}"
+    echo ""
+    usage
+    exit 1
+    ;;
+  esac
+
+  if ! [[ ${zone:-} =~ us-east1-[bcd] ]]; then
+    echo -e "${_BRED}Invalid zone: ${zone:-not set}!${_NORM}"
+    echo ""
+    usage
+    exit 1
+  fi
+
+  gcloudCmd="gcloud --quiet --project $project"
+  gcloudCmdNoDryRun="$gcloudCmd"
+  if [[ ${dryRun:-} == true ]]; then
+    gcloudCmd="echo -e ${_YEL}Would run:${_NORM} $gcloudCmd"
+  fi
+
+  if [[ $($gcloudCmdNoDryRun config get-value project) == *production* ]]; then
+    echo -e "${_BRED}!! This script is not meant to be used against Production !!${_NORM}"
+    exit 1
+  fi
+
+  case "${action:-}" in
+  deny)
+    if ! [[ ${dryRun:-} == true ]]; then
+      echo -e "${_CYN}You are about to run the zone denier on $project for zone $zone${_NORM}"
+      echo "Press any key to continue ..."
+      read -rp ""
+    fi
+    deny
+    ;;
+  allow)
+    allow
+    ;;
+  *)
+    echo -e "${_BRED}Invalid action: ${action:-not set}!${_NORM}"
+    echo ""
+    usage
+    exit 1
+    ;;
+  esac
+}
+
+while getopts "h?a:e:z:d" opt; do
+  case "$opt" in
+  h | \?)
+    usage
+    exit 0
+    ;;
+  a)
+    action=${OPTARG}
+    ;;
+  e)
+    env=${OPTARG}
+    ;;
+  z)
+    zone=${OPTARG}
+    ;;
+  d)
+    dryRun=true
+    ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+ingressRuleName="deny-all-ingress-zone-failure-$zone"
+egressRuleName="deny-all-egress-zone-failure-$zone"
+networkTag="zone-failure-simulation-$zone"
+
+main "$@"

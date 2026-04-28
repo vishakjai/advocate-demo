@@ -1,0 +1,49 @@
+groups:
+- name: cloud_sql.rules
+  rules:
+  - alert: CloudSQLDatabaseDown
+    expr: stackdriver_cloudsql_database_cloudsql_googleapis_com_database_up{env="pre"} != 1
+    for: 5m
+    labels:
+      pager: pagerduty
+      severity: s2
+      alert_type: cause
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      title: CloudSQL database {{ $labels.database_id }} is down
+      description: The CloudSQL database {{ $labels.database_id }} appears to be down.
+      runbook: cloud-sql/alerts/CloudSQLDatabaseDown/
+  - alert: CloudSQLDatabaseFailedCreate
+    expr: stackdriver_cloudsql_database_cloudsql_googleapis_com_database_instance_state{env="pre", state="FAILED"} == 1
+    for: 5m
+    labels:
+      severity: s3
+      alert_type: cause
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      title: CloudSQL database instance {{ $labels.database_id }} has failed to create
+      description: The creation of the CloudSQL database instance {{ $labels.database_id }} appears to have failed.
+      runbook: cloud-sql/cloud-sql/
+  - alert: CloudSQLDatabaseSuspended
+    expr: stackdriver_cloudsql_database_cloudsql_googleapis_com_database_instance_state{env="pre", state="SUSPENDED"} == 1
+    for: 5m
+    labels:
+      pager: pagerduty
+      severity: s2
+      alert_type: cause
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      title: CloudSQL database instance {{ $labels.database_id }} is suspended
+      description: The CloudSQL database instance {{ $labels.database_id }} appears to be suspended.
+      runbook: cloud-sql/cloud-sql/
+  - alert: CloudSQLDatabaseUnknownState
+    expr: stackdriver_cloudsql_database_cloudsql_googleapis_com_database_instance_state{env="pre", state="UNKNOWN_STATE"} == 1
+    for: 5m
+    labels:
+      severity: s4
+      alert_type: cause
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      title: CloudSQL database instance {{ $labels.database_id }} state unknown
+      description: The state of the CloudSQL database instance {{ $labels.database_id }} could not be retrieved.
+      runbook: cloud-sql/cloud-sql/

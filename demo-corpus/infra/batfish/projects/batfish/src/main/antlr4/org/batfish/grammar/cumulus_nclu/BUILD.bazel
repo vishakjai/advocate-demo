@@ -1,0 +1,21 @@
+load("@rules_java//java:defs.bzl", "java_library")
+load("//skylark:antlr.bzl", "antlr_grammar")
+
+package(default_visibility = ["//visibility:public"])
+
+antlr_grammar(
+    name = "cumulus_nclu_generated",
+    srcs = glob(["*.g4"]),
+    package = "org.batfish.grammar.cumulus_nclu",
+)
+
+java_library(
+    name = "cumulus_nclu",
+    srcs = [":cumulus_nclu_generated"],
+    javacopts = ["-XepDisableAllChecks"],
+    deps = [
+        "//projects/batfish/src/main/java/org/batfish/grammar/cumulus_nclu/parsing:cumulus_nclu_base_parser",
+        "//projects/common:parser_common",
+        "@maven//:org_antlr_antlr4_runtime",
+    ],
+)

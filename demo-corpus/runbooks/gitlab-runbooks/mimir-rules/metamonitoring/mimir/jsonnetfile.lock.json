@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "grafana-builder"
+        }
+      },
+      "version": "12eea97fe8a8d081231eb2d98d9c7b114b193dc6",
+      "sum": "TWpxm5vPO23V3hoF3pdwGs1NvR+PQce9baN716mJq+4="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "mixin-utils"
+        }
+      },
+      "version": "12eea97fe8a8d081231eb2d98d9c7b114b193dc6",
+      "sum": "zVkvwae4zHP6xeIoDvde/wldI6ClprFjnk50mMD9/z4="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://gitlab.com/gitlab-com/gl-infra/monitoring-mixins.git",
+          "subdir": "mixins/mimir"
+        }
+      },
+      "version": "7332c62721a5979108b7b0e5a8eacc77903b5e11",
+      "sum": "MXrQsS4clmcHe+SpHR9XBqiDrz0y0gsXVdr3i5gjWLI="
+    }
+  ],
+  "legacyImports": false
+}

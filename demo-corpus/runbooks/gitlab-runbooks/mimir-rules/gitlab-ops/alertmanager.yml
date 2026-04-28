@@ -1,0 +1,45 @@
+groups:
+- name: Alertmanager
+  rules:
+  - alert: AlertmanagerNotificationsFailing
+    expr: >
+      sum by (integration) (
+        increase(alertmanager_notifications_failed_total{integration!="webhook", env="ops"}[5m])
+      ) > 4
+    labels:
+      pager: pagerduty
+      severity: s1
+      alert_type: cause
+      type: alertmanager
+    annotations:
+      grafana_datasource_id: mimir-gitlab-ops
+      title: Alertmanager is failing sending notifications
+      runbook: monitoring/alerts/AlertmanagerNotificationsFailing/
+      description: Alertmanager is seeing errors for the {{$labels.integration}} integration.
+  - alert: AlertmanagerWebhookNotificationsFailing
+    expr: >
+      sum by (integration) (
+        increase(alertmanager_notifications_failed_total{integration="webhook", env="ops"}[5m])
+      ) > 10
+    for: 10m
+    labels:
+      pager: pagerduty
+      severity: s2
+      alert_type: cause
+      type: alertmanager
+    annotations:
+      grafana_datasource_id: mimir-gitlab-ops
+      title: Alertmanager is failing sending notifications for the webhook integration
+      runbook: monitoring/alerts/AlertmanagerNotificationsFailing/
+      description: Alertmanager is seeing errors for the webhook integration, check https://console.cloud.google.com/functions/details/us-central1/alertManagerBridge?env=gen1&project=gitlab-infra-automation
+  - alert: SnitchHeartBeat
+    # Fires as long as there are no notification failures on any alertmanager.
+    expr: sum(increase(alertmanager_notifications_failed_total{integration="pagerduty", env="ops"}[1h])) == bool 0 > 0
+    labels:
+      # Fake env for routing to the correct snitch token.
+      env: alertmanager-notifications
+      severity: s4
+      alert_type: heartbeat
+    annotations:
+      runbook: monitoring/alertmanager-notification-failures/
+      title: SnitchHeartBeat

@@ -1,0 +1,6 @@
+# This file should contain dependency versions not managed directly by mise
+# Use Renovate annotation comments to manage dependencies. Renovate is configured
+# to read this file automatically.
+
+variables:
+  GL_CATALOG_IMPORTER_VERSION: v2.9.6  # datasource=docker depName=incidentio/catalog-importer

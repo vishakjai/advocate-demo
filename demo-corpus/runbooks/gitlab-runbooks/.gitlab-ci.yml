@@ -1,0 +1,984 @@
+---
+include:
+  # Import GL_ASDF_* variables to match versions declared in ASDF
+  - local: .gitlab-ci-asdf-versions.yml
+  - local: .gitlab-ci-other-versions.yml
+
+  # This template should be included in all Infrastructure projects.
+  # It includes standard checks, gitlab-scanners, validations and release processes
+  # common to all projects using this template library.
+  # see https://gitlab.com/gitlab-com/gl-infra/common-ci-tasks/-/blob/main/templates/standard-build/README.md
+  - component: $CI_SERVER_FQDN/gitlab-com/gl-infra/common-ci-tasks/standard-build@v3.19
+    inputs:
+      mirror_instance: ops.gitlab.net
+
+  # Merge request review tasks
+  # see https://gitlab.com/gitlab-com/gl-infra/common-ci-tasks/-/blob/main/danger.md
+  - component: $CI_SERVER_FQDN/gitlab-com/gl-infra/common-ci-tasks/danger@v3.19
+
+  # Docker build tasks
+  # see https://gitlab.com/gitlab-com/gl-infra/common-ci-tasks/-/blob/main/docker.md
+  - component: $CI_SERVER_FQDN/gitlab-com/gl-infra/common-ci-tasks/docker@v3.19
+
+  # jsonnet-fmt
+  # see https://gitlab.com/gitlab-com/gl-infra/common-ci-tasks/-/blob/main/jsonnetfmt.md
+  - component: $CI_SERVER_FQDN/gitlab-com/gl-infra/common-ci-tasks/jsonnetfmt@v3.19
+stages:
+  - build
+  - release
+  - prepare
+  - validate
+  - test
+  - deploy
+  - scheduled
+  - renovate_bot
+
+################
+# Variables
+################
+
+variables:
+  BUNDLER_VERSION: 2.4.12
+  GOLANG_IMAGE: golang:${GL_ASDF_GOLANG_VERSION}
+  COMMON_TASK_VALIDATIONS_EXCLUDES_REGEXP: "test/lib/shunit2|vendor"
+  SHELLCHECK_ARGS: "-e SC1090,SC1091,SC2002"
+
+.id-tokens: &id-tokens
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: https://vault.gitlab.net
+
+################
+# Rules
+################
+
+.ruby-patterns: &ruby-patterns
+  - "**/*.rb"
+  - "Gemfile"
+  - "Gemfile.lock"
+
+.pingdom-patterns: &pingdom-patterns
+  - pingdom/go.mod
+  - pingdom/go.sum
+  - pingdom/pingdom.go
+  - pingdom/pingdom.yml
+
+.avoid-stage-group-check: &avoid-stage-group-check-rule
+  if: $CHECK_STAGE_GROUPS == "1"
+  when: never
+
+.avoid-downstream-generation-pipelines:
+  &avoid-downstream-generation-pipelines-rule
+  if: ($GENERATE_SERVICE_MATURITY_MANIFEST == "1") || ($GENERATE_TAMLAND_SATURATION_MANIFEST == "1")
+  when: never
+
+.avoid-schedule: &avoid-schedule-rule
+  if: $CI_PIPELINE_SOURCE == "schedule"
+  when: never
+
+.avoid-merge-train: &avoid-merge-train-rule
+  if: $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+  when: never
+
+.if-merge-request: &if-merge-request-rule
+  if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+.if-main-branch: &if-main-branch-rule
+  if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+.if-tag: &if-tag-rule
+  if: $CI_COMMIT_TAG
+
+.gitlab-com-only: &gitlab-com-only-rule
+  if: $CI_API_V4_URL != "https://gitlab.com/api/v4"
+  when: never
+
+.ops-gitlab-net-only: &ops-gitlab-net-only-rule
+  if: $CI_API_V4_URL != "https://ops.gitlab.net/api/v4"
+  when: never
+
+# Regular test jobs that run on merge requests or master should extend this
+# However, if those jobs define their own rules, they need to make sure to include
+# the anchors above to avoid running on schedules or when triggered by an external
+# pipeline to run a specific job.
+.default-job-rules:
+  rules:
+    # by default, don't create a job when triggered with `CHECK_STAGE_GROUPS` set
+    # in this case we'll only want to run the `check-stage-groups` job.
+    - *avoid-stage-group-check-rule
+    - *avoid-downstream-generation-pipelines-rule
+    - *avoid-schedule-rule
+
+.default-job:
+  rules:
+    - !reference [.default-job-rules, rules]
+    - when: always
+
+workflow:
+  rules:
+    # For merge requests, create a pipeline.
+    - if: $CI_MERGE_REQUEST_IID
+    # For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # For tags, create a pipeline.
+    - if: $CI_COMMIT_TAG
+    # When triggered from another pipeline, create a pipeline
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
+    # Allow manually triggering pipelines
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+
+################
+# Default job, inherited in all other jobs
+################
+
+default:
+  image: ${CI_REGISTRY_IMAGE}:latest
+  tags:
+    - gitlab-org
+
+################
+# Mirroring
+################
+
+# Disable the check remote mirror job in MRs, the mirror pipeline only runs for the main branch.
+# We only want the notify_mirror_source job from the mirror pipeline.
+check_remote:ops.gitlab.net:
+  rules:
+    - when: never
+
+################
+# Docker image
+################
+
+.container_builds:
+  stage: build
+  extends:
+    - .docker_buildx_base
+
+container-image:build:
+  extends:
+    - .container_builds
+  variables:
+    DOCKER_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+  rules:
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - .gitlab-ci-asdf-versions.yml
+          - .gitlab-ci.yml
+          - Dockerfile
+          - jsonnetfile.json
+          - jsonnetfile.lock.json
+
+container-image:latest:
+  extends:
+    - .container_builds
+  variables:
+    DOCKER_DESTINATION: ${CI_REGISTRY_IMAGE}:latest
+  rules:
+    - *avoid-schedule-rule
+    - *if-main-branch-rule
+
+container-image:tagged:
+  extends:
+    - .container_builds
+  variables:
+    DOCKER_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
+  rules:
+    - *if-tag-rule
+
+################
+# Common checks
+################
+
+editorconfig_check:
+  rules:
+    - *gitlab-com-only-rule
+    - *avoid-merge-train-rule
+    - *if-merge-request-rule
+
+yamllint:
+  rules:
+    - *gitlab-com-only-rule
+    - *avoid-merge-train-rule
+    - *if-merge-request-rule
+
+################
+# Linting
+################
+
+markdownlint:
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - .markdownlint.yml
+          - package.json
+          - "**/*.md"
+  script:
+    - npm install
+    - npm run markdownlint README.md
+    # this will only run markdownlint against the changes made in the current branch, to avoid complaints about random files not touched
+    - cat <(git diff --name-only HEAD -- "*.md") <(git diff --name-only HEAD origin/master -- "*.md") | xargs npm run markdownlint
+
+rubocop:
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths: *ruby-patterns
+  script:
+    - gem install bundler --no-document -v $BUNDLER_VERSION
+    - bundle install --with=test
+    # this will only run rubocop against the changes made in the current branch, to avoid complaints about random files not touched
+    # - cat <(git diff --name-only HEAD) <(git diff --name-only HEAD origin/master) | xargs bundle exec rubocop --only-recognized-file-types
+    - bundle exec rubocop
+
+################
+# Jsonnet
+################
+
+ensure-generated-content-up-to-date:
+  extends:
+    - .default-job
+    - .jsonnet-cache
+  stage: test
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *if-merge-request-rule
+  script:
+    - make jsonnet-bundle ensure-generated-content-up-to-date
+
+test-jsonnet:
+  stage: test
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - when: always
+  script:
+    - make jsonnet-bundle test-jsonnet
+
+################
+# Dashboards / Services
+################
+
+# Cache the jsonnet vendor bundle for faster builds
+.jsonnet-cache: &jsonnet-cache
+  cache:
+    - key:
+        files:
+          - jsonnetfile.lock.json
+      paths:
+        - vendor
+    - key: cache-v2-$CI_COMMIT_REF_SLUG
+      paths:
+        - .cache
+
+.dashboards:
+  extends:
+    - .id-tokens
+    - .jsonnet-cache
+  environment:
+    name: ops
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *avoid-merge-train-rule
+    - *if-merge-request-rule
+    - *if-main-branch-rule
+    - *if-tag-rule
+  secrets:
+    GRAFANA_API_TOKEN:
+      file: false
+      vault: ${VAULT_SECRETS_PATH}/ops/grafana/api_token@ci
+  before_script:
+    - make jsonnet-bundle
+
+prepare-service-health-dashboard-json:
+  extends:
+    - .id-tokens
+    - .jsonnet-cache
+  stage: prepare
+  environment:
+    name: ops
+    action: prepare
+  rules:
+    - *avoid-stage-group-check-rule
+    - *avoid-schedule-rule
+    - *gitlab-com-only-rule
+    - *if-merge-request-rule
+    - *if-main-branch-rule
+    - *if-tag-rule
+    - if: $GENERATE_SERVICE_MATURITY_MANIFEST == "1"
+  secrets:
+    GRAFANA_API_TOKEN:
+      file: false
+      vault: ${VAULT_SECRETS_PATH}/ops/grafana/api_token@ci
+  script:
+    - ./dashboards/generate-dashboards.sh
+    - ./dashboards/generate-service-health-dashboards-metadata-json.sh
+    - mkdir -p service-health-dashboard-manifest/generated
+    - cp dashboards/autogenerated-service-health-dashboards.json service-health-dashboard-manifest/
+    - cp -r dashboards/generated service-health-dashboard-manifest
+  artifacts:
+    expose_as: service health dashboard manifest
+    expire_in: 1 day
+    paths:
+      - service-health-dashboard-manifest/
+
+validate-service-catalog-schema:
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_IID
+      changes:
+        paths:
+          - services/service-catalog.yml
+          - services/teams.yml
+  script:
+    - npm install
+    - ./scripts/compile_jsonnet.rb ./services/raw-catalog.jsonnet > ./services/service_catalog.json
+    - npm run validate-service-catalog-schema -- -s ./services/service-catalog-schema.json -d ./services/service_catalog.json
+
+validate-service-catalog:
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - services/**/*
+  script:
+    - make validate-service-catalog
+
+check-stage-groups:
+  extends:
+    - .jsonnet-cache
+  stage: test
+  needs: []
+  rules:
+    - *gitlab-com-only-rule
+    - if: $CHECK_STAGE_GROUPS == "1"
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - services/stage-group-mapping.jsonnet
+    - <<: *if-merge-request-rule
+      when: manual
+      allow_failure: true
+  script:
+    - make jsonnet-bundle update-feature-categories-ci
+    - git diff --exit-code
+
+ensure-maturity-model-minimum-level:
+  stage: test
+  needs:
+    - job: prepare-service-health-dashboard-json
+      artifacts: true
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *if-merge-request-rule
+  script:
+    - make jsonnet-bundle
+    - cp service-health-dashboard-manifest/autogenerated-service-health-dashboards.json dashboards/
+    - scripts/validate-maturity-model
+
+generate-service-maturity-manifest:
+  stage: test
+  needs:
+    - job: prepare-service-health-dashboard-json
+      artifacts: true
+  rules:
+    - *avoid-stage-group-check-rule
+    - *gitlab-com-only-rule
+    - if: $GENERATE_SERVICE_MATURITY_MANIFEST == "1"
+    - *if-merge-request-rule
+  script:
+    - make jsonnet-bundle
+    - cp service-health-dashboard-manifest/autogenerated-service-health-dashboards.json dashboards/
+    - mkdir -p service-maturity-manifest
+    - ./scripts/compile_jsonnet.rb ./service-maturity/maturity.jsonnet > ./service-maturity-manifest/service_maturity.yml
+  artifacts:
+    expose_as: service maturity manifest
+    expire_in: 1 day
+    paths:
+      - service-maturity-manifest/
+
+generate-tamland-saturation-manifest:
+  stage: test
+  needs: []
+  rules:
+    - *avoid-stage-group-check-rule
+    - if: $GENERATE_TAMLAND_SATURATION_MANIFEST == "1"
+    - *gitlab-com-only-rule
+    - *if-merge-request-rule
+  script:
+    - make jsonnet-bundle
+    - mkdir -p tamland-saturation-manifest
+    - ./scripts/compile_jsonnet.rb ./metrics-catalog/saturation/tamland.jsonnet > ./tamland-saturation-manifest/saturation.json
+  artifacts:
+    expose_as: Tamland saturation manifest
+    expire_in: 1 day
+    paths:
+      - tamland-saturation-manifest/
+
+rspec:
+  stage: test
+  needs:
+    - job: prepare-service-health-dashboard-json
+      artifacts: true
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - "**/*.rb"
+          - "**/*.jsonnet"
+          - "**/*.libsonnet"
+          - ".ruby-version"
+          - "Gemfile"
+          - "Gemfile.lock"
+  script:
+    - make jsonnet-bundle
+    - gem install bundler --no-document -v $BUNDLER_VERSION
+    - bundle install --with=test
+    - cp service-health-dashboard-manifest/autogenerated-service-health-dashboards.json dashboards/
+    - bundle exec rspec
+
+test-shunit:
+  extends: .default-job
+  stage: test
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+  script:
+    - make jsonnet-bundle test-shunit
+
+test-dashboards:
+  extends:
+    - .dashboards
+    - .jsonnet-cache
+  stage: test
+  environment:
+    action: verify
+  needs:
+    - job: prepare-service-health-dashboard-json
+      artifacts: true
+  rules:
+    - !reference [.dashboards, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - services/**/*
+          - dashboards/**/*
+          - lib/monitored_services.rb
+  script:
+    - cp service-health-dashboard-manifest/autogenerated-service-health-dashboards.json dashboards/
+    - cp -r service-health-dashboard-manifest/generated dashboards
+    - dashboards/upload.sh -D
+    - make validate-service-dashboards
+
+test-service-catalog-schema:
+  extends: .default-job
+  stage: test
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *if-main-branch-rule
+    - *if-merge-request-rule
+  script:
+    - npm install
+    - ./scripts/compile_jsonnet.rb ./services/raw-catalog.jsonnet > ./services/service_catalog.json
+    - npm run test-service-catalog-schema -- -s ./services/service-catalog-schema.json -d ./services/service_catalog.json
+
+verify:
+  extends: .default-job
+  stage: test
+  needs:
+    - job: prepare-service-health-dashboard-json
+      artifacts: true
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+  script:
+    - cp service-health-dashboard-manifest/autogenerated-service-health-dashboards.json dashboards/
+    - make verify
+
+deploy-dashboards:
+  extends:
+    - .dashboards
+    - .jsonnet-cache
+  stage: deploy
+  needs:
+    - job: prepare-service-health-dashboard-json
+      artifacts: true
+    - job: test-dashboards
+      artifacts: false
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *if-main-branch-rule
+  script:
+    - cp service-health-dashboard-manifest/autogenerated-service-health-dashboards.json dashboards/
+    - cp -r service-health-dashboard-manifest/generated dashboards
+    - dashboards/ensure-grafana-folders.sh
+    - dashboards/upload.sh
+    - dashboards/delete-orphaned-dashboards.sh
+    - dashboards/tag-unmanaged-dashboards.sh
+
+reconcile-service-catalog-labels:
+  extends: .id-tokens
+  stage: deploy
+  secrets:
+    GITLAB_RECONCILE_SERVICE_LABELS_TOKEN:
+      file: false
+      vault: access_tokens/gitlab-com/gitlab-com/gl-infra/_group_access_tokens/runbooks-label-reconciler/token@ci
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - <<: *if-main-branch-rule
+      changes:
+        paths:
+          - services/service-catalog.yml
+  script:
+    - ./scripts/reconcile_service_catalog_labels.rb
+
+################
+# Elasticsearch / Kibana
+################
+
+validate-kibana-urls:
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - "**/*.md"
+  script:
+    - make validate-kibana-urls
+
+.elastic:
+  extends: .id-tokens
+
+
+################
+# Pingdom
+################
+
+.pingdom:
+  extends: .id-tokens
+  image: $GOLANG_IMAGE
+  secrets:
+    PINGDOM_API_TOKEN:
+      file: false
+      vault: ${VAULT_SECRETS_PATH}/shared/pingdom/api_token@ci
+  before_script:
+    - cd pingdom
+    - go build
+
+dry-run-pingdom-checks:
+  extends: .pingdom
+  stage: test
+  needs: []
+  script:
+    - ./pingdom --dry-run
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths: *pingdom-patterns
+
+deploy-pingdom-checks:
+  extends: .pingdom
+  stage: deploy
+  needs: []
+  script:
+    - ./pingdom
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *avoid-schedule-rule
+    - <<: *if-main-branch-rule
+      changes:
+        paths: *pingdom-patterns
+
+################
+# Alertmanager
+################
+
+test-alert-templates:
+  stage: test
+  needs: []
+  image: $GOLANG_IMAGE
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-schedule-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - alertmanager/templates/**/*
+  script:
+    - make test-alert-templates
+
+validate-alerts:
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - docs/**/*
+          - mimir-rules/**/*
+          - services/**/*
+          - scripts/validate-alerts
+  script:
+    - make validate-alerts
+
+test-alertmanager:
+  extends: .default-job
+  stage: test
+  needs: []
+  script:
+    - make test-alertmanager
+
+update-alertmanager:
+  extends:
+    - .id-tokens
+    - .gke-cluster-auth
+  stage: deploy
+  needs:
+    - job: test-alertmanager
+  environment: ops
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *ops-gitlab-net-only-rule
+    - *if-main-branch-rule
+  tags:
+    - k8s-workloads
+  secrets:
+    ALERTMANAGER_SECRETS_FILE:
+      file: true
+      vault: ${VAULT_SECRETS_PATH}/ops/alertmanager/secrets@ci
+  variables:
+    ENVIRONMENT: ops
+    GKE_CLUSTER: ops-gitlab-gke
+    GOOGLE_PROJECT: gitlab-ops
+    KUBE_NAMESPACE: monitoring
+    LOCATION: us-east1
+    VAULT_KUBERNETES_ROLE: alertmanager-edit
+  script:
+    - make alertmanager/alertmanager.yml
+    - kubectl apply --namespace "${KUBE_NAMESPACE}" --filename alertmanager/k8s_alertmanager_secret.yaml
+
+.gke-cluster-auth:
+  extends: .id-tokens
+  variables:
+    KUBE_NAMESPACE: default
+    VAULT_KUBERNETES_ROLE: prometheus-rules-view
+  before_script:
+    - kube_context="gke_${GOOGLE_PROJECT}_${LOCATION}_${GKE_CLUSTER}"
+    - VAULT_TOKEN="$(vault write -field=token "auth/${VAULT_AUTH_PATH}/login" role="${VAULT_AUTH_ROLE}" jwt="${VAULT_ID_TOKEN}")"; export VAULT_TOKEN
+    - kube_token="$(vault write -field=service_account_token "kubernetes/${GKE_CLUSTER_VAULT:-${GKE_CLUSTER}}/creds/${VAULT_KUBERNETES_ROLE}" kubernetes_namespace="${KUBE_NAMESPACE}" ttl=30m)"
+    - kubectl config set-credentials "${VAULT_KUBERNETES_ROLE}" --token "${kube_token}"
+    - gke_endpoint="$(vault kv get -mount shared -field endpoint "kubernetes/clusters/${ENVIRONMENT}/${GKE_CLUSTER}")"
+    - gke_ca_cert="$(vault kv get -mount shared -field ca_cert "kubernetes/clusters/${ENVIRONMENT}/${GKE_CLUSTER}")"
+    - kubectl config set-cluster "${kube_context}" --server="${gke_endpoint}"
+    - kubectl config set "clusters.${kube_context}.certificate-authority-data" "$(echo "${gke_ca_cert}" | base64)"
+    - kubectl config set-context "${kube_context}" --cluster "${kube_context}" --user "${VAULT_KUBERNETES_ROLE}"
+    - kubectl config use-context "${kube_context}"
+
+.mimir-query-auth:
+  secrets:
+    MIMIR_API_USER:
+      file: false
+      vault: shared/observability/tenants/runbooks/username@k8s
+    MIMIR_API_KEY:
+      file: false
+      vault: shared/observability/tenants/runbooks/password@k8s
+
+test-periodic-queries:
+  extends:
+    - .mimir-query-auth
+    - .id-tokens
+  stage: test
+  needs: []
+  rules:
+    - *avoid-schedule-rule
+    - *avoid-stage-group-check-rule
+    - *avoid-downstream-generation-pipelines-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - libsonnet/**/*
+          - periodic-queries/*
+          - lib/periodic_queries.rb
+          - lib/periodic_queries/**/*
+    - <<: *if-merge-request-rule
+      when: manual
+      allow_failure: true
+  script:
+    - export PERIODIC_QUERY_PROMETHEUS_AUTH_HEADER="Basic $(echo -n "${MIMIR_API_USER}:${MIMIR_API_KEY}" | base64)"
+    - gem install bundler --no-document -v $BUNDLER_VERSION
+    - bundle install
+    - bundle exec scripts/perform-periodic-queries.rb -n
+
+publish-periodic-queries:
+  extends:
+    - .mimir-query-auth
+    - .id-tokens
+  stage: deploy
+  rules:
+    - if: $PERIODIC_QUERY_PUBLISH == "1"
+  tags:
+    - k8s-workloads
+  script:
+    - export PERIODIC_QUERY_PROMETHEUS_AUTH_HEADER="Basic $(echo -n "${MIMIR_API_USER}:${MIMIR_API_KEY}" | base64)"
+    - gem install bundler --no-document -v $BUNDLER_VERSION
+    - bundle install
+    - bundle exec scripts/perform-periodic-queries.rb
+  artifacts:
+    expose_as: thanos query results
+    paths:
+      - periodic-query-results/
+
+##########
+# Mimir
+##########
+
+.mimir:
+  variables:
+    MIMIR_ADDRESS: https://mimir-internal.ops.gke.gitlab.net
+
+validate-mimir-rules:
+  stage: validate
+  extends: .mimir
+  rules:
+    - *avoid-merge-train-rule
+    - <<: *if-merge-request-rule
+      changes:
+        paths:
+          - mimir-rules/**/*
+  script:
+    - |
+      for dir in $(find mimir-rules -mindepth 1 -maxdepth 1 -type d); do
+        tenant=$(basename ${dir})
+        printf "Checking rules for tenant: ${tenant}\n"
+        mimirtool rules check --rule-dirs="${dir}"
+      done
+
+# Disable until work on jsonnet is completed.
+deploy-mimir-rules:
+  stage: deploy
+  environment: ops
+  extends:
+    - .mimir
+    - .id-tokens
+  secrets:
+    MIMIR_API_USER:
+      vault: ops-gitlab-net/gitlab-com/runbooks/ops/mimir/username@ci
+      file: false
+    MIMIR_API_KEY:
+      vault: ops-gitlab-net/gitlab-com/runbooks/ops/mimir/token@ci
+      file: false
+  rules:
+    - *ops-gitlab-net-only-rule
+    - if: $TASK_DEPLOY_MIMIR_RULES == "1"
+      when: always
+    - <<: *if-main-branch-rule
+      changes:
+        paths:
+          - mimir-rules/**/*
+  script:
+    - |
+      for dir in $(find mimir-rules -mindepth 1 -maxdepth 1 -type d); do
+        tenant=$(basename ${dir})
+        printf "Deploying rules for tenant: ${tenant}\n"
+        mimirtool rules sync --rule-dirs="${dir}" --id="${tenant}"
+      done
+
+commit-and-push-feature-categories-update:
+  extends:
+    - .jsonnet-cache
+  stage: deploy
+  rules:
+    - if: $UPDATE_FEATURE_CATEGORIES == "1"
+  script:
+    - git config user.email ops@ops.gitlab.net
+    - git config user.name ops-gitlab-net
+    - ./scripts/commit-and-push-feature-categories-update.sh
+
+pages:
+  image: python:3.14
+  stage: release
+  script:
+    - mkdir -p public
+    - pip install -r requirements.txt
+    - generate-schema-doc --config examples_as_yaml=true --config expand_buttons=true services/service-catalog-schema.json public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"'
+
+##########
+# Incident.io
+##########
+
+.incident-io:
+  extends: .id-tokens
+  image:
+    name: incidentio/catalog-importer:${GL_CATALOG_IMPORTER_VERSION}
+    entrypoint: [""]
+  secrets:
+    INCIDENT_API_KEY:
+      file: false
+      vault: ${VAULT_SECRETS_PATH}/shared/incident-io/api_token@ci
+  before_script:
+    - cd services
+    - apk add --no-cache yq
+
+validate-incident-io-service-catalog:
+  extends: .incident-io
+  stage: validate
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *avoid-merge-train-rule
+    - *if-merge-request-rule
+  script:
+    - catalog-importer validate --config incident-io-importer.jsonnet
+    - catalog-importer sync --config incident-io-importer.jsonnet --dry-run --source-repo-url https://gitlab.com/gitlab-com/runbooks/-/blob/master/services/incident-io-importer.jsonnet
+
+sync-incident-io-service-catalog:
+  extends: .incident-io
+  stage: deploy
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *gitlab-com-only-rule
+    - *avoid-merge-train-rule
+    - *if-main-branch-rule
+  script:
+    - catalog-importer sync --api-key $INCIDENT_API_KEY --config incident-io-importer.jsonnet --source-repo-url https://gitlab.com/gitlab-com/runbooks/-/blob/master/services/incident-io-importer.jsonnet
+
+##########
+# Metrics catalog generation
+##########
+
+.metrics-catalog-patterns: &metrics-catalog-patterns
+  - metrics-catalog/*
+  - reference-architectures/get-hybrid/src/*
+  - reference-architectures/default-overrides/*
+  - mixins-monitoring/*
+  - scripts/generate-reference-architecture-config.sh
+  - scripts/ensure-jsonnet-tool.sh
+  - scripts/ensure-mixtool.sh
+  - libsonnet/*
+
+# Build an image, anytime something is pushed to main
+build-oci-artifact:latest:
+  stage: deploy
+  variables:
+    DOCKER_DESTINATION: ${CI_REGISTRY_IMAGE}/metrics-catalog-config:dev-${CI_COMMIT_SHORT_SHA}
+  rules:
+    - *avoid-schedule-rule
+    - <<: *if-main-branch-rule
+      changes:
+        paths: *metrics-catalog-patterns
+  script:
+    - ./scripts/ci-create-and-push-image.sh
+
+# Also build an image, anytime we're doing a tag push
+build-oci-artifact:tagged:
+  stage: deploy
+  variables:
+    DOCKER_DESTINATION: ${CI_REGISTRY_IMAGE}/metrics-catalog-config:${CI_COMMIT_TAG}
+  rules:
+    - <<: *if-tag-rule
+      changes:
+        paths: *metrics-catalog-patterns
+  script:
+    - ./scripts/ci-create-and-push-image.sh
+
+##########
+# Astro
+##########
+
+.vault-auth-gcp:
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: https://vault.gitlab.net
+  variables:
+    GOOGLE_PROJECT: gitlab-production
+    VAULT_GCP_IMPERSONATED_ACCOUNT: ${GOOGLE_PROJECT}--runbooks-ci
+  secrets:
+    # Generate a temporary OAuth token
+    CLOUDSDK_AUTH_ACCESS_TOKEN:
+      file: false
+      vault:
+        engine:
+          name: generic
+          path: gcp
+        field: token
+        path: impersonated-account/${VAULT_GCP_IMPERSONATED_ACCOUNT}/token
+
+astro-build:
+  stage: build
+  needs: []
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-schedule-rule
+    - *gitlab-com-only-rule
+    - *if-merge-request-rule
+    - *if-main-branch-rule
+  script:
+    - cd astro
+    - npm install
+    - ./astro.sh build
+  allow_failure: true
+  artifacts:
+    expose_as: astro static site
+    expire_in: 1 day
+    paths:
+      - astro/dist
+
+astro-deploy:
+  extends: .vault-auth-gcp
+  stage: deploy
+  needs:
+    - job: astro-build
+      artifacts: true
+  rules:
+    - !reference [.default-job-rules, rules]
+    - *avoid-schedule-rule
+    - *gitlab-com-only-rule
+    - *if-main-branch-rule
+  script:
+    - gcloud storage rsync --recursive --delete-unmatched-destination-objects astro/dist gs://runbooks.gitlab-static.net
+  allow_failure: true

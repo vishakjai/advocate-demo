@@ -1,0 +1,100 @@
+groups:
+- name: Rails mtail
+  interval: 1m
+  rules:
+  - record: instance:rails_requests_started:rate1m
+    expr: sum(rate(rails_requests_started{env="gstg"}[1m])) without (verb)
+  - record: status:rails_requests_completed_seconds:p50
+    expr: >
+      histogram_quantile(0.5,
+        sum without (fqdn,instance,node,pod,pod_template_hash) (
+          rate(rails_requests_completed_seconds_bucket{env="gstg"}[1m])
+        )
+      )
+  - record: status:rails_requests_completed_seconds:p95
+    expr: >
+      histogram_quantile(0.95,
+        sum without (fqdn,instance,node,pod,pod_template_hash) (
+          rate(rails_requests_completed_seconds_bucket{env="gstg"}[1m])
+        )
+      )
+
+- name: Rails Transactions 1m
+  interval: 1m
+  rules:
+  # Request data, per controller/action.
+  - record: controller_action:gitlab_transaction_duration_seconds_count:rate1m
+    expr: >
+      sum without (fqdn,instance,node,pod,pod_template_hash) (
+        rate(gitlab_transaction_duration_seconds_count{env="gstg"}[1m])
+      )
+  - record: controller_action:gitlab_transaction_duration_seconds_sum:rate1m
+    expr: >
+      sum without (fqdn,instance,node,pod,pod_template_hash) (
+        rate(gitlab_transaction_duration_seconds_sum{env="gstg"}[1m])
+      )
+  - record: controller_action:gitlab_transaction_duration_seconds:p95
+    expr: >
+      histogram_quantile(0.95,
+        sum without (fqdn,instance,node,pod,pod_template_hash) (
+          rate(gitlab_transaction_duration_seconds_bucket{env="gstg"}[1m])
+        )
+      )
+  - record: controller_action:gitlab_transaction_duration_seconds:p99
+    expr: >
+      histogram_quantile(0.99,
+        sum without (fqdn,instance,node,pod,pod_template_hash) (
+          rate(gitlab_transaction_duration_seconds_bucket{env="gstg"}[1m])
+        )
+      )
+  # Request data, across the board.
+  - record: job_environment:gitlab_transaction_duration_seconds_sum:rate1m
+    expr: >
+      sum without (controller,action) (
+        controller_action:gitlab_transaction_duration_seconds_sum:rate1m{env="gstg"}
+      )
+
+- name: Rails Transactions 5m
+  interval: 1m
+  rules:
+  # Request data, per controller/action.
+  - record: controller_action:gitlab_transaction_duration_seconds_sum:rate5m
+    expr: sum(rate(gitlab_transaction_duration_seconds_sum{env="gstg"}[5m])) without (fqdn,instance,node,pod,pod_template_hash)
+  - record: controller_action:gitlab_transaction_duration_seconds_bucket:rate5m
+    expr: sum without (fqdn,instance,node,pod,pod_template_hash) (rate(gitlab_transaction_duration_seconds_bucket{type="api", env="gstg"}[5m]))
+  - record: controller_action:gitlab_transaction_duration_seconds_bucket:rate5m
+    expr: sum without (fqdn,instance,node,pod,pod_template_hash) (rate(gitlab_transaction_duration_seconds_bucket{type="git", env="gstg"}[5m]))
+  - record: controller_action:gitlab_transaction_duration_seconds_bucket:rate5m
+    expr: sum without (fqdn,instance,node,pod,pod_template_hash) (rate(gitlab_transaction_duration_seconds_bucket{type="web", env="gstg"}[5m]))
+  - record: controller_action:gitlab_transaction_duration_seconds:p95
+    expr: histogram_quantile(0.95, controller_action:gitlab_transaction_duration_seconds_bucket:rate5m{env="gstg"})
+  - record: controller_action:gitlab_transaction_duration_seconds:p99
+    expr: histogram_quantile(0.99, controller_action:gitlab_transaction_duration_seconds_bucket:rate5m{env="gstg"})
+
+  # Request data, across the board.
+  - record: job_environment:gitlab_transaction_duration_seconds_sum:rate5m
+    expr: sum(controller_action:gitlab_transaction_duration_seconds_sum:rate5m{env="gstg"}) without (controller,action)
+  - record: job_environment:gitlab_transaction_duration_seconds_bucket:rate5m
+    expr: sum(controller_action:gitlab_transaction_duration_seconds_bucket:rate5m{env="gstg"}) without (controller,action)
+
+- name: Rails SQL 1m
+  interval: 1m
+  rules:
+  - record: controller_action:gitlab_sql_duration_seconds_count:rate1m
+    expr: >
+      sum without (fqdn,instance,node,pod,pod_template_hash) (
+        rate(gitlab_sql_duration_seconds_count{env="gstg"}[1m])
+      )
+  - record: controller_action:gitlab_sql_duration_seconds_sum:rate1m
+    expr: >
+      sum without (fqdn,instance,node,pod,pod_template_hash) (
+        rate(gitlab_sql_duration_seconds_sum{env="gstg"}[1m])
+      )
+
+- name: Rails SQL 5m
+  interval: 1m
+  rules:
+  - record: controller_action:gitlab_sql_duration_seconds_sum:rate5m
+    expr: sum(rate(gitlab_sql_duration_seconds_sum{env="gstg"}[5m])) without (fqdn,instance,node,pod,pod_template_hash)
+  - record: job_environment:gitlab_sql_duration_seconds_sum:rate5m
+    expr: sum(controller_action:gitlab_sql_duration_seconds_sum:rate5m{env="gstg"}) without (controller, action)

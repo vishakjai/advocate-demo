@@ -1,0 +1,70 @@
+load("@rules_java//java:defs.bzl", "java_plugin")
+load(":jmh.bzl", "jmh_java_benchmarks")
+
+package(default_visibility = ["//tools/benchmarks:__subpackages__"])
+
+java_plugin(
+    name = "jmh_annotation_processor",
+    processor_class = "org.openjdk.jmh.generators.BenchmarkProcessor",
+    deps = ["@jmh_maven//:org_openjdk_jmh_jmh_generator_annprocess"],
+)
+
+jmh_java_benchmarks(
+    name = "ipWildcardToBdd",
+    srcs = ["BenchmarkIpWildcardToBdd.java"],
+    deps = [
+        "//projects/allinone",
+        "//projects/bdd",
+        "//projects/common",
+        "@maven//:com_google_guava_guava",
+        "@maven//:org_apache_logging_log4j_log4j_core",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
+    ],
+)
+
+jmh_java_benchmarks(
+    name = "onehot",
+    srcs = ["BenchmarkOnehot.java"],
+    deps = [
+        "//projects/bdd",
+    ],
+)
+
+jmh_java_benchmarks(
+    name = "orAll",
+    srcs = ["BenchmarkOrAll.java"],
+    deps = [
+        "//projects/allinone",
+        "//projects/bdd",
+        "//projects/common",
+        "@maven//:com_google_guava_guava",
+        "@maven//:org_apache_logging_log4j_log4j_core",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
+    ],
+)
+
+jmh_java_benchmarks(
+    name = "snapshotBddBenchmarks",
+    testonly = True,
+    srcs = ["SnapshotBddBenchmarks.java"],
+    deps = [
+        "//projects/allinone",
+        "//projects/batfish",
+        "//projects/batfish:batfish_testlib",
+        "//projects/bdd",
+        "//projects/common",
+        "@maven//:com_google_guava_guava",
+        "@maven//:org_apache_logging_log4j_log4j_core",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
+    ],
+)
+
+jmh_java_benchmarks(
+    name = "streamDecoder",
+    srcs = ["BenchmarkStreamDecoder.java"],
+    deps = [
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_ibm_icu_icu4j",
+        "@maven//:commons_io_commons_io",
+    ],
+)

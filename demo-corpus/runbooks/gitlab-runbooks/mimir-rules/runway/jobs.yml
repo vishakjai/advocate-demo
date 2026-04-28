@@ -1,0 +1,43 @@
+groups:
+- name: runway-jobs.rules
+  rules:
+  # Step 1: Capture any new failure events with current timestamp
+  - record: runway_jobs:new_failure_events
+    expr: |
+      max by(type, env) (
+        (stackdriver_cloud_run_job_run_googleapis_com_job_completed_execution_count{result="failed"} * 0 + 1) * time()
+      )
+
+  # Step 2: Record the lasting timestamp by comparing with the previous value
+  - record: runway_jobs:last_failure_timestamp
+    expr: |
+      max_over_time(runway_jobs:new_failure_events[24h]) or runway_jobs:last_failure_timestamp
+
+  # Step 1: Capture any new success events with current timestamp
+  - record: runway_jobs:new_success_events
+    expr: |
+      max by(type, env) (
+        (stackdriver_cloud_run_job_run_googleapis_com_job_completed_execution_count{result="succeeded"} * 0 + 1) * time()
+      )
+
+  # Step 2: Record the lasting timestamp by comparing with the previous value
+  - record: runway_jobs:last_success_timestamp
+    expr: |
+      max_over_time(runway_jobs:new_success_events[24h]) or runway_jobs:last_success_timestamp
+
+  # Alert when the latest failure is more recent than the latest success (or no
+  # successful run recorded)
+  - alert: RunwayJobFailure
+    expr: |
+      runway_jobs:last_failure_timestamp > 0
+      unless
+      (runway_jobs:last_success_timestamp > runway_jobs:last_failure_timestamp)
+    labels:
+      severity: s4
+      alert_type: symptom
+      team: runway
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      summary: "Runway Job execution failed for {{ $labels.type }}"
+      description: "Runway Job execution failed for {{ $labels.type }} at {{ humanizeTimestamp $value }} and has not had a successful execution since the failure."
+      title: Runway Job Execution Failure

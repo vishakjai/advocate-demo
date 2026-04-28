@@ -1,0 +1,36 @@
+groups:
+- name: gcp-snapshots.rules
+  rules:
+  - record: gcp_scheduled_snapshot:occurrence
+    expr: |
+      clamp_max(stackdriver_gce_disk_logging_googleapis_com_user_scheduled_snapshots + 1, 1)
+  - alert: GCPScheduledSnapshotsDelayed
+    expr: |
+        (
+            max by (disk_name, env) (sum_over_time(gcp_scheduled_snapshot:occurrence{env="gprd", disk_name!~".*packer.*"}[6h])) > 0
+          or on (disk_name, env)
+            present_over_time(stackdriver_gce_disk_logging_googleapis_com_user_scheduled_snapshots{env="gprd", disk_name!~".*packer.*"}[1w]) * 0
+        ) == 0
+    for: 4h
+    labels:
+      pager: pagerduty
+      severity: s2
+      alert_type: cause
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      description: Recent GCP scheduled snapshot are missing for {{ $labels.disk_name }}. Please follow the runbook to review the problem.
+      runbook: disaster-recovery/alerts/GCPScheduledSnapshots/
+      title: GCP scheduled snapshots are delayed
+  - alert: GCPScheduledSnapshotsFailed
+    expr: |
+      count by (env)(stackdriver_gce_disk_logging_googleapis_com_user_scheduled_snapshots_errors{env="gprd", disk_name!~".*packer.*"}) >= 1
+    for: 1m
+    labels:
+      pager: pagerduty
+      severity: s1
+      alert_type: cause
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      description: GCP scheduled snapshots are reporting failures for {{ $labels.env }}. Please follow the runbook to review the problem.
+      runbook: disaster-recovery/alerts/GCPScheduledSnapshots/
+      title: GCP scheduled snapshots are failing

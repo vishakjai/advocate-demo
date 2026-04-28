@@ -1,0 +1,18 @@
+groups:
+  - name: Mirrored CI tables consistency checks
+    rules:
+      - alert: Inconsistent CI mirrored tables records
+        expr: sum by (environment, source_table) (rate(consistency_checks{result="mismatch", env="gstg"}[1m])) > 100
+        for: 1m
+        labels:
+          severity: s2
+          team: cells_infrastructure
+          alert_type: symptom
+          pager: pagerduty
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gstg
+          title: "CI mirrored tables for {{ $labels.source_table }} inconsistencies has exceeded threshold"
+          environment: "{{ $labels.environment }}"
+          description: >
+            "The CI mirrored tables of the table {{ $labels.source_table }} are different than in the source table"
+          runbook: decomposition/ci-mirrored-tables/

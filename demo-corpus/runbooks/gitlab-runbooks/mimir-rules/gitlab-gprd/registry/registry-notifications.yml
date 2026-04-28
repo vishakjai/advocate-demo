@@ -1,0 +1,29 @@
+groups:
+  - name: Container Registry Webhook Notifications
+    rules:
+      - alert: ContainerRegistryNotificationsPendingCountTooHigh
+        expr: sum by (env, stage) (registry_notifications_pending) > 1000
+        for: 15m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "The number of Container Registry pending webhook notifications is high for the last 15m"
+          description: "There are over 1000 pending notifications in {{ $labels.env }} {{ $labels.stage }} stage for the 15m."
+          grafana_dashboard_id: registry-notifications/registry3a-webhook-notifications-detail
+          runbook: registry/alerts/ContainerRegistryNotifications/
+      - alert: ContainerRegistryNotificationsPendingQueueGrows
+        expr: sum by (env, stage) (delta(registry_notifications_pending[5m])) > 100
+        for: 1h
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "The number of Container Registry pending webhook notifications keeps growing for the last hour, notifications are not delivered in timely manner."
+          description: "The number of pending notifications in {{ $labels.env }} {{ $labels.stage }} stage keeps growing, notifications are not delivered in timely manner."
+          grafana_dashboard_id: registry-notifications/registry3a-webhook-notifications-detail
+          runbook: registry/alerts/ContainerRegistryNotifications/

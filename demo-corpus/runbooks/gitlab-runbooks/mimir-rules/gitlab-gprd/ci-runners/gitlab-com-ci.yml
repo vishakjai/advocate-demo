@@ -1,0 +1,126 @@
+groups:
+  - name: gitlab-com-ci.rules
+    rules:
+      - alert: CICDWorkhorseQueuingUnderperformant
+        expr: |
+          histogram_quantile(
+            0.90,
+            sum by(environment, tier, type, stage, shard, le) (
+              rate(gitlab_workhorse_queueing_waiting_time_bucket{queue_name="ci_api_job_requests",job="gitlab-workhorse", env="gprd"}[5m])
+            )
+          ) >= 30
+        for: 5m
+        labels:
+          team: runner_core
+          severity: s3
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "90% of request queued on Workhorse is longer than 30s"
+          description: |
+            90% of requests queued on Workhorse are longer than 30s for last 5 minutes.
+
+            This should be considered as service degradation and the reason should be investigated.
+          runbook: ci-runners/troubleshooting-guide/
+
+      - alert: CICDTooManyArchivingTraceFailures
+        expr: |
+          sum by (environment, tier, type, stage, shard) (
+            rate(job_trace_archive_failed_total{env="gprd"}[5m])
+          ) > 10
+        for: 5m
+        labels:
+          team: runner_core
+          severity: s4
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Too big number of traces archiving failures: {{$value}}"
+          description: |
+            Traces archiving keeps failing for more than 5 minutes.
+            Plese check https://dashboards.gitlab.net/d/000000159/ci?&orgId=1&panelId=153&fullscreen,
+            https://new-sentry.gitlab.net/organizations/gitlab/issues/?project=3&query=ArchiveTraceWorker, and
+            https://new-sentry.gitlab.net/organizations/gitlab/issues/?project=3&query=ArchiveTracesCronWorker to find out more details
+          runbook: ci-runners/troubleshooting-guide/
+
+      - alert: CICDJobsStuckInDockerPull
+        expr: |
+          (
+            sum by (environment, tier, type, stage, shard) (gitlab_runner_jobs{env="gprd",executor_stage="docker_pulling_image"})
+            /
+            sum by (environment, tier, type, stage, shard) (gitlab_runner_jobs{env="gprd",executor_stage="docker_run"})
+          ) > 1
+        for: 5m
+        labels:
+          team: runner_core
+          severity: s4
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "More CI Jobs are in state docker_pulling_image than state docker_run"
+          description: |
+            More CI Jobs are in state docker_pulling_image than are in state docker_run
+            for over 5 minutes. This could mean connectivity to docker hub is broken.
+            Plese check https://dashboards.gitlab.net/d/000000159/ci?viewPanel=46&orgId=1&from=now-1h&to=now&fullscreen
+
+      - alert: FleetingPendingInstancesTooHigh
+        expr: |
+          (
+            sum by(environment, tier, type, stage, shard) (
+              fleeting_provisioner_instances{state="pending", env="gprd"}
+            ) > 0
+            and
+            sum by(environment, tier, type, stage, shard) (
+              fleeting_provisioner_instances{state="pending", env="gprd"}
+              -
+              fleeting_provisioner_instances{state="pending", env="gprd"} offset 15m
+            ) >= 0
+          )
+        for: 15m
+        labels:
+          team: runner_core
+          severity: s3
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Number of Fleeting pending instances is constantly growing"
+          description: |
+            Constantly growing number of Fleeting's pending instances usually means that something
+            odd happens with our autoscaling. We've identified (and as for now didn't found the root
+            cause) that occasionally Runner asks autoscaling groups to increase the number of instances,
+            but these requests are never recognized by the ASGs. Runner, however, awaits these instances
+            which at some moment brings it to clog in the scaling mechanism.
+            Please check https://dashboards.gitlab.net/d/ci-runners-incident-autoscaling-new/ci-runners-incident-support-autoscaling-new?viewPanel=17&orgId=1&from=now-1h&to=now&fullscrean
+
+      - alert: CIRunnersConfigReloadErrors
+        expr: |
+          sum by(environment, stage, type, shard, instance) (
+            increase(gitlab_runner_configuration_loading_error_total{environment="gprd", stage="main", type="ci-runners"}[5m])
+          ) > 0
+        for: 1m
+        labels:
+          team: runner_core
+          severity: s3
+          alert_type: cause
+        annotations:
+          title: "Runner config.toml reload failures in the fleet"
+          description: |
+            Runner config.toml reloading ratio being above 0 means that the configuration file
+            that we generate automatically from IaaC code is somehow invalid (malformed, not passing
+            internal validation) and can't be loaded.
+
+            That doesn't have immediate impact on CI/CD workloads (the failure is silent in this scope)
+            but it means that whatever configuration we've been trying to add, is not active. And
+            that may cause problems depending on the case.
+
+            If you see this error it means that either someone was trying to update runners configuration
+            and it gone wrong, or some of our IaaC code that is responsible for configuring runners
+            got updated (with a bug) and that update just got deployed.
+
+            Check which runner shard and/or instances are affected and start by visually checking the
+            config.toml files after SSHing on the instances.
+          grafana_dashboard_id: ci-runners-incident-runner-manager
+          grafana_dashboard_link: https://dashboards.gitlab.net/d/ci-runners-incident-runner-manager?from=now-4h/m&to=now-1m/m&var-environment={{$labels.environment}}&var-stage={{$labels.stage}}&var-type={{$labels.type}}&var-shard={{$labels.shard}}&viewPanel=panel-41
+          grafana_datasource_id: mimir-gitlab-gprd
+          grafana_min_zoom_hours: "4"
+          grafana_variables: environment,stage,type,shard

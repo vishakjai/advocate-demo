@@ -1,0 +1,269 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 687,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "alertThreshold": true
+      },
+      "pluginVersion": "7.2.0",
+      "repeat": "env",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg by (environment, type) (quantile_over_time(0.95, instance:cpu_utilization:ratio_avg{env=~\"$env\",type=~\"$type\"}[$__interval]))",
+          "format": "time_series",
+          "interval": "5m",
+          "intervalFactor": 2,
+          "legendFormat": "{{type}}",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg by (environment) (quantile_over_time(0.95, instance:cpu_utilization:ratio_avg{environment=~\"$env\",type=~\"$type\"}[$__interval]))",
+          "format": "time_series",
+          "interval": "5m",
+          "intervalFactor": 2,
+          "legendFormat": "Average",
+          "refId": "B"
+        }
+      ],
+      "title": "CPU Utilization - $env",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 12,
+      "options": {
+        "alertThreshold": true
+      },
+      "pluginVersion": "7.2.0",
+      "repeat": "env",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg by (environment, type) (quantile_over_time(0.95, instance:memory_utilization:ratio_avg{env=~\"$env\",type=~\"$type\"}[$__interval]))",
+          "format": "time_series",
+          "interval": "5m",
+          "intervalFactor": 2,
+          "legendFormat": "{{type}}",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg by (environment) (quantile_over_time(0.95, instance:memory_utilization:ratio_avg{environment=~\"$env\",type=~\"$type\"}[$__interval]))",
+          "format": "time_series",
+          "interval": "5m",
+          "intervalFactor": 2,
+          "legendFormat": "Average",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory Utilization - $env",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 5,
+      "options": {},
+      "repeat": "env",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "bottomk(10, avg by (fqdn, environment) (quantile_over_time(0.95, instance:cpu_utilization:ratio_q95{env=~\"$env\",type=~\"$type\"}[$__range])))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Worst 10 CPU Utilization $env",
+      "type": "table-old"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 8,
+      "options": {},
+      "repeat": "env",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "bottomk(10, avg by (fqdn, environment) (quantile_over_time(0.95, instance:memory_utilization:ratio_q95{env=~\"$env\",type=~\"$type\"}[$__range])))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Worst 10 Memory Utilization $env",
+      "type": "table-old"
+    }
+  ],
+  "preload": false,
+  "refresh": "5m",
+  "schemaVersion": 41,
+  "tags": [
+    "unmanaged"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": [
+            "gprd"
+          ],
+          "value": [
+            "gprd"
+          ]
+        },
+        "datasource": "Global",
+        "definition": "label_values(up{job=~\"prometheus.*\"}, env)",
+        "includeAll": true,
+        "multi": true,
+        "name": "env",
+        "options": [],
+        "query": "label_values(up{job=~\"prometheus.*\"}, env)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": [
+            "api",
+            "web"
+          ],
+          "value": [
+            "api",
+            "web"
+          ]
+        },
+        "datasource": "Global",
+        "definition": "label_values(up{env=~\"$env\",job=~\"node(-exporter)?\"}, type)",
+        "includeAll": true,
+        "multi": true,
+        "name": "type",
+        "options": [],
+        "query": "label_values(up{env=~\"$env\",job=~\"node(-exporter)?\"}, type)",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Fleet Utilization",
+  "uid": "Qe6veT_mk",
+  "version": 17
+}

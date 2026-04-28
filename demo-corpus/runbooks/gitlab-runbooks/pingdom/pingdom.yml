@@ -1,0 +1,311 @@
+# See ../docs/uncategorized/pingdom.md for details of how to use this
+unique_tag: pingdom-automated
+defaults:
+  timeout_ms: 2000
+integrations:
+  - name: pagerduty
+    id: 139568
+  - name: incident-io
+    id: 143050
+checks:
+  - url: https://gitlab.com/users/sign_in
+    timeout_ms: 20000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - web
+      - patroni
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://gitlab.com/gitlab-org/gitlab-foss/-/tree/master
+    timeout_ms: 20000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - web
+      - gitaly
+      - patroni
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://gitlab.com/gitlab-org/gitlab-foss/-/work_items
+    timeout_ms: 20000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - web
+      - patroni
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://gitlab.com/api/v4/projects/13083 # GitLab-CE / GitLab-FOSS
+    timeout_ms: 20000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - api
+      - patroni
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://gitlab.com/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - web
+      - sla
+      - pingdom-exporter-check
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://staging.gitlab.com/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - web
+      - staging
+      - pingdom-exporter-check
+    teams:
+      - Infrastructure
+
+  - url: http://gitlab.org/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - haproxy
+      - pingdom-exporter-check
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  #######################################
+  # registry.gitlab.com
+  #######################################
+  # Registry root URL will always return 200
+  # if health check succeeds
+  # https://github.com/docker/distribution/pull/874
+  #######################################
+
+  - url: https://registry.gitlab.com/
+    timeout_ms: 5000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - registry
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  #######################################
+  # about.gitlab.com
+  #######################################
+
+  - url: https://about.gitlab.com/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - about-gitlab
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: http://about.gitlab.com/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - about-gitlab
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  #######################################
+  # Cloudflare monitoring
+  #######################################
+
+  # Integrations disabled before rollout
+
+  - url: https://gitlab.com/cdn-cgi/trace
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - cloudflare
+      - pingdom-exporter-check
+    teams:
+      - Infrastructure
+  # integrations:
+  #   - pagerduty
+
+  - url: https://staging.gitlab.com/cdn-cgi/trace
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - cloudflare
+      - pingdom-exporter-check
+    teams:
+      - Infrastructure
+  # integrations:
+  #   - pagerduty
+
+  - url: https://health-check.cdn.web-ide.gitlab-static.net/-/ping
+    timeout_ms: 20000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - cloudflare
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  #######################################
+  # Ancillary Properties
+  #######################################
+
+  - url: https://ir.gitlab.com/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - ir-gitlab
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://version.gitlab.com/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - version-gitlab
+      - pingdom-exporter-check
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://snowplow.trx.gitlab.net/health
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - snowplow
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://snowplowprd.trx.gitlab.net/health
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - snowplow
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://gitlab-examples.gitlab.io/
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - pages
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  - url: https://forum.gitlab.com/srv/status
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - forum-gitlab
+    teams:
+      - Infrastructure
+      - Community Relations
+
+  #######################################
+  # Kas is using a TCP check instead of http because it uses websockets
+  # See: https://gitlab.com/gitlab-com/gl-infra/production-engineering/-/issues/14911
+  #######################################
+  - url: https://kas.gitlab.com/
+    timeout_ms: 3000
+    resolution_minutes: 5
+    notify_when_restored: true
+    check_type: tcp
+    check_port: 443
+    tags:
+      - kas
+      - sla
+    teams:
+      - Infrastructure
+    integrations:
+      - pagerduty
+      - incident-io
+
+  #######################################
+  # People Group Engineering Projects
+  #######################################
+  - url: https://comp-calculator.gitlab.net/users/sign_in
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - people-engineering
+    teams:
+      - People Group Engineering
+
+  - url: https://nominatorbot.gitlab.net/health
+    timeout_ms: 30000
+    resolution_minutes: 5
+    notify_when_restored: true
+    tags:
+      - people-engineering
+    teams:
+      - People Group Engineering

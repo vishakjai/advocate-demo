@@ -1,0 +1,148 @@
+groups:
+  - name: Gitaly grpc handled
+    interval: 1m
+    rules:
+      - record: gitaly_grpc:grpc_server_handled_total:rate1m
+        expr: >
+          sum without (fqdn,instance,ansible_deploy_name,zone,cluster) (
+            rate(grpc_server_handled_total{job="scrapeConfig/monitoring/prometheus-agent-gitaly", env="gprd"}[1m])
+          )
+      - record: gitaly:grpc_server_handled_total:rate1m
+        expr: >
+          sum without (grpc_code) (
+            gitaly_grpc:grpc_server_handled_total:rate1m{env="gprd"}
+          )
+      - record: gitaly:grpc_server_handled_total:error_rate1m
+        expr: gitaly_grpc:grpc_server_handled_total:rate1m{grpc_code!="OK",grpc_code!="Canceled",grpc_code!="NotFound", env="gprd"}
+      - record: gitaly:grpc_server_handled_total:instance_error_rate1m
+        expr: >
+          sum without (grpc_code, grpc_method, grpc_service, grpc_type) (
+            rate(grpc_server_handled_total{job="scrapeConfig/monitoring/prometheus-agent-gitaly",grpc_code!="OK",env="gprd"}[1m])
+          )
+
+  - name: Gitaly grpc server handling buckets
+    interval: 1m
+    rules:
+      - record: gitaly:grpc_server_handling_seconds_bucket:rate1m
+        expr: >
+          sum without (grpc_service, grpc_type, fqdn, instance, ansible_deploy_name,zone,cluster) (
+            rate(grpc_server_handling_seconds_bucket{job="scrapeConfig/monitoring/prometheus-agent-gitaly",env="gprd"}[1m])
+          )
+      - record: gitaly:grpc_server_handling_seconds:p95
+        expr: >
+          histogram_quantile(0.95,
+            sum without (grpc_method) (
+              sum without (grpc_service, grpc_type) (
+                rate(grpc_server_handling_seconds_bucket{job="scrapeConfig/monitoring/prometheus-agent-gitaly",env="gprd"}[1m])
+              )
+            )
+          )
+      - record: gitaly:grpc_server_handling_seconds:p50
+        expr: >
+          histogram_quantile(0.5,
+            sum without (grpc_method) (
+              sum without (grpc_service, grpc_type) (
+                rate(grpc_server_handling_seconds_bucket{job="scrapeConfig/monitoring/prometheus-agent-gitaly",env="gprd"}[1m])
+              )
+            )
+          )
+
+  - name: Gitaly grpc server handled
+    rules:
+      - record: gitaly_instance_grpc_method_code:grpc_server_handled_total:irate1m
+        expr: >
+          sum without (fqdn, instance, ansible_deploy_name, zone, cluster, grpc_service, grpc_type) (
+            irate(grpc_server_handled_total{job="scrapeConfig/monitoring/prometheus-agent-gitaly",env="gprd"}[1m])
+          )
+
+  - name: Gitaly grpc misc
+    interval: 1m
+    rules:
+      - record: gitaly:grpc_server_handling_seconds:avg5m
+        expr: >
+          avg without (fqdn, instance, ansible_deploy_name, zone, cluster, grpc_service, grpc_type) (
+            rate(grpc_server_handling_seconds_sum{job="scrapeConfig/monitoring/prometheus-agent-gitaly",env="gprd"}[5m])
+              /
+            rate(grpc_server_handling_seconds_count{job="scrapeConfig/monitoring/prometheus-agent-gitaly",env="gprd"}[5m]) > 0
+          )
+      - record: instance:gitaly_grpc_errors_total:rate1m
+        expr: >
+          sum without (grpc_method, grpc_type, grpc_service, grpc_code) (
+            rate(grpc_server_handled_total{job="scrapeConfig/monitoring/prometheus-agent-gitaly",grpc_code!="OK",env="gprd"}[1m])
+          )
+
+  - name: Gitaly rate limiting
+    rules:
+      - record: gitaly:gitaly_rate_limiting_queued:grpc_method
+        expr: sum(gitaly_rate_limiting_queued{env="gprd"}) by (environment, grpc_method, job)
+
+  - name: Gitaly misc alerts
+    rules:
+      - alert: GitalyFileServerDown
+        expr: up{job="scrapeConfig/monitoring/prometheus-agent-gitaly",tier="stor",type="gitaly",env="gprd",fqdn!~".*packer.*"} == 0
+        for: 5m
+        labels:
+          severity: s3
+          team: tenant_services
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description:
+            Gitaly has been marked as down for the past 5 minutes on {{$labels.instance}}.
+            Check the Gitaly node to see why it is unresponsive, or whether it has been rebooted.
+          runbook: gitaly/alerts/GitalyFileServerDown/
+          title: Gitaly is down on {{ $labels.fqdn }}
+      - alert: GitalyFileServerDown
+        expr: up{job="scrapeConfig/monitoring/prometheus-agent-gitaly",tier="stor",type="gitaly",env="gprd",fqdn!~".*packer.*"} == 0
+        for: 15m
+        labels:
+          team: gitaly
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description:
+            Gitaly has been marked as down for the past 15 minutes on {{$labels.instance}}.
+            Check Gitaly logs and restart the process if necessary
+          runbook: gitaly/alerts/GitalyFileServerDown/
+          title: Gitaly is down on {{ $labels.fqdn }}
+      - alert: GitalyVersionMismatch
+        expr: >
+          count by (environment, stage) (
+            count by (environment, stage, version) (
+              gitlab_build_info{tier="stor",type="gitaly",env="gprd", fqdn!=""}
+            )
+          ) > 1
+        for: 60m
+        labels:
+          team: gitaly
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description:
+            Two or more different version of Gitaly are running in stage {{ $labels.stage }}
+            During a deployment, two distinct versions of Gitaly may be running
+            alongside one another, but this should not be the case for more than 60m.
+            Visit https://dashboards.gitlab.net/dashboard/db/gitaly-version-tracker?orgId=1
+            for details of versions deployed across the fleet.
+          runbook: gitaly/alerts/GitalyVersionMismatch/
+          title: "Multiple versions of Gitaly have been running alongside one another"
+      - alert: GCPScheduledSnapshotMissingForGitaly
+        # This regex for the disk name (^file-hdd|^gitaly) excludes the packer disks
+        expr: |
+          count(up{type="gitaly", job="scrapeConfig/monitoring/prometheus-agent-gitaly", env="gprd", fqdn!~".*packer.*"} == 1) > count(present_over_time(stackdriver_gce_disk_logging_googleapis_com_user_scheduled_snapshots{env="gprd", disk_name=~"(^file-hdd|^gitaly)-.*-stor-gprd-data$"}[2h]))
+        for: 1h
+        labels:
+          severity: s2
+          pager: pagerduty
+          alert_type: cause
+          type: gitaly
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: Recent GCP scheduled snapshot are missing for one or more disks. Please follow the runbook to review the problem.
+          runbook: disaster-recovery/alerts/GCPScheduledSnapshots/
+          title: GCP scheduled snapshots are missing for at least one Gitaly data disk in Production
+          promql_template_1: present_over_time(stackdriver_gce_disk_logging_googleapis_com_user_scheduled_snapshots{env="gprd", disk_name=~"(file|gitaly)-.*-stor-gprd-data$"env="gprd"}[2h]) == 0

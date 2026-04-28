@@ -1,0 +1,85 @@
+{{ define "gitlab.title" }}
+    {{- if .GroupLabels.type -}}
+        {{- printf "%s - Service %s (%s)" .Status .GroupLabels.type .CommonLabels.env -}}
+    {{- else -}}
+        {{- printf "%s - %s (%s)" .Status .CommonAnnotations.title .CommonLabels.env -}}
+    {{- end -}}
+{{ end }}
+
+{{ define "gitlab.text" }}
+    {{- if eq .Status "firing" -}}
+        {{- printf ":fire: Alerts :fire:\n" -}}
+        {{- $panesTemplate := `{"00v":{"datasource":"%s","queries":[{"refId":"A","expr":"EXPR_PLACEHOLDER","range":true,"instant":true,"datasource":{"type":"prometheus","uid":"%s"},"editorMode":"code"}],"range":{"from":"now-1h","to":"now"}}}` -}}
+        {{- $baseURL := "https://dashboards.gitlab.net/explore?schemaVersion=1&orgId=1&panes=" -}}
+        {{- range .Alerts -}}
+            {{/* If we have a Grafana datasource ID the alert has come from Mimir so link to Grafana's explore page */}}
+            {{- if and .Annotations.grafana_datasource_id .GeneratorURL -}}
+                {{/*
+                    First we need to pull the query expression from the generator URL, this is urlquery encoded already.
+                    Double quotes have to be escaped manually before being inserted into the panes query, so `"` or `%22` becomes `\"` or `%5C%22`.
+                    This is because unfortunately if a query parameter has a JSON value Grafana will only accept it if it uses double quotes, not single quotes.
+                    We also have to double escape backslashes because JSON requires requires backslashes to be escaped as `\\`, so `%5C%5C`` becomes `"%5C%5C%5C%5C`.
+                */}}
+                {{- $expr := (.GeneratorURL | reReplaceAll "&g0.*" "" | reReplaceAll ".*expr=" "" | reReplaceAll "%5C%5C" "%5C%5C%5C%5C" | reReplaceAll "\n" "\\n" | reReplaceAll "\"" `\"` | reReplaceAll "%22" "%5C%22") -}}
+                {{/* Then we need to insert the query expression into the panes JSON object that Grafana expects and URL encode it */}}
+                {{- $panes := urlquery (printf $panesTemplate .Annotations.grafana_datasource_id .Annotations.grafana_datasource_id) | reReplaceAll "EXPR_PLACEHOLDER" $expr -}}
+                {{/* Finally we build the link to the Grafana explore page */}}
+                {{- printf "*<%s%s|%s>*\n" $baseURL $panes .Labels.alertname -}}
+            {{- else if .GeneratorURL -}}
+                {{- printf "*<%s|%s>*" .GeneratorURL .Labels.alertname -}}
+            {{- else -}}
+                {{- printf "*%s*" .Labels.alertname -}}
+            {{- end -}}
+
+            {{/* If we have a Grafana data source ID we can link to the Grafana Explore page */}}
+            {{- if .Annotations.grafana_datasource_id -}}
+                {{/* If we have two PromQL template annotations build a split view */}}
+                {{- if and .Annotations.promql_template_1 .Annotations.promql_template_2 -}}
+                    {{- $panesTemplate = `{"yzb":{"datasource":"%s","queries":[{"refId":"A","expr":"EXPR1_PLACEHOLDER","range":true,"instant":true,"datasource":{"type":"prometheus","uid":"%s"},"editorMode":"code"}],"range":{"from":"now-1h","to":"now"}},"6nt":{"datasource":"%s","queries":[{"refId":"A","expr":"EXPR2_PLACEHOLDER","range":true,"instant":true,"datasource":{"type":"prometheus","uid":"%s"},"editorMode":"code"}],"range":{"from":"now-1h","to":"now"}}}` -}}
+                    {{/* PromQL template are not URL encoded, so do that now */}}
+                    {{- $expr1 := urlquery (.Annotations.promql_template_1 | reReplaceAll "\n" "\\n" | reReplaceAll "\"" `\"`) -}}
+                    {{- $expr2 := urlquery (.Annotations.promql_template_2 | reReplaceAll "\n" "\\n" | reReplaceAll "\"" `\"`) -}}
+                    {{- $panes := urlquery (printf $panesTemplate .Annotations.grafana_datasource_id .Annotations.grafana_datasource_id .Annotations.grafana_datasource_id .Annotations.grafana_datasource_id) | reReplaceAll "EXPR1_PLACEHOLDER" $expr1 | reReplaceAll "EXPR2_PLACEHOLDER" $expr2 -}}
+                    {{- printf ":point_right: <%s%s|Grafana Explore>\n" $baseURL $panes -}}
+                {{/* Otherwise just build the single view */}}
+                {{- else if .Annotations.promql_template_1 -}}
+                    {{/* PromQL template are not URL encoded, so do that now */}}
+                    {{- $expr := urlquery (.Annotations.promql_template_1 | reReplaceAll "\n" "\\n" | reReplaceAll "\"" `\"`) -}}
+                    {{- $panes := urlquery (printf $panesTemplate .Annotations.grafana_datasource_id .Annotations.grafana_datasource_id) | reReplaceAll "EXPR_PLACEHOLDER" $expr -}}
+                    {{- printf ":point_right: <%s%s|Grafana Explore>\n" $baseURL $panes -}}
+                {{- end -}}
+            {{/* Fall back to the Thanos links */}}
+            {{- else -}}
+                {{- if and .Annotations.promql_template_1 .Annotations.promql_template_2 -}}
+                    {{- printf ":point_right: <https://thanos.gitlab.net/graph?g0.expr=%s&g1.expr=%s|Thanos Graph>\n" (.Annotations.promql_template_1 | urlquery) (.Annotations.promql_template_2 | urlquery) -}}
+                {{- else if .Annotations.promql_template_1 -}}
+                    {{- printf ":point_right: <https://thanos.gitlab.net/graph?g0.expr=%s|Thanos Graph>\n" (.Annotations.promql_template_1 | urlquery) -}}
+                {{- end -}}
+            {{- end -}}
+
+            {{- printf "%s\n\n" .Annotations.title -}}
+            {{- printf "%s\n\n" .Annotations.description -}}
+        {{- end -}}
+
+        {{- if gt (len .CommonLabels) 0 -}}
+            {{- $removeLabels := stringSlice "alert_class" "environment" "feature_category" "pager" "monitor" "rules_domain" "severity" "slo_alert" "user_impacting" -}}
+            {{- $filteredLabels := .CommonLabels.Remove $removeLabels -}}
+
+            {{- printf "\n:label: Labels :label:\n" -}}
+
+            {{- range $filteredLabels.SortedPairs -}}
+                {{- printf "*%s*: %s\n" .Name .Value -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{ end }}
+
+{{ define "gitlab.runbook.link" }}
+    {{- if .CommonAnnotations.runbook_url -}}
+        {{- .CommonAnnotations.runbook_url -}}
+    {{- else if eq .CommonAnnotations.link "" -}}
+        https://runbooks.gitlab.com/{{ .CommonAnnotations.runbook -}}
+    {{- else -}}
+        {{- .CommonAnnotations.link -}}
+    {{- end -}}
+{{- end }}

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Ensure that you have Graphviz and Python installed
+# Instructions at https://diagrams.mingrammer.com/docs/getting-started/installation
+# then install `pip install diagrams`
+
+find "${ROOT_DIR}/docs" -name 'generate_diagrams.py' | while read -r diagram_script; do
+  echo >&2 "# ${diagram_script}"
+  pushd "$(dirname "${diagram_script}")"
+  python "${diagram_script}"
+  popd
+done

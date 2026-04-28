@@ -1,0 +1,51 @@
+groups:
+- name: google-cloud
+  interval: 1m
+  rules:
+  - record: load_balancer_name:health_backend:ratio
+    labels:
+      tier: inf
+      environment: gprd
+      env: gprd
+      lb_type: internal_tcp
+      alert_type: cause
+    expr: >
+      count by (load_balancer_name) (
+        sum by (load_balancer_name, backend_name) (
+          rate(stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_packets_count{load_balancer_name=~"gprd-.*"}[5m])
+        )
+        >
+        max by (load_balancer_name, backend_name) (
+          rate(stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_packets_count{load_balancer_name=~"gprd-.*"}[5m])
+        ) / 2
+      )
+      /
+      count by (load_balancer_name) (
+        sum by (load_balancer_name, backend_name) (
+          rate(stackdriver_internal_tcp_lb_rule_loadbalancing_googleapis_com_l_3_internal_egress_packets_count{load_balancer_name=~"gprd-.*"}[1h])
+        )
+      )
+
+  - record: load_balancer_name:health_backend:ratio
+    labels:
+      tier: inf
+      environment: gprd
+      env: gprd
+      lb_type: tcp
+      alert_type: cause
+    expr: >
+      count by (load_balancer_name) (
+        sum by (load_balancer_name, backend_name) (
+          rate(stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count{load_balancer_name=~"gprd-.*"}[5m])
+        )
+        >
+        max by (load_balancer_name, backend_name) (
+          rate(stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count{load_balancer_name=~"gprd-.*"}[5m])
+        ) / 2
+      )
+      /
+      count by (load_balancer_name) (
+        sum by (load_balancer_name, backend_name) (
+          rate(stackdriver_tcp_lb_rule_loadbalancing_googleapis_com_l_3_external_egress_bytes_count{load_balancer_name=~"gprd-.*"}[1h])
+        )
+      )

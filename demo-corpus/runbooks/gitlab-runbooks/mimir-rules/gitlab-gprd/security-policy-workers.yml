@@ -1,0 +1,68 @@
+groups:
+- name: security_policy_management_worker_db_duration
+  rules:
+  - alert: HighSecurityPolicyWorkerDatabaseDuration
+    expr: >
+      sum by (worker) (rate(sidekiq_jobs_db_seconds_sum{environment="gprd",stage="main",type="sidekiq",feature_category="security_policy_management"}[10m]))
+      /
+      sum by (worker) (
+        rate(sidekiq_jobs_completion_count{environment="gprd",stage="main",type="sidekiq",feature_category="security_policy_management"}[10m])
+        or
+        rate(sidekiq_jobs_db_seconds_count{environment="gprd",stage="main",type="sidekiq",feature_category="security_policy_management"}[10m])
+      ) > 50
+    for: 10m
+    labels:
+      severity: 's4'
+      team: security_policies
+      alert_type: symptom
+      type: logging
+    annotations:
+      title: "High database duration for {{ $labels.worker }}"
+      description: "The avg. database time for {{ $labels.worker }} exceeded 50 seconds over 10 minutes."
+- name: security_policy_pipeline_execution_project_schedules
+  rules:
+  - alert: HighSecurityPolicyScheduleWorkerDuration
+    expr: >
+      (
+        sum by (worker) (
+          rate(
+            gitlab_security_policies_pipeline_execution_policy_scheduling_duration_seconds_bucket{
+              environment="gprd",
+              stage="main",
+              type="sidekiq",
+              le="+Inf"
+            }[10m]
+          )
+        )
+        -
+        sum by (worker) (
+          rate(
+            gitlab_security_policies_pipeline_execution_policy_scheduling_duration_seconds_bucket{
+              environment="gprd",
+              stage="main",
+              type="sidekiq",
+              le="300"
+            }[10m]
+          )
+        )
+      )
+      /
+      sum by (worker) (
+        rate(
+          gitlab_security_policies_pipeline_execution_policy_scheduling_duration_seconds_count{
+            environment="gprd",
+            stage="main",
+            type="sidekiq"
+          }[10m]
+        )
+      )
+      > 0.1
+    for: 10m
+    labels:
+      severity: 's3'
+      team: security_policies
+      alert_type: symptom
+      type: logging
+    annotations:
+      title: "At least 10% of {{ $labels.worker }} executions exceeded the lock timeout over the past 10 minutes"
+      description: "Multiple instances of {{ $labels.worker }} may be running in parallel."

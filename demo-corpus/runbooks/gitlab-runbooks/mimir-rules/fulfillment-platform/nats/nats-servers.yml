@@ -1,0 +1,18 @@
+groups:
+  - name: NATS Jetstream Servers
+    rules:
+      - alert: NATSLossOfJetstreamServer
+        expr: >
+          count(up{job="nats/nats", env="gprd"} == 1) < max(nats_varz_jetstream_meta_cluster_size{env="gprd"})
+        for: 5m
+        labels:
+          severity: s2
+          alert_type: symptom
+          team: sre_reliability
+          pager: pagerduty
+        annotations:
+          grafana_datasource_id: mimir-fulfillment-platform
+          title: "NATS Jetstream cluster has lost server(s)"
+          description: "NATS cluster in {{ $labels.environment }} {{ $labels.stage }} has only {{ $value }} servers (expected 3) reporting for more than 5 minutes"
+          grafana_dashboard_id: nats-usage-billing
+          runbook: nats/

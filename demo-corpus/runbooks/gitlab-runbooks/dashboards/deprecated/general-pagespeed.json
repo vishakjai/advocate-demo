@@ -1,0 +1,992 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Uploaded by https://gitlab.com/gitlab-com/runbooks/-/jobs/9458539780 at Wed Mar 19 12:45:22 UTC 2025",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1378,
+  "links": [
+    {
+      "icon": "external link",
+      "tags": [],
+      "targetBlank": true,
+      "title": "Pagespeed v3 Reference",
+      "tooltip": "Opens the pagespeed reference",
+      "type": "link",
+      "url": "https://developers.google.com/web/tools/lighthouse/v3/scoring"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "panels": [],
+      "repeat": "strategy",
+      "title": "Overview ($strategy)",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "id": 27,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "#### Lighthouse scores for $strategy\n* 0 to 49 (slow): Red\n* 50 to 89 (average): Orange\n* 90 to 100 (fast): Green\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "11.6.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "description": "Performance Score",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a"
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 50
+              },
+              {
+                "color": "#299c46",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "id": 17,
+      "maxDataPoints": 100,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\",category=\"performance\"} * 100)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Performance Score",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "description": "The Accessibility score is a weighted average of all the accessibility audits. See Scoring Details for a full list of how each audit is weighted. The heavier-weighted audits have a bigger impact on your score.\n\nEach accessibility audit is pass or fail. Unlike the Performance audits, a page doesn't get points for partially passing an accessibility audit. For example, if some elements have screenreader-friendly names, but others don't, that page gets a 0 for the screenreader-friendly-names audit.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a"
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 50
+              },
+              {
+                "color": "#299c46",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 18,
+      "maxDataPoints": 100,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\",category=\"accessibility\"} * 100)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Accessibility Score",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "description": "Lighthouse returns a Progressive Web App (PWA) score between 0 and 100. 0 is the worst possible score, and 100 is the best.\n\nThe PWA audits are based on the Baseline PWA Checklist, which lists 14 requirements. Lighthouse has automated audits for 11 of the 14 requirements. The remaining 3 can only be tested manually. Each of the 11 automated PWA audits are weighted equally, so each one contributes approximately 9 points to your PWA score.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a"
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 50
+              },
+              {
+                "color": "#299c46",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 13,
+      "maxDataPoints": 100,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\",category=\"pwa\"} * 100)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "PWA Score",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "description": "Search Engine Optimization Score",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a"
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 50
+              },
+              {
+                "color": "#299c46",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 10,
+      "maxDataPoints": 100,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\",category=\"seo\"} * 100)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "SEO Score",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "description": "Lighthouse returns a Best Practices score between 0 and 100. 0 is the worst possible score, and 100 is the best.\n\nThe Best Practices audits are equally weighted. To calculate how much each audit contributes to your overall Best Practices score, count the number of Best Practices audits, then divide 100 by that number.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a"
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 50
+              },
+              {
+                "color": "#299c46",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 19,
+      "maxDataPoints": 100,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\",category=\"best-practices\"} * 100)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Best Practices Score",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 66,
+      "panels": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 16
+          },
+          "id": 45,
+          "maxPerRow": 2,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_total_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "Total Time",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_first_contentful_paint_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "First Contentful Paint",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_first_cpu_idle_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "First CPU Idle",
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_first_meaningful_paint_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "First Meaningful Paint",
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_interactive_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Interactive",
+              "refId": "E"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_speed_index_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Content Speed Index ",
+              "refId": "F"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_bootup_time_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "JS Bootup Time",
+              "refId": "G"
+            }
+          ],
+          "title": "Timings",
+          "type": "graph"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 16
+          },
+          "id": 62,
+          "maxPerRow": 2,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_total_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "Total Time",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_first_contentful_paint_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "First Contentful Paint",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_first_cpu_idle_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "First CPU Idle",
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_first_meaningful_paint_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "First Meaningful Paint",
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_interactive_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Interactive",
+              "refId": "E"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_speed_index_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Content Speed Index ",
+              "refId": "F"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_bootup_time_duration_seconds{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "JS Bootup Time",
+              "refId": "G"
+            }
+          ],
+          "title": "Timing Diff $diff",
+          "type": "graph"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "description": "https://developers.google.com/web/tools/lighthouse/v3/scoring",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 24
+          },
+          "id": 55,
+          "maxPerRow": 4,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_audit_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{audit}}",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "count(pagespeed_lighthouse_audit_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"})",
+              "format": "time_series",
+              "hide": true,
+              "intervalFactor": 1,
+              "legendFormat": "MAX",
+              "refId": "B"
+            }
+          ],
+          "title": "Audit Scores",
+          "type": "graph"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "description": "https://developers.google.com/web/tools/lighthouse/v3/scoring",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 24
+          },
+          "id": 63,
+          "maxPerRow": 4,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_audit_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{audit}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Audit Diff $diff",
+          "type": "graph"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 32
+          },
+          "id": 57,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}*100 ",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{category}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Score History",
+          "type": "graph"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 32
+          },
+          "id": 64,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "delta(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])*100",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{category}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Score History Diff $diff",
+          "type": "graph"
+        }
+      ],
+      "repeat": "strategy",
+      "title": "Timings / Scores / Audits ($strategy)",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "id": 4,
+      "panels": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 66
+          },
+          "id": 2,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "uid": "Global"
+              },
+              "expr": "pagespeed_scrape_duration_seconds",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "scrape duration",
+              "refId": "A"
+            }
+          ],
+          "title": "Pagespeed Scrape Duration",
+          "type": "graph"
+        }
+      ],
+      "title": "Pagespeed Exporter Metrics",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "managed",
+    "general"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "https://gitlab.com",
+          "value": "https://gitlab.com"
+        },
+        "datasource": "Global",
+        "definition": "",
+        "includeAll": false,
+        "label": "host",
+        "name": "host",
+        "options": [],
+        "query": "label_values(pagespeed_lighthouse_category_score,host)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 6,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "/gitlab-org/gitlab",
+          "value": "/gitlab-org/gitlab"
+        },
+        "datasource": "Global",
+        "definition": "",
+        "includeAll": false,
+        "label": "path",
+        "name": "path",
+        "options": [],
+        "query": "label_values(pagespeed_lighthouse_category_score{env=\"ops\", host=\"$host\"},path)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 6,
+        "type": "query"
+      },
+      {
+        "allValue": "all",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "Mimir - Gitlab - All Environments",
+        "definition": "",
+        "includeAll": true,
+        "label": "strategy",
+        "multi": true,
+        "name": "strategy",
+        "options": [],
+        "query": "label_values(pagespeed_lighthouse_category_score,strategy)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "1w",
+          "value": "1w"
+        },
+        "includeAll": false,
+        "label": "Diff",
+        "name": "diff",
+        "options": [
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "2d",
+            "value": "2d"
+          },
+          {
+            "selected": true,
+            "text": "1w",
+            "value": "1w"
+          },
+          {
+            "selected": false,
+            "text": "2w",
+            "value": "2w"
+          },
+          {
+            "selected": false,
+            "text": "1m",
+            "value": "1m"
+          }
+        ],
+        "query": "1d,2d,1w, 2w, 1m",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m"
+    ]
+  },
+  "timezone": "",
+  "title": "general: Pagespeed",
+  "uid": "general-pagespeed",
+  "version": 5381
+}

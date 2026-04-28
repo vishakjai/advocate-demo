@@ -1,0 +1,51 @@
+{
+  "ci": [
+    "gitlab-ci-windows",
+    "gitlab-ci-155816"
+  ],
+  "db-benchmarking": [
+    "gitlab-db-benchmarking"
+  ],
+  "db-lab": [
+    "gitlab-db-lab"
+  ],
+  "dev-1": [
+    "gitlab-dev-1"
+  ],
+  "dr-testing": [
+    "gitlab-dr-testing",
+    "gitlab-gitaly-dr-testing-*"
+  ],
+  "gprd": [
+    "gitlab-production",
+    "gitlab-gitaly-gprd-*"
+  ],
+  "gstg": [
+    "gitlab-staging-1",
+    "gitlab-gitaly-gstg-*"
+  ],
+  "omnibus-build-runners": [
+    "omnibus-build-runners"
+  ],
+  "ops": [
+    "gitlab-ops"
+  ],
+  "prdsub": [
+    "gitlab-subscriptions-prod"
+  ],
+  "pre": [
+    "gitlab-pre"
+  ],
+  "qa-runners": [
+    "gitlab-qa-runners-2"
+  ],
+  "release": [
+    "gitlab-release"
+  ],
+  "stgsub": [
+    "gitlab-subscriptions-staging"
+  ],
+  "stgsub-ref": [
+    "gitlab-subscriptions-stg-ref"
+  ]
+}

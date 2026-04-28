@@ -1,0 +1,971 @@
+groups:
+    - interval: 1m
+      name: 'Service Component Alerts: hosted-runners'
+      rules:
+        - alert: HostedRunnersServiceApiRequestsErrorSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner api requests.
+
+                Requests marked as failing with status 5xx are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/api_requests_error_violation/index.html
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "3164281263"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(gitlab_runner_api_request_statuses_total{job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*",status!="409",status=~"5.."}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The api_requests SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_errors:ratio_1h{component="api_requests",type="hosted-runners"}
+                > (14.4 * 0.001000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_errors:ratio_5m{component="api_requests",type="hosted-runners"}
+                > (14.4 * 0.001000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_1h{component="api_requests",type="hosted-runners"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 1h
+        - alert: HostedRunnersServiceApiRequestsErrorSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner api requests.
+
+                Requests marked as failing with status 5xx are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/api_requests_error_violation/index.html
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "3164281263"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(gitlab_runner_api_request_statuses_total{job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*",status!="409",status=~"5.."}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The api_requests SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_errors:ratio_6h{component="api_requests",type="hosted-runners"}
+                > (6 * 0.001000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_errors:ratio_30m{component="api_requests",type="hosted-runners"}
+                > (6 * 0.001000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_6h{component="api_requests",type="hosted-runners"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 6h
+        - alert: HostedRunnersServiceApiRequestsTrafficCessationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner api requests.
+
+                Requests marked as failing with status 5xx are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/api_requests_error_violation/index.html
+
+                This alert signifies that the SLI is reporting a cessation of traffic; the signal is present, but is zero.
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "4211690882"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(gitlab_runner_api_request_statuses_total{job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The api_requests SLI of the hosted-runners service on shard `{{ $labels.shard }}` has not received any traffic in the past 30m
+          expr: |
+            gitlab_component_shard_ops:rate_30m{component="api_requests",type="hosted-runners"} == 0
+            and
+            gitlab_component_shard_ops:rate_30m{component="api_requests",type="hosted-runners"} offset 1h >= 0.16666666666666666
+          for: 5m
+          labels:
+            aggregation: component_shard
+            alert_class: traffic_cessation
+            alert_type: cause
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: ops
+            slo_alert: "no"
+            user_impacting: "yes"
+        - alert: HostedRunnersServiceApiRequestsTrafficAbsentSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner api requests.
+
+                Requests marked as failing with status 5xx are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/api_requests_error_violation/index.html
+
+                This alert signifies that the SLI was previously reporting traffic, but is no longer - the signal is absent.
+
+                This could be caused by a change to the metrics used in the SLI, or by the service not receiving traffic.
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "4211690882"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(gitlab_runner_api_request_statuses_total{job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The api_requests SLI of the hosted-runners service on shard `{{ $labels.shard }}` has not reported any traffic in the past 30m
+          expr: |
+            gitlab_component_shard_ops:rate_5m{component="api_requests",type="hosted-runners"} offset 1h
+            unless
+            gitlab_component_shard_ops:rate_5m{component="api_requests",type="hosted-runners"}
+          for: 30m
+          labels:
+            aggregation: component_shard
+            alert_class: traffic_cessation
+            alert_type: cause
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: ops
+            slo_alert: "no"
+            user_impacting: "yes"
+        - alert: HostedRunnersServiceCiRunnerJobsApdexSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner jobs handling. Each job is an operation.
+
+                Jobs marked as failing with runner system failures are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the apdex value is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "2925052761"
+            grafana_variables: environment,stage,shard
+            runbook: hosted-runners/#alerts
+            title: The ci_runner_jobs SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an apdex violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_apdex:ratio_1h{component="ci_runner_jobs",type="hosted-runners"}
+                < (1 - 14.4 * 0.030000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_apdex:ratio_5m{component="ci_runner_jobs",type="hosted-runners"}
+                < (1 - 14.4 * 0.030000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_1h{component="ci_runner_jobs",type="hosted-runners"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: apdex
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 1h
+        - alert: HostedRunnersServiceCiRunnerJobsApdexSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner jobs handling. Each job is an operation.
+
+                Jobs marked as failing with runner system failures are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the apdex value is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "2925052761"
+            grafana_variables: environment,stage,shard
+            runbook: hosted-runners/#alerts
+            title: The ci_runner_jobs SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an apdex violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_apdex:ratio_6h{component="ci_runner_jobs",type="hosted-runners"}
+                < (1 - 6 * 0.030000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_apdex:ratio_30m{component="ci_runner_jobs",type="hosted-runners"}
+                < (1 - 6 * 0.030000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_6h{component="ci_runner_jobs",type="hosted-runners"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: apdex
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 6h
+        - alert: HostedRunnersServiceCiRunnerJobsErrorSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner jobs handling. Each job is an operation.
+
+                Jobs marked as failing with runner system failures are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "1816907671"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(gitlab_runner_failed_jobs_total{failure_reason="runner_system_failure",job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The ci_runner_jobs SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_errors:ratio_1h{component="ci_runner_jobs",type="hosted-runners"}
+                > (14.4 * 0.020000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_errors:ratio_5m{component="ci_runner_jobs",type="hosted-runners"}
+                > (14.4 * 0.020000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_1h{component="ci_runner_jobs",type="hosted-runners"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 1h
+        - alert: HostedRunnersServiceCiRunnerJobsErrorSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors the hosted runner jobs handling. Each job is an operation.
+
+                Jobs marked as failing with runner system failures are considered to be in error.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "1816907671"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(gitlab_runner_failed_jobs_total{failure_reason="runner_system_failure",job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The ci_runner_jobs SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_errors:ratio_6h{component="ci_runner_jobs",type="hosted-runners"}
+                > (6 * 0.020000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_errors:ratio_30m{component="ci_runner_jobs",type="hosted-runners"}
+                > (6 * 0.020000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_6h{component="ci_runner_jobs",type="hosted-runners"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 6h
+        - alert: HostedRunnersServicePendingBuildsApdexSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors pending job from runners.
+
+                Jobs that are waiting more than 300s are considered as a error and impact service apdex.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the apdex value is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "578652087"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                histogram_quantile(
+                  0.950000,
+                  sum by (le,shard) (
+                    rate(gitlab_runner_job_queue_duration_seconds_bucket{job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                  )
+                )
+            runbook: hosted-runners/#alerts
+            title: The pending_builds SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an apdex violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_apdex:ratio_1h{component="pending_builds",type="hosted-runners"}
+                < (1 - 14.4 * 0.030000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_apdex:ratio_5m{component="pending_builds",type="hosted-runners"}
+                < (1 - 14.4 * 0.030000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_1h{component="pending_builds",type="hosted-runners"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            rules_domain: general
+            severity: s3
+            sli_type: apdex
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 1h
+        - alert: HostedRunnersServicePendingBuildsApdexSLOViolationSingleShard
+          annotations:
+            description: |
+                This SLI monitors pending job from runners.
+
+                Jobs that are waiting more than 300s are considered as a error and impact service apdex.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the apdex value is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "578652087"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                histogram_quantile(
+                  0.950000,
+                  sum by (le,shard) (
+                    rate(gitlab_runner_job_queue_duration_seconds_bucket{job="hosted-runners-prometheus-agent",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                  )
+                )
+            runbook: hosted-runners/#alerts
+            title: The pending_builds SLI of the hosted-runners service on shard `{{ $labels.shard }}` has an apdex violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_apdex:ratio_6h{component="pending_builds",type="hosted-runners"}
+                < (1 - 6 * 0.030000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_apdex:ratio_30m{component="pending_builds",type="hosted-runners"}
+                < (1 - 6 * 0.030000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_6h{component="pending_builds",type="hosted-runners"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            rules_domain: general
+            severity: s3
+            sli_type: apdex
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 6h
+        - alert: HostedRunnersServicePollingErrorSLOViolation
+          annotations:
+            description: |
+                This SLI monitors job polling operations from runners, via Workhorse's `/api/v4/jobs/request` route.
+
+                5xx responses are considered to be errors, and could indicate postgres timeouts (after 15s) on the main query used in assigning jobs to runners.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "2980174133"
+            grafana_variables: environment,stage
+            promql_template_1: |
+                sum by () (
+                  rate(gitlab_workhorse_http_requests_total{code=~"5..",route="^/api/v4/jobs/request\\z"}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The polling SLI of the hosted-runners service (`{{ $labels.stage }}` stage) has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_errors:ratio_1h{component="polling",type="hosted-runners"}
+                > (14.4 * 0.001000)
+              )
+              and on (type,component)
+              (
+                gitlab_component_errors:ratio_5m{component="polling",type="hosted-runners"}
+                > (14.4 * 0.001000)
+              )
+            )
+            and on(type,component)
+            (
+              sum by(type,component) (gitlab_component_ops:rate_1h{component="polling",type="hosted-runners"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 1h
+        - alert: HostedRunnersServicePollingErrorSLOViolation
+          annotations:
+            description: |
+                This SLI monitors job polling operations from runners, via Workhorse's `/api/v4/jobs/request` route.
+
+                5xx responses are considered to be errors, and could indicate postgres timeouts (after 15s) on the main query used in assigning jobs to runners.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "2980174133"
+            grafana_variables: environment,stage
+            promql_template_1: |
+                sum by () (
+                  rate(gitlab_workhorse_http_requests_total{code=~"5..",route="^/api/v4/jobs/request\\z"}[5m])
+                )
+            runbook: hosted-runners/#alerts
+            title: The polling SLI of the hosted-runners service (`{{ $labels.stage }}` stage) has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_errors:ratio_6h{component="polling",type="hosted-runners"}
+                > (6 * 0.001000)
+              )
+              and on (type,component)
+              (
+                gitlab_component_errors:ratio_30m{component="polling",type="hosted-runners"}
+                > (6 * 0.001000)
+              )
+            )
+            and on(type,component)
+            (
+              sum by(type,component) (gitlab_component_ops:rate_6h{component="polling",type="hosted-runners"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "yes"
+            window: 6h
+        - alert: HostedRunnersServiceQueuingQueriesDurationApdexSLOViolation
+          annotations:
+            description: |
+                This SLI monitors the queuing queries duration. Everything above 1 second is considered to be unexpected and needs investigation.
+
+                These database queries are executed in the Rails application when a runner requests a new build to process in `POST /api/v4/jobs/request`.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Currently the apdex value is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "4172966397"
+            grafana_variables: environment,stage
+            promql_template_1: |
+                histogram_quantile(
+                  0.950000,
+                  sum by (le) (
+                    rate(gitlab_runner_job_queue_duration_seconds_bucket{}[5m])
+                  )
+                )
+            runbook: hosted-runners/#alerts
+            title: The queuing_queries_duration SLI of the hosted-runners service (`{{ $labels.stage }}` stage) has an apdex violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_apdex:ratio_1h{component="queuing_queries_duration",type="hosted-runners"}
+                < (1 - 14.4 * 0.001000)
+              )
+              and on (type,component)
+              (
+                gitlab_component_apdex:ratio_5m{component="queuing_queries_duration",type="hosted-runners"}
+                < (1 - 14.4 * 0.001000)
+              )
+            )
+            and on(type,component)
+            (
+              sum by(type,component) (gitlab_component_ops:rate_1h{component="queuing_queries_duration",type="hosted-runners"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: apdex
+            slo_alert: "yes"
+            user_impacting: "no"
+            window: 1h
+        - alert: HostedRunnersServiceQueuingQueriesDurationApdexSLOViolation
+          annotations:
+            description: |
+                This SLI monitors the queuing queries duration. Everything above 1 second is considered to be unexpected and needs investigation.
+
+                These database queries are executed in the Rails application when a runner requests a new build to process in `POST /api/v4/jobs/request`.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+                Currently the apdex value is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-main/hosted-runners-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-main/hosted-runners-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "4172966397"
+            grafana_variables: environment,stage
+            promql_template_1: |
+                histogram_quantile(
+                  0.950000,
+                  sum by (le) (
+                    rate(gitlab_runner_job_queue_duration_seconds_bucket{}[5m])
+                  )
+                )
+            runbook: hosted-runners/#alerts
+            title: The queuing_queries_duration SLI of the hosted-runners service (`{{ $labels.stage }}` stage) has an apdex violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_apdex:ratio_6h{component="queuing_queries_duration",type="hosted-runners"}
+                < (1 - 6 * 0.001000)
+              )
+              and on (type,component)
+              (
+                gitlab_component_apdex:ratio_30m{component="queuing_queries_duration",type="hosted-runners"}
+                < (1 - 6 * 0.001000)
+              )
+            )
+            and on(type,component)
+            (
+              sum by(type,component) (gitlab_component_ops:rate_6h{component="queuing_queries_duration",type="hosted-runners"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: apdex
+            slo_alert: "yes"
+            user_impacting: "no"
+            window: 6h
+    - interval: 1m
+      name: 'Service Component Alerts: hosted-runners-logging'
+      rules:
+        - alert: HostedRunnersLoggingServiceUsageLogsErrorSLOViolationSingleShard
+          annotations:
+            description: |
+                This log SLI represents the total number of errors encountered by Fluentd while writing logs to S3 destination.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/logging_service_usage_logs_error/index.html
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-logging-main/hosted-runners-logging-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-logging-main/hosted-runners-logging-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "3320013885"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(fluentd_output_status_num_errors{job="hosted-runners-fluentd-agent",plugin="s3",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                )
+            runbook: hosted-runners-logging/#alerts
+            title: The usage_logs SLI of the hosted-runners-logging service on shard `{{ $labels.shard }}` has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_errors:ratio_1h{component="usage_logs",type="hosted-runners-logging"}
+                > (14.4 * 0.001000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_errors:ratio_5m{component="usage_logs",type="hosted-runners-logging"}
+                > (14.4 * 0.001000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_1h{component="usage_logs",type="hosted-runners-logging"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "no"
+            window: 1h
+        - alert: HostedRunnersLoggingServiceUsageLogsErrorSLOViolationSingleShard
+          annotations:
+            description: |
+                This log SLI represents the total number of errors encountered by Fluentd while writing logs to S3 destination.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/logging_service_usage_logs_error/index.html
+
+                Since the `{{ $labels.type }}` service is not fully redundant, SLI violations on a single shard may represent a user-impacting service degradation.
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-logging-main/hosted-runners-logging-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-logging-main/hosted-runners-logging-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}&var-shard={{ $labels.shard }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "3320013885"
+            grafana_variables: environment,stage,shard
+            promql_template_1: |
+                sum by (shard) (
+                  rate(fluentd_output_status_num_errors{job="hosted-runners-fluentd-agent",plugin="s3",shard="{{ $labels.shard }}",shard=~".*"}[5m])
+                )
+            runbook: hosted-runners-logging/#alerts
+            title: The usage_logs SLI of the hosted-runners-logging service on shard `{{ $labels.shard }}` has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_shard_errors:ratio_6h{component="usage_logs",type="hosted-runners-logging"}
+                > (6 * 0.001000)
+              )
+              and on (type,component,shard)
+              (
+                gitlab_component_shard_errors:ratio_30m{component="usage_logs",type="hosted-runners-logging"}
+                > (6 * 0.001000)
+              )
+            )
+            and on(type,component,shard)
+            (
+              sum by(type,component,shard) (gitlab_component_shard_ops:rate_6h{component="usage_logs",type="hosted-runners-logging"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component_shard
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "no"
+            window: 6h
+        - alert: HostedRunnersLoggingServiceUsageReplicationErrorSLOViolation
+          annotations:
+            description: |
+                This log SLI represents the total number of errors encountered by S3 replicating objects to the central S3 destination.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/usage_replication_error/index.html
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-logging-main/hosted-runners-logging-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-logging-main/hosted-runners-logging-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "1779856505"
+            grafana_variables: environment,stage
+            promql_template_1: |
+                sum by () (
+                  avg_over_time(aws_s3_operations_failed_replication_sum[5m])
+                )
+            runbook: hosted-runners-logging/#alerts
+            title: The usage_replication SLI of the hosted-runners-logging service (`{{ $labels.stage }}` stage) has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_errors:ratio_1h{component="usage_replication",type="hosted-runners-logging"}
+                > (14.4 * 0.001000)
+              )
+              and on (type,component)
+              (
+                gitlab_component_errors:ratio_5m{component="usage_replication",type="hosted-runners-logging"}
+                > (14.4 * 0.001000)
+              )
+            )
+            and on(type,component)
+            (
+              sum by(type,component) (gitlab_component_ops:rate_1h{component="usage_replication",type="hosted-runners-logging"}) >= 0.01389
+            )
+          for: 2m
+          labels:
+            aggregation: component
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "no"
+            window: 1h
+        - alert: HostedRunnersLoggingServiceUsageReplicationErrorSLOViolation
+          annotations:
+            description: |
+                This log SLI represents the total number of errors encountered by S3 replicating objects to the central S3 destination.
+
+                For more information, see: https://runbooks.gitlab-static.net/hosted-runners/usage_replication_error/index.html
+
+                Currently the error-rate is {{ $value | humanizePercentage }}.
+            grafana_dashboard_id: hosted-runners-logging-main/hosted-runners-logging-overview
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/hosted-runners-logging-main/hosted-runners-logging-overview?from=now-6h/m&to=now-1m/m&var-environment={{ $labels.environment }}&var-stage={{ $labels.stage }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "1779856505"
+            grafana_variables: environment,stage
+            promql_template_1: |
+                sum by () (
+                  avg_over_time(aws_s3_operations_failed_replication_sum[5m])
+                )
+            runbook: hosted-runners-logging/#alerts
+            title: The usage_replication SLI of the hosted-runners-logging service (`{{ $labels.stage }}` stage) has an error rate violating SLO
+          expr: |
+            (
+              (
+                gitlab_component_errors:ratio_6h{component="usage_replication",type="hosted-runners-logging"}
+                > (6 * 0.001000)
+              )
+              and on (type,component)
+              (
+                gitlab_component_errors:ratio_30m{component="usage_replication",type="hosted-runners-logging"}
+                > (6 * 0.001000)
+              )
+            )
+            and on(type,component)
+            (
+              sum by(type,component) (gitlab_component_ops:rate_6h{component="usage_replication",type="hosted-runners-logging"}) >= 0.00231
+            )
+          for: 2m
+          labels:
+            aggregation: component
+            alert_class: slo_violation
+            alert_type: symptom
+            feature_category: not_owned
+            pager: pagerduty
+            rules_domain: general
+            severity: s1
+            sli_type: error
+            slo_alert: "yes"
+            user_impacting: "no"
+            window: 6h
+    - interval: 1m
+      name: GitLab Saturation Alerts
+      rules:
+        - alert: component_saturation_slo_out_of_bounds:pending_builds
+          annotations:
+            description: |+
+                This means that this resource is running close to capacity and is at risk of exceeding its current capacity limit.
+
+                Details of the Hosted Runner Manager Concurrency Limit resource:
+
+                Hosted Runner Manager Concurrency Limit.
+
+                For more information, see: https://runbooks.gitlab.com/hosted-runners/#alerts
+
+            grafana_dashboard_id: alerts-gitlab_runner_concurrent
+            grafana_dashboard_link: https://dashboards.gitlab.net/d/alerts-gitlab_runner_concurrent?from=now-6h/m&to=now-1m/m&var-type={{ $labels.type }}
+            grafana_min_zoom_hours: "6"
+            grafana_panel_id: "1133763935"
+            grafana_variables: type
+            promql_query: |
+                max by(hosted-runners,shard) (
+                  clamp_min(
+                    clamp_max(
+                      (
+                        sum by (shard, type) (gitlab_runner_jobs)
+                      /
+                        sum by (shard, type) (gitlab_runner_concurrent)
+                      )
+                      ,
+                      1)
+                  ,
+                  0)
+                )
+            promql_template_1: |
+                max by(hosted-runners,shard) (
+                  clamp_min(
+                    clamp_max(
+                      (
+                        sum by (shard, type) (gitlab_runner_jobs)
+                      /
+                        sum by (shard, type) (gitlab_runner_concurrent)
+                      )
+                      ,
+                      1)
+                  ,
+                  0)
+                )
+            runbook: '{{ $labels.type }}/'
+            title: The Hosted Runner Manager Concurrency Limit resource of the {{ $labels.type }} service has a saturation exceeding SLO and is close to its capacity limit.
+          expr: |
+            gitlab_component_saturation:ratio{component="pending_builds"} > on(component) group_left
+            slo:max:hard:gitlab_component_saturation:ratio{component="pending_builds"}
+          for: 5m
+          labels:
+            alert_type: cause
+            pager: pagerduty
+            rules_domain: general
+            severity: s2
+    - interval: 1m
+      name: 'Custom Alerts: hosted-runners'
+      rules:
+        - alert: HostedRunnersServiceRunnerManagerDownSingleShard
+          annotations:
+            description: The runner manager in HostedRunnersService has disconnected for a single shard. This may impact job scheduling for that shard.
+            runbook: hosted-runners/
+          expr: gitlab_component_shard_ops:rate_5m{component="api_requests",type="hosted-runners"} == 0
+          for: 5m
+          labels:
+            alert_type: cause
+            severity: s1

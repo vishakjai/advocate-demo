@@ -1,0 +1,962 @@
+{
+  "acl": [
+    0,
+    0
+  ],
+  "append": [
+    1,
+    1
+  ],
+  "asking": [
+    0,
+    0
+  ],
+  "auth": [
+    0,
+    0
+  ],
+  "bgrewriteaof": [
+    0,
+    0
+  ],
+  "bgsave": [
+    0,
+    0
+  ],
+  "bitcount": [
+    1,
+    1
+  ],
+  "bitfield": [
+    1,
+    1
+  ],
+  "bitfield_ro": [
+    1,
+    1
+  ],
+  "bitop": [
+    2,
+    -1
+  ],
+  "bitpos": [
+    1,
+    1
+  ],
+  "blmove": [
+    1,
+    2
+  ],
+  "blmpop": [
+    0,
+    0
+  ],
+  "blpop": [
+    1,
+    -2
+  ],
+  "brpop": [
+    1,
+    -2
+  ],
+  "brpoplpush": [
+    1,
+    2
+  ],
+  "bzmpop": [
+    0,
+    0
+  ],
+  "bzpopmax": [
+    1,
+    -2
+  ],
+  "bzpopmin": [
+    1,
+    -2
+  ],
+  "client": [
+    0,
+    0
+  ],
+  "cluster": [
+    0,
+    0
+  ],
+  "command": [
+    0,
+    0
+  ],
+  "config": [
+    0,
+    0
+  ],
+  "copy": [
+    1,
+    2
+  ],
+  "dbsize": [
+    0,
+    0
+  ],
+  "debug": [
+    0,
+    0
+  ],
+  "decr": [
+    1,
+    1
+  ],
+  "decrby": [
+    1,
+    1
+  ],
+  "del": [
+    1,
+    -1
+  ],
+  "discard": [
+    0,
+    0
+  ],
+  "dump": [
+    1,
+    1
+  ],
+  "echo": [
+    0,
+    0
+  ],
+  "eval": [
+    0,
+    0
+  ],
+  "eval_ro": [
+    0,
+    0
+  ],
+  "evalsha": [
+    0,
+    0
+  ],
+  "evalsha_ro": [
+    0,
+    0
+  ],
+  "exec": [
+    0,
+    0
+  ],
+  "exists": [
+    1,
+    -1
+  ],
+  "expire": [
+    1,
+    1
+  ],
+  "expireat": [
+    1,
+    1
+  ],
+  "expiretime": [
+    1,
+    1
+  ],
+  "failover": [
+    0,
+    0
+  ],
+  "fcall": [
+    0,
+    0
+  ],
+  "fcall_ro": [
+    0,
+    0
+  ],
+  "flushall": [
+    0,
+    0
+  ],
+  "flushdb": [
+    0,
+    0
+  ],
+  "function": [
+    0,
+    0
+  ],
+  "geoadd": [
+    1,
+    1
+  ],
+  "geodist": [
+    1,
+    1
+  ],
+  "geohash": [
+    1,
+    1
+  ],
+  "geopos": [
+    1,
+    1
+  ],
+  "georadius": [
+    1,
+    1
+  ],
+  "georadius_ro": [
+    1,
+    1
+  ],
+  "georadiusbymember": [
+    1,
+    1
+  ],
+  "georadiusbymember_ro": [
+    1,
+    1
+  ],
+  "geosearch": [
+    1,
+    1
+  ],
+  "geosearchstore": [
+    1,
+    2
+  ],
+  "get": [
+    1,
+    1
+  ],
+  "getbit": [
+    1,
+    1
+  ],
+  "getdel": [
+    1,
+    1
+  ],
+  "getex": [
+    1,
+    1
+  ],
+  "getrange": [
+    1,
+    1
+  ],
+  "getset": [
+    1,
+    1
+  ],
+  "hdel": [
+    1,
+    1
+  ],
+  "hello": [
+    0,
+    0
+  ],
+  "hexists": [
+    1,
+    1
+  ],
+  "hget": [
+    1,
+    1
+  ],
+  "hgetall": [
+    1,
+    1
+  ],
+  "hincrby": [
+    1,
+    1
+  ],
+  "hincrbyfloat": [
+    1,
+    1
+  ],
+  "hkeys": [
+    1,
+    1
+  ],
+  "hlen": [
+    1,
+    1
+  ],
+  "hmget": [
+    1,
+    1
+  ],
+  "hmset": [
+    1,
+    1
+  ],
+  "hrandfield": [
+    1,
+    1
+  ],
+  "hscan": [
+    1,
+    1
+  ],
+  "hset": [
+    1,
+    1
+  ],
+  "hsetnx": [
+    1,
+    1
+  ],
+  "hstrlen": [
+    1,
+    1
+  ],
+  "hvals": [
+    1,
+    1
+  ],
+  "incr": [
+    1,
+    1
+  ],
+  "incrby": [
+    1,
+    1
+  ],
+  "incrbyfloat": [
+    1,
+    1
+  ],
+  "info": [
+    0,
+    0
+  ],
+  "keys": [
+    0,
+    0
+  ],
+  "lastsave": [
+    0,
+    0
+  ],
+  "latency": [
+    0,
+    0
+  ],
+  "lcs": [
+    1,
+    2
+  ],
+  "lindex": [
+    1,
+    1
+  ],
+  "linsert": [
+    1,
+    1
+  ],
+  "llen": [
+    1,
+    1
+  ],
+  "lmove": [
+    1,
+    2
+  ],
+  "lmpop": [
+    0,
+    0
+  ],
+  "lolwut": [
+    0,
+    0
+  ],
+  "lpop": [
+    1,
+    1
+  ],
+  "lpos": [
+    1,
+    1
+  ],
+  "lpush": [
+    1,
+    1
+  ],
+  "lpushx": [
+    1,
+    1
+  ],
+  "lrange": [
+    1,
+    1
+  ],
+  "lrem": [
+    1,
+    1
+  ],
+  "lset": [
+    1,
+    1
+  ],
+  "ltrim": [
+    1,
+    1
+  ],
+  "memory": [
+    0,
+    0
+  ],
+  "mget": [
+    1,
+    -1
+  ],
+  "migrate": [
+    3,
+    3
+  ],
+  "module": [
+    0,
+    0
+  ],
+  "monitor": [
+    0,
+    0
+  ],
+  "move": [
+    1,
+    1
+  ],
+  "mset": [
+    1,
+    -1
+  ],
+  "msetnx": [
+    1,
+    -1
+  ],
+  "multi": [
+    0,
+    0
+  ],
+  "object": [
+    0,
+    0
+  ],
+  "persist": [
+    1,
+    1
+  ],
+  "pexpire": [
+    1,
+    1
+  ],
+  "pexpireat": [
+    1,
+    1
+  ],
+  "pexpiretime": [
+    1,
+    1
+  ],
+  "pfadd": [
+    1,
+    1
+  ],
+  "pfcount": [
+    1,
+    -1
+  ],
+  "pfdebug": [
+    2,
+    2
+  ],
+  "pfmerge": [
+    1,
+    -1
+  ],
+  "pfselftest": [
+    0,
+    0
+  ],
+  "ping": [
+    0,
+    0
+  ],
+  "psetex": [
+    1,
+    1
+  ],
+  "psubscribe": [
+    0,
+    0
+  ],
+  "psync": [
+    0,
+    0
+  ],
+  "pttl": [
+    1,
+    1
+  ],
+  "publish": [
+    0,
+    0
+  ],
+  "pubsub": [
+    0,
+    0
+  ],
+  "punsubscribe": [
+    0,
+    0
+  ],
+  "quit": [
+    0,
+    0
+  ],
+  "randomkey": [
+    0,
+    0
+  ],
+  "readonly": [
+    0,
+    0
+  ],
+  "readwrite": [
+    0,
+    0
+  ],
+  "rename": [
+    1,
+    2
+  ],
+  "renamenx": [
+    1,
+    2
+  ],
+  "replconf": [
+    0,
+    0
+  ],
+  "replicaof": [
+    0,
+    0
+  ],
+  "reset": [
+    0,
+    0
+  ],
+  "restore": [
+    1,
+    1
+  ],
+  "restore-asking": [
+    1,
+    1
+  ],
+  "role": [
+    0,
+    0
+  ],
+  "rpop": [
+    1,
+    1
+  ],
+  "rpoplpush": [
+    1,
+    2
+  ],
+  "rpush": [
+    1,
+    1
+  ],
+  "rpushx": [
+    1,
+    1
+  ],
+  "sadd": [
+    1,
+    1
+  ],
+  "save": [
+    0,
+    0
+  ],
+  "scan": [
+    0,
+    0
+  ],
+  "scard": [
+    1,
+    1
+  ],
+  "script": [
+    0,
+    0
+  ],
+  "sdiff": [
+    1,
+    -1
+  ],
+  "sdiffstore": [
+    1,
+    -1
+  ],
+  "select": [
+    0,
+    0
+  ],
+  "set": [
+    1,
+    1
+  ],
+  "setbit": [
+    1,
+    1
+  ],
+  "setex": [
+    1,
+    1
+  ],
+  "setnx": [
+    1,
+    1
+  ],
+  "setrange": [
+    1,
+    1
+  ],
+  "shutdown": [
+    0,
+    0
+  ],
+  "sinter": [
+    1,
+    -1
+  ],
+  "sintercard": [
+    0,
+    0
+  ],
+  "sinterstore": [
+    1,
+    -1
+  ],
+  "sismember": [
+    1,
+    1
+  ],
+  "slaveof": [
+    0,
+    0
+  ],
+  "slowlog": [
+    0,
+    0
+  ],
+  "smembers": [
+    1,
+    1
+  ],
+  "smismember": [
+    1,
+    1
+  ],
+  "smove": [
+    1,
+    2
+  ],
+  "sort": [
+    1,
+    1
+  ],
+  "sort_ro": [
+    1,
+    1
+  ],
+  "spop": [
+    1,
+    1
+  ],
+  "spublish": [
+    1,
+    1
+  ],
+  "srandmember": [
+    1,
+    1
+  ],
+  "srem": [
+    1,
+    1
+  ],
+  "sscan": [
+    1,
+    1
+  ],
+  "ssubscribe": [
+    1,
+    -1
+  ],
+  "strlen": [
+    1,
+    1
+  ],
+  "subscribe": [
+    0,
+    0
+  ],
+  "substr": [
+    1,
+    1
+  ],
+  "sunion": [
+    1,
+    -1
+  ],
+  "sunionstore": [
+    1,
+    -1
+  ],
+  "sunsubscribe": [
+    1,
+    -1
+  ],
+  "swapdb": [
+    0,
+    0
+  ],
+  "sync": [
+    0,
+    0
+  ],
+  "time": [
+    0,
+    0
+  ],
+  "touch": [
+    1,
+    -1
+  ],
+  "ttl": [
+    1,
+    1
+  ],
+  "type": [
+    1,
+    1
+  ],
+  "unlink": [
+    1,
+    -1
+  ],
+  "unsubscribe": [
+    0,
+    0
+  ],
+  "unwatch": [
+    0,
+    0
+  ],
+  "wait": [
+    0,
+    0
+  ],
+  "watch": [
+    1,
+    -1
+  ],
+  "xack": [
+    1,
+    1
+  ],
+  "xadd": [
+    1,
+    1
+  ],
+  "xautoclaim": [
+    1,
+    1
+  ],
+  "xclaim": [
+    1,
+    1
+  ],
+  "xdel": [
+    1,
+    1
+  ],
+  "xgroup": [
+    0,
+    0
+  ],
+  "xinfo": [
+    0,
+    0
+  ],
+  "xlen": [
+    1,
+    1
+  ],
+  "xpending": [
+    1,
+    1
+  ],
+  "xrange": [
+    1,
+    1
+  ],
+  "xread": [
+    0,
+    0
+  ],
+  "xreadgroup": [
+    0,
+    0
+  ],
+  "xrevrange": [
+    1,
+    1
+  ],
+  "xsetid": [
+    1,
+    1
+  ],
+  "xtrim": [
+    1,
+    1
+  ],
+  "zadd": [
+    1,
+    1
+  ],
+  "zcard": [
+    1,
+    1
+  ],
+  "zcount": [
+    1,
+    1
+  ],
+  "zdiff": [
+    0,
+    0
+  ],
+  "zdiffstore": [
+    1,
+    1
+  ],
+  "zincrby": [
+    1,
+    1
+  ],
+  "zinter": [
+    0,
+    0
+  ],
+  "zintercard": [
+    0,
+    0
+  ],
+  "zinterstore": [
+    1,
+    1
+  ],
+  "zlexcount": [
+    1,
+    1
+  ],
+  "zmpop": [
+    0,
+    0
+  ],
+  "zmscore": [
+    1,
+    1
+  ],
+  "zpopmax": [
+    1,
+    1
+  ],
+  "zpopmin": [
+    1,
+    1
+  ],
+  "zrandmember": [
+    1,
+    1
+  ],
+  "zrange": [
+    1,
+    1
+  ],
+  "zrangebylex": [
+    1,
+    1
+  ],
+  "zrangebyscore": [
+    1,
+    1
+  ],
+  "zrangestore": [
+    1,
+    2
+  ],
+  "zrank": [
+    1,
+    1
+  ],
+  "zrem": [
+    1,
+    1
+  ],
+  "zremrangebylex": [
+    1,
+    1
+  ],
+  "zremrangebyrank": [
+    1,
+    1
+  ],
+  "zremrangebyscore": [
+    1,
+    1
+  ],
+  "zrevrange": [
+    1,
+    1
+  ],
+  "zrevrangebylex": [
+    1,
+    1
+  ],
+  "zrevrangebyscore": [
+    1,
+    1
+  ],
+  "zrevrank": [
+    1,
+    1
+  ],
+  "zscan": [
+    1,
+    1
+  ],
+  "zscore": [
+    1,
+    1
+  ],
+  "zunion": [
+    0,
+    0
+  ],
+  "zunionstore": [
+    1,
+    1
+  ]
+}

@@ -1,0 +1,2688 @@
+tiers:
+  - name: sv
+  - name: lb
+  - name: stor
+  - name: db
+  - name: inf
+
+# For each entry in services, a label is automatically created by the
+# `reconcile_service_catalog_labels` job in CI when a service label does not
+# already exist.
+#
+# The label name can be customized using the `label` field, which will
+# automatically convert to scoped label, e.g. `Service::my-service`.
+#
+# The full list of service labels can be viewed under
+# https://gitlab.com/groups/gitlab-com/gl-infra/-/labels?search=Service%3A%3A&sort=created_desc.
+#
+# You can check the schema for a service in https://gitlab-com.gitlab.io/runbooks/service-catalog-schema.html,
+# and read more about it in https://gitlab.com/gitlab-com/runbooks/-/blob/master/services/README.md#schema
+services:
+  - name: amp
+    tier: inf
+    label: Amp
+    friendly_name: Amp
+    owner: cells_infrastructure
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/gitlab-dedicated/amp/
+      documents:
+        architecture: https://gitlab.com/gitlab-com/gl-infra/gitlab-dedicated/team/-/tree/main/architecture
+        sre_guide: https://runbooks.gitlab.com//cells/amp/
+      logging:
+        - name: cellsdev
+          permalink: https://console.cloud.google.com/logs/query?project=amp-b6f1
+        - name: cellsprod
+          permalink: https://console.cloud.google.com/logs/query?project=amp-3c0d
+  - name: api
+    friendly_name: GitLab API
+    tier: sv
+    teams:
+      - create
+      - deploy
+      - geo
+      - gitaly
+      - manage
+      - plan
+    label: API
+    owner: api
+    business:
+      SLA:
+        overall_sla_weighting: 5 # If this exists, this service will be included in the overall SLA, using this value as a weighted average
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-ce
+        - https://gitlab.com/gitlab-org/gitlab-ee
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/api-k8s-migration
+        sre_guide: https://runbooks.gitlab.com/api/
+        developer_guide: https://docs.gitlab.com/ee/development/api_styleguide.html
+        service:
+          - https://docs.gitlab.com/ce/api/
+          - https://docs.gitlab.com/ee/api/
+      dependencies:
+        - service: consul
+        - service: postgres
+        - service: gitaly
+        - service: redis
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/goto/f61f543b668c26f2dcdb8a0eb06e2edb
+        - name: Workhorse
+          permalink: https://log.gprd.gitlab.net/goto/66979d90ca195652b7a4d10d22ca2db7
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/goto/88eab835042a07b213b8c7f24213d5bf
+    observability:
+      monitors:
+        primary_grafana_dashboard: api-main/api-overview
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22rails%22
+
+  - name: argocd
+    tier: inf
+    friendly_name: ArgoCD
+    label: ArgoCD
+    owner: fleet_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/argocd
+      documents:
+        architecture: https://runbooks.gitlab.com/argocd/#architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/argocd
+        sre_guide: https://runbooks.gitlab.com/argocd/#troubleshooting
+      logging:
+        - name: Elasticsearch
+          permalink: https://nonprod-log.gitlab.net/app/r/s/c8v2r
+    observability:
+      monitors:
+        grafana_folder: ArgoCD
+        primary_grafana_dashboard: argocd-main/argocd-overview
+
+  - name: atlantis
+    tier: inf
+    friendly_name: Atlantis
+    label: atlantis
+    owner: fleet_management
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/atlantis/
+      logging:
+        - name: Atlantis
+          permalink: https://dashboards.gitlab.net/goto/ZJOLqE4SR
+    observability:
+      monitors:
+        primary_grafana_dashboard: atlantis-main/atlantis-overview
+
+  - name: backup-restore-testing
+    tier: inf
+    friendly_name: Backup & Restore Testing
+    label: backup-restore-testing
+    owner: tenant_services
+  - name: blackbox
+    tier: inf
+    friendly_name: Blackbox Exporters
+    label: Blackbox
+    owner: observability
+    technical:
+      project:
+        - https://gitlab.com/gitlab-cookbooks/gitlab-exporters
+      documents:
+        service:
+          - https://github.com/prometheus/blackbox_exporter/blob/master/README.md
+      dependencies:
+        - service: prometheus
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/b4618f79f80f44cb21a32623a275a0e6
+  - name: build-tooling
+    friendly_name: Distribution Build Tooling
+    tier: inf
+    teams:
+      - build
+    label: Build-Tooling
+    owner: build
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/omnibus-gitlab
+        - https://gitlab.com/gitlab-org/build/CNG
+  - name: release-tooling
+    friendly_name: Delivery Release Tooling
+    tier: inf
+    teams:
+      - release-and-deploy
+    label: release-Tooling
+    owner: release-and-deploy
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/release-tools
+        - https://ops.gitlab.net/gitlab-com/gl-infra/deployer
+        - https://ops.gitlab.net/gitlab-com/gl-infra/deploy-tooling
+        - https://ops.gitlab.net/gitlab-com/gl-infra/patcher
+        - https://gitlab.com/gitlab-org/merge-train
+        - https://gitlab.com/gitlab-com/gl-infra/release-environments
+  - name: camoproxy
+    tier: sv
+    friendly_name: Camoproxy
+    label: Camoproxy
+    owner: reliability_unowned
+    technical:
+      project:
+        - https://github.com/cactus/go-camo
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles/-/tree/master/releases/camoproxy/charts
+      documents:
+        sre_guide: https://runbooks.gitlab.com/camoproxy/
+        developer_guide: https://docs.gitlab.com/ee/security/asset_proxy.html
+      logging:
+        - name: Camoproxy
+          permalink: https://log.gprd.gitlab.net/goto/f86d35a17e46e0de9d8454b3a5d4387f
+    observability:
+      monitors:
+        primary_grafana_dashboard: camoproxy-main/camoproxy-overview
+
+  - name: clickhouse
+    tier: inf
+    friendly_name: ClickHouse Cloud
+    label: Service::ClickHouseCloud
+    owner: clickhouse
+    teams:
+      - clickhouse
+    technical:
+      documents:
+        architecture: https://docs.gitlab.com/ee/architecture/blueprints/clickhouse_usage/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/173
+        sre_guide: https://runbooks.gitlab.com/clickhouse/
+        developer_guide: https://docs.gitlab.com/ee/development/database/clickhouse/clickhouse_within_gitlab.html
+      logging:
+        - name: ClickHouse Cloud monitoring
+          permalink: https://clickhouse.cloud/services
+  - name: console
+    tier: sv
+    friendly_name: Console Access
+    label: Console
+    owner: reliability_unowned
+    technical:
+      project:
+        - https://gitlab.com/gitlab-cookbooks/gitlab_users
+      dependencies:
+        - service: postgres
+        - service: gitaly
+        - service: redis
+    observability:
+      monitors:
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22rails%22
+
+  - name: consul
+    tier: inf
+    friendly_name: Consul
+    label: Consul
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://github.com/hashicorp/consul
+      documents:
+        architecture: https://developer.hashicorp.com/consul/docs/architecture/control-plane
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/80
+        sre_guide: https://runbooks.gitlab.com/consul/
+        service:
+          - https://github.com/hashicorp/consul/blob/master/README.md
+        security: https://developer.hashicorp.com/consul/docs/secure
+      logging:
+        - name: Consul
+          permalink: https://log.gprd.gitlab.net/goto/7f15b1f04a0f09fbb18fc62adefe3ed1
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/a22fbb60e45a3f6d7860908a5427301c
+    observability:
+      monitors:
+        primary_grafana_dashboard: a988f2tmz/consul
+
+  - name: contributors
+    tier: sv
+    friendly_name: contributors.gitlab.com
+    label: Contributors
+    owner: developer_relations
+  - name: db-benchmarking
+    tier: db
+    friendly_name: Database Benchmarking
+    label: db-benchmarking
+    owner: database_operations
+  - name: dblab
+    tier: db
+    friendly_name: Database Lab (postgres.ai)
+    label: dblab
+    owner: database_operations
+    technical:
+      project:
+        - https://docs.gitlab.com/development/database/database_lab
+  - name: docs-website
+    tier: sv
+    friendly_name: docs.gitlab.com
+    label: docs.gitlab.com
+    owner: technical_writing
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/technical-writing/docs-gitlab-com
+      documents:
+        architecture: https://gitlab.com/gitlab-org/technical-writing/docs-gitlab-com/-/blob/main/doc/architecture.md
+        sre_guide: https://runbooks.gitlab.com/docs.gitlab.com/
+        developer_guide: https://gitlab.com/gitlab-org/technical-writing/docs-gitlab-com/-/blob/main/doc/development.md
+        service:
+          - https://gitlab.com/gitlab-org/technical-writing/docs-gitlab-com/-/blob/main/doc
+      dependencies:
+        - service: elasticsearch
+        - service: web-pages
+      logging:
+        - name: elasticsearch logs and metrics
+          permalink: https://cloud.elastic.co/deployments/6812a4f2d673478cabffaf43ffbaab56/logs-metrics
+  - name: errortracking
+    tier: sv
+    friendly_name: ErrorTracking
+    teams:
+      - platform_insights
+    label: ErrorTracking
+    owner: platform_insights
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/opstrace/opstrace
+      documents:
+        architecture: https://gitlab.com/gitlab-org/opstrace/runbooks/#architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/library/database/clickhouse
+        developer_guide: https://gitlab.com/gitlab-org/opstrace/opstrace/-/tree/main/docs
+      logging:
+        - name: Kibana
+          permalink: https://log.gprd.gitlab.net/app/r/s/Kvsjn
+    observability:
+      monitors:
+        primary_grafana_dashboard: observability-errortracking/observability-errortracking-api
+
+  - name: tracing
+    tier: sv
+    friendly_name: Distributed Tracing
+    teams:
+      - platform_insights
+    label: Tracing
+    owner: platform_insights
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/opstrace/opstrace
+      documents:
+        service:
+          - https://docs.gitlab.com/ee/operations/tracing.html
+        architecture: https://gitlab.com/gitlab-org/opstrace/runbooks/#architecture
+        developer_guide: https://gitlab.com/gitlab-org/opstrace/opstrace/-/tree/main/docs
+      logging:
+        - name: Kibana
+          permalink: https://log.gprd.gitlab.net/app/r/s/Kvsjn
+    observability:
+      monitors:
+        primary_grafana_dashboard: observability-tracing/observability3a-tracing
+
+  - name: customersdot
+    tier: sv
+    friendly_name: CustomersDot
+    teams:
+      - fulfillment
+    label: CustomersDot
+    owner: fulfillment_platform
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/customers-gitlab-com
+      documents:
+        architecture: https://gitlab.com/gitlab-org/customers-gitlab-com/-/blob/main/doc/architecture/index.md
+        sre_guide: https://runbooks.gitlab.com/customersdot/
+        developer_guide: https://docs.gitlab.com/ee/development/product_qualified_lead_guide/#hand-raise-flow-on-customersdot
+        service:
+          - https://gitlab.com/gitlab-org/customers-gitlab-com/-/tree/main/doc
+      logging:
+        - name: Rails
+          permalink: https://console.cloud.google.com/logs/query;query=resource.type%3D%22gce_instance%22%0Alog_name%3D%22projects%2Fgitlab-subscriptions-prod%2Flogs%2Frails.production%22;cursorTimestamp=2022-06-08T08:35:26.081Z?referrer=search&project=gitlab-subscriptions-prod
+        - name: Sidekiq
+          permalink: https://console.cloud.google.com/logs/query;query=resource.type%3D%22gce_instance%22%0Alog_name%3D%22projects%2Fgitlab-subscriptions-prod%2Flogs%2Fsidekiq.production%22;cursorTimestamp=2022-06-08T08:34:39.368440702Z?referrer=search&project=gitlab-subscriptions-prod/
+    observability:
+      monitors:
+        sentry_slug: gitlab/customersgitlabcom/
+        primary_grafana_dashboard: customersdot-main/customersdot-overview
+
+  - name: data-insights-platform
+    tier: sv
+    friendly_name: Data Insights Platform
+    teams:
+      - platform_insights
+    label: DataInsightsPlatform
+    owner: platform_insights
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/analytics-section/platform-insights/core
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/data_insights_platform/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/issues/131
+  - name: nats
+    tier: sv
+    friendly_name: NATS
+    teams:
+      - platform_insights
+    label: NATS
+    owner: platform_insights
+    technical:
+      project:
+        - https://github.com/nats-io/nats-server
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/gitlab_messaging_layer/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/issues/125
+  - name: siphon
+    tier: inf
+    friendly_name: Siphon
+    label: Siphon
+    owner: platform_insights
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/analytics-section/siphon
+      documents:
+        design: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/siphon/
+        architecture:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/231
+  - name: external_license_db
+    tier: sv
+    friendly_name: External License DB
+    teams:
+      - Secure Composition Analysis
+    label: LicenseDB
+    owner: composition_analysis
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/security-products/license-db
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/183/diffs
+
+  - name: ext-pvs
+    tier: inf
+    friendly_name: External Pipeline Validation Service
+    label: ExtPVS
+    owner: trust_and_safety
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/modelops/anti-abuse/pipeline-validation-service
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/issues/17
+        sre_guide: https://runbooks.gitlab.com/pipeline-validation-service/
+        developer_guide: https://docs.gitlab.com/ee/administration/external_pipeline_validation.html
+      logging:
+        - name: stackdriver
+          permalink: https://cloudlogging.app.goo.gl/2Nwee4eLCHa8Zcp87
+    observability:
+      monitors:
+        grafana_folder: pvs
+        primary_grafana_dashboard: ext-pvs-main/ext-pvs-overview
+
+  - name: forum
+    tier: sv
+    friendly_name: forum.gitlab.com
+    label: forum.gitlab.com
+    owner: developer_relations
+  - name: kube
+    tier: inf
+    friendly_name: Kubernetes
+    label: Kube
+    owner: runway
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gitlab-com-infrastructure
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/common
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-com
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/kube/
+      logging:
+        - name: Stackdriver
+          permalink: https://cloudlogging.app.goo.gl/81mKjkvq3BfTUwRN9
+    observability:
+      monitors:
+        grafana_folder: kube
+        primary_grafana_dashboard: kube-main/kube-overview
+
+  - name: logging
+    tier: inf
+    friendly_name: Logging
+    label: Logging
+    owner: observability
+    technical:
+      documents:
+        design: https://gitlab.com/gitlab-com/www-gitlab-com/-/merge_requests/23545
+        architecture: https://gitlab.com/gitlab-com/runbooks/raw/master/img/logging-infr.png
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/es-logging-cluster/index.md
+        sre_guide: https://runbooks.gitlab.com/logging/
+        developer_guide: https://docs.gitlab.com/ee/development/logging.html#gitlab-developers-guide-to-logging
+        service:
+          - https://runbooks.gitlab.com/howto/logging/
+          - https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/es-logging-cluster/index.md
+      sub_components:
+        - fluentd
+        - google-pubsub-topics
+        - pubsubbeat
+        - stackdriver
+        - stackdriver-exporter
+        - elk
+      logging:
+        - name: Kibana
+          permalink: https://log.gprd.gitlab.net/app/kibana
+        - name: Stackdriver
+          permalink: https://console.cloud.google.com/logs/viewer?project=gitlab-production
+        - name: elastic stack monitoring
+          permalink: https://00a4ef3362214c44a044feaa539b4686.us-central1.gcp.cloud.es.io:9243/app/monitoring#/home?_g=(cluster_uuid:RM2uqM76TnWT3JL5n5NzCw)
+  - name: nginx
+    friendly_name: NGINX
+    tier: sv
+    teams:
+      - deploy
+    label: NGINX
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/omnibus-gitlab
+        - https://gitlab.com/gitlab-org/charts/gitlab/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/nginx/
+      logging:
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/goto/88eab835042a07b213b8c7f24213d5bf
+        - name: Error Logs
+          permalink: https://cloudlogging.app.goo.gl/neeqq5jQEKWsxZRx8
+  - name: search
+    tier: inf
+    friendly_name: Global Search
+    label: Elasticsearch
+    owner: global_search
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/search/
+        developer_guide: https://docs.gitlab.com/ee/development/elasticsearch.html
+      sub_components:
+        - elasticsearch
+      logging:
+        - name: elastic stack monitoring
+          permalink: https://00a4ef3362214c44a044feaa539b4686.us-central1.gcp.cloud.es.io:9243/app/monitoring#/overview?_g=(cluster_uuid:D31oWYIkTUWCDPHigrPwHg)
+  - name: zoekt
+    tier: inf
+    friendly_name: Exact code search
+    label: Zoekt
+    owner: global_search
+    technical:
+      documents:
+        architecture: https://docs.gitlab.com/ee/architecture/blueprints/code_search_with_zoekt/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/146
+        sre_guide: https://runbooks.gitlab.com/zoekt/
+        developer_guide: https://docs.gitlab.com/development/exact_code_search/
+      dependencies:
+        - service: gitaly
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/goto/15b83f5a97e93af2496072d4aa53105f
+        - name: Sidekiq
+          permalink: https://log.gprd.gitlab.net/goto/d7e4791e63d2a2b192514ac821c9f14f
+        - name: Zoekt Health Dashboard
+          permalink: https://log.gprd.gitlab.net/app/r/s/rtbpx
+    observability:
+      monitors:
+        grafana_folder: zoekt
+        primary_grafana_dashboard: zoekt-main/zoekt3a-overview
+
+  - name: web
+    tier: sv
+    friendly_name: GitLab.com Web
+    teams:
+      - create
+      - deploy
+      - geo
+      - gitaly
+      - manage
+      - plan
+    label: Web
+    owner: reliability_unowned
+    business:
+      SLA:
+        overall_sla_weighting: 5 # If this exists, this service will be included in the overall SLA, using this value as a weighted average
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-ce
+        - https://gitlab.com/gitlab-org/gitlab-ee
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+        sre_guide: https://runbooks.gitlab.com/web/
+        developer_guide: https://docs.gitlab.com/ee/development/architecture.html
+        service:
+          - https://docs.gitlab.com/ce/
+          - https://docs.gitlab.com/ee/
+      dependencies:
+        - service: consul
+        - service: postgres
+        - service: gitaly
+        - service: redis
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/goto/15b83f5a97e93af2496072d4aa53105f
+        - name: Workhorse
+          permalink: https://log.gprd.gitlab.net/goto/464bddf849abfd4ca28494a04bad3ead
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/goto/88eab835042a07b213b8c7f24213d5bf
+    observability:
+      monitors:
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22rails%22
+        primary_grafana_dashboard: web-main/web-overview
+        gitlab_dashboard: https://ops.gitlab.net/gitlab-com/metrics-dogfooding/-/environments/266/metrics?dashboard=.gitlab%2Fdashboards%2Fkey_service_web.yml&duration_seconds=10800
+
+  - name: frontend
+    tier: lb
+    friendly_name: HAProxy (Frontend)
+    label: HAProxy
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-cookbooks/gitlab-haproxy
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#infra-current-archi-diagram
+        sre_guide: https://runbooks.gitlab.com/frontend/
+        developer_guide: https://docs.gitlab.com/ee/development/fe_guide/#frontend-development-guidelines
+        service:
+          - http://docs.haproxy.org/2.8/intro.html
+          - http://docs.haproxy.org/2.8/configuration.html
+          - http://docs.haproxy.org/2.8/management.html
+      dependencies:
+        - service: api
+        - service: git
+        - service: web
+      logging:
+        - name: haproxy
+          permalink: https://console.cloud.google.com/logs/viewer?project=gitlab-production&organizationId=769164969568&interval=PT1H&resource=gce_instance%2Finstance_id%2F1812745190666049211&scrollTimestamp=2019-01-22T15:27:18.915253748Z&advancedFilter=resource.type%3D%22gce_instance%22%0Alabels.tag%3D%22haproxy%22
+    observability:
+      monitors:
+        grafana_folder: N9YSt6Siz
+        primary_grafana_dashboard: frontend-main/frontend-overview
+
+  - name: google-cloud-storage
+    tier: inf
+    friendly_name: Google Cloud Storage
+    label: GoogleCloudStorage
+    owner: tenant_services
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/google-cloud-storage/
+        developer_guide: https://docs.gitlab.com/ee/administration/object_storage.html
+      logging:
+        - name: Admin Activity
+          permalink: https://cloudlogging.app.goo.gl/Htfsfyye1PeAfc1r6
+        - name: Data Access
+          permalink: https://cloudlogging.app.goo.gl/fSJgyQ1k1Fupsqb1A
+  - name: git
+    tier: sv
+    friendly_name: Git Access
+    teams:
+      - create
+      - deploy
+      - geo
+      - gitaly
+      - manage
+      - plan
+    label: Git
+    owner: reliability_unowned
+    business:
+      SLA:
+        overall_sla_weighting: 5 # If this exists, this service will be included in the overall SLA, using this value as a weighted average
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-shell # SSH
+        - https://gitlab.com/gitlab-org/gitlab-workhorse # HTTP
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#infra-current-archi-diagram
+        sre_guide: https://runbooks.gitlab.com/git/
+        developer_guide: https://docs.gitlab.com/ee/topics/git/#git
+        service:
+          - https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+      dependencies:
+        - service: consul
+        - service: gitaly
+        - service: postgres
+        - service: redis
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/goto/b368513b02f183a06d28c2a958b00602
+        - name: Workhorse
+          permalink: https://log.gprd.gitlab.net/goto/3ddd4ee7141ba2ec1a8b3bb0cb1476fe
+        - name: Puma
+          permalink: https://log.gprd.gitlab.net/goto/a2601cff0b6f000339e05cdb9deab58b
+        - name: nginx
+          permalink: https://log.gprd.gitlab.net/goto/8a5fb5820ec7c8daebf719c51fa00ce0
+        - name: Unstructured Rails
+          permalink: https://console.cloud.google.com/logs/viewer?project=gitlab-production&interval=PT1H&resource=gce_instance&advancedFilter=jsonPayload.hostname%3A%22git%22%0Alabels.tag%3D%22unstructured.production%22&customFacets=labels.%22compute.googleapis.com%2Fresource_name%22
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/bd680ccb3c21567e47a821bbf52a7c09
+    observability:
+      monitors:
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22rails%22
+        primary_grafana_dashboard: git-main/git-overview
+
+  - name: gitaly
+    tier: stor
+    friendly_name: Gitaly
+    teams:
+      - gitaly
+    label: Gitaly
+    owner: gitaly
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitaly
+      documents:
+        design: https://gitlab.com/gitlab-org/gitaly/blob/master/doc/DESIGN.md
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+        sre_guide: https://runbooks.gitlab.com/gitaly/
+        developer_guide: https://docs.gitlab.com/ee/development/gitaly.html#gitaly-developers-guide
+        service:
+          - https://gitlab.com/gitlab-org/gitaly/blob/master/README.md
+      dependencies:
+        - service: gitaly
+        - service: haproxy # through gitlab-shell
+        - service: redis # through gitlab-shell
+      logging:
+        - name: Gitaly
+          permalink: https://log.gprd.gitlab.net/goto/4f0bd7f08b264e7de970bb0cc9530f9d
+        - name: gitlab-shell
+          permalink: https://log.gprd.gitlab.net/goto/ba97a9597863f0df1c3b894b44eb1db6
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/7cfb513706cffc0789ad0842674e108a
+    observability:
+      monitors:
+        sentry_slug: gitlab/gitaly-production
+        grafana_folder: SRXyrrSmk
+        primary_grafana_dashboard: gitaly-main/gitaly-overview
+
+  - name: http-router
+    tier: lb
+    friendly_name: Cloudflare HTTP Router
+    label: HttpRouter
+    owner: cells_infrastructure
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/cells/router
+      documents:
+        architecture: https://docs.gitlab.com/ee/architecture/blueprints/cells/routing-service.html
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/http-router
+      logging:
+        - name: staging.gitlab.com
+          permalink: https://dash.cloudflare.com/852e9d53d0f8adbd9205389356f2303d/workers/services/view/staging-gitlab-com-cells-http-router/production/observability/logs
+        - name: gitlab.com
+          permalink: https://dash.cloudflare.com/852e9d53d0f8adbd9205389356f2303d/workers/services/view/production-gitlab-com-cells-http-router/production/observability/logs
+    observability:
+      monitors:
+        gitlab_dashboard: https://dash.cloudflare.com/852e9d53d0f8adbd9205389356f2303d/workers/services/view/production-gitlab-com-cells-http-router/production
+
+  - name: ai-gateway
+    tier: sv
+    friendly_name: AI Gateway
+    label: AIGateway
+    owner: ai_framework
+    teams:
+      - agent_foundations
+      - ai_framework
+      - ai_coding
+    technical:
+      project:
+        - https://gitlab.com/groups/gitlab-org/modelops/applied-ml/code-suggestions
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/ai_gateway/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/issues/81
+      logging:
+        - name: mlops
+          permalink: https://log.gprd.gitlab.net/goto/d21f8880-f0a7-11ed-a017-0d32180b1390
+        - name: request rate
+          permalink: https://log.gprd.gitlab.net/goto/c4faac00-f612-11ed-a017-0d32180b1390
+        - name: request latency
+          permalink: https://log.gprd.gitlab.net/goto/b423c240-f612-11ed-8afc-c9851e4645c0
+    observability:
+      monitors:
+        primary_grafana_dashboard: ai-gateway-main/ai-gateway-overview
+
+  - name: duo-workflow-svc
+    tier: sv
+    friendly_name: Duo Workflow Service
+    label: DuoWorkflow
+    owner: agent_foundations
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/modelops/applied-ml/code-suggestions/ai-assist
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/duo_workflow/
+      logging:
+        - name: gitlab.com
+          permalink: https://cloudlogging.app.goo.gl/5zAqZnsS2pdrgn4S8
+        - name: staging.gitlab.com
+          permalink: https://cloudlogging.app.goo.gl/76p7VVzJr4aLSGua8
+    observability:
+      monitors:
+        primary_grafana_dashboard: duo-workflow-svc-main/duo-workflow-svc-overview
+
+  - name: duo-agent-platform
+    tier: sv
+    friendly_name: Duo Agent Platform
+    label: DuoAgentPlatform
+    owner: agent_foundations
+    technical:
+      documents:
+        service:
+          - https://docs.gitlab.com/user/duo_agent_platform/
+  - name: mcp-server
+    tier: sv
+    friendly_name: GitLab MCP Server
+    label: GitLabMCPServer
+    owner: ai_framework
+    technical:
+      documents:
+        design: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/mcp_graphql/
+        developer_guide: https://docs.gitlab.com/development/mcp_server/
+        service:
+          - https://docs.gitlab.com/user/gitlab_duo/model_context_protocol/mcp_server/
+      project:
+        - https://gitlab.com/gitlab-org/gitlab
+        - https://gitlab.com/gitlab-org/gitlab-workhorse
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/app/r/s/0TLyk
+        - name: staging.gitlab.com
+          permalink: https://nonprod-log.gitlab.net/app/r/s/9PlWH
+  - name: mailgun
+    tier: sv
+    friendly_name: Mailgun
+    label: mailgun
+    owner: reliability_unowned
+    observability:
+      monitors:
+        grafana_folder: mailgun
+        primary_grafana_dashboard: mailgun-main/mailgun-overview
+
+  - name: mailroom
+    tier: sv
+    friendly_name: Mailroom Incoming Mail Service
+    teams:
+      - create
+      - deploy
+      - geo
+      - gitaly
+      - manage
+      - plan
+    label: Mailroom
+    owner: reliability_unowned
+    technical:
+      project:
+        - https://github.com/tpitale/mail_room
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/mailroom/overview.md
+        sre_guide: https://runbooks.gitlab.com/mailroom/
+        developer_guide: https://docs.gitlab.com/ee/development/emails.html#mailroom-gem-updates
+        service:
+          - https://github.com/tpitale/mail_room/blob/master/README.md
+      dependencies:
+        - service: redis
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/0ce3bf67abafcfc0f81f3d6e7a066912
+    observability:
+      monitors:
+        primary_grafana_dashboard: mailroom-main/mailroom-overview
+
+  - name: web-pages
+    tier: sv
+    friendly_name: GitLab Pages
+    label: Pages
+    owner: knowledge
+    business:
+      SLA:
+        overall_sla_weighting: 0 # Treated as a primary service, but with a zero weight for now
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-pages
+      documents:
+        sre_guide: https://runbooks.gitlab.com/web-pages/
+        developer_guide: https://docs.gitlab.com/ee/development/pages/
+        service:
+          - https://gitlab.com/gitlab-org/gitlab-pages/blob/master/README.md
+      logging:
+        - name: Pages
+          permalink: https://log.gprd.gitlab.net/goto/00a732029c1448a741c8730c04038fd9
+        - name: haproxy
+          permalink: https://console.cloud.google.com/logs/viewer?project=gitlab-production&interval=PT1H&resource=gce_instance&customFacets=labels.%22compute.googleapis.com%2Fresource_name%22&advancedFilter=labels.tag%3D%22haproxy%22%0Alabels.%22compute.googleapis.com%2Fresource_name%22%3A%22fe-pages-%22
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3384c89c5a828db866d2fa8ec86cd97f
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/goto/f12db328608ead73063861ce1a53822b
+    observability:
+      monitors:
+        grafana_folder: web-pages
+        primary_grafana_dashboard: web-pages-main/web-pages-overview
+
+  - name: pgbouncer
+    tier: db
+    friendly_name: PGBouncer Primary Database Pool
+    label: Pgbouncer
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/pgbouncer/pgbouncer
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/pgbouncer/
+        service:
+          - https://pgbouncer.github.io/features.html
+      dependencies:
+        - service: postgres
+      logging:
+        - name: pgbouncer
+          permalink: https://log.gprd.gitlab.net/goto/3fb9391e5ef07b47aac2fce6fda175d9
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/ae311f6f133cc1c45b62541977081043
+    observability:
+      monitors:
+        grafana_folder: pgbouncer
+        primary_grafana_dashboard: pgbouncer-main/pgbouncer-overview
+
+  - name: pgbouncer-registry
+    tier: db
+    friendly_name: Registry PGBouncer Primary Database Pool
+    label: PgbouncerRegistry
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/pgbouncer/pgbouncer
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/pgbouncer-registry/
+        service:
+          - https://pgbouncer.github.io/features.html
+      dependencies:
+        - service: postgres
+      logging:
+        - name: pgbouncer
+          permalink: https://log.gprd.gitlab.net/goto/3fb9391e5ef07b47aac2fce6fda175d9
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/ae311f6f133cc1c45b62541977081043
+    observability:
+      monitors:
+        grafana_folder: pgbouncer-registry
+        primary_grafana_dashboard: pgbouncer-main/pgbouncer-overview
+
+  - name: pgbouncer-ci
+    tier: db
+    friendly_name: CI PGBouncer Primary Database Pool
+    label: pgbouncerCI
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/pgbouncer/pgbouncer
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/pgbouncer-ci/
+        service:
+          - https://pgbouncer.github.io/features.html
+      dependencies:
+        - service: postgres
+      logging:
+        - name: pgbouncer
+          permalink: https://log.gprd.gitlab.net/goto/3fb9391e5ef07b47aac2fce6fda175d9
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/ae311f6f133cc1c45b62541977081043
+    observability:
+      monitors:
+        grafana_folder: pgbouncer-ci
+        primary_grafana_dashboard: pgbouncer-main/pgbouncer-overview
+
+  - name: pgbouncer-sec
+    tier: db
+    friendly_name: Sec PGBouncer Primary Database Pool
+    label: pgbouncerSec
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/pgbouncer/pgbouncer
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/pgbouncer-sec/
+        service:
+          - https://pgbouncer.github.io/features.html
+      dependencies:
+        - service: postgres
+      logging:
+        - name: pgbouncer
+          permalink: https://log.gprd.gitlab.net/goto/3fb9391e5ef07b47aac2fce6fda175d9
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/ae311f6f133cc1c45b62541977081043
+    observability:
+      monitors:
+        grafana_folder: pgbouncer-sec
+        primary_grafana_dashboard: pgbouncer-main/pgbouncer-overview
+
+  - name: patroni
+    tier: db
+    friendly_name: Postgres (Patroni)
+    label: Patroni
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/patroni/
+        service:
+          - https://www.postgresql.org/docs/9.6/index.html
+        security: https://www.postgresql.org/support/security/
+      dependencies:
+        - service: consul
+      components:
+        - patroni
+      logging:
+        - name: Postgres
+          permalink: https://log.gprd.gitlab.net/goto/d0f8993486c9007a69d85e3a08f1ea7c
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3669d551a595a3a5cf1e9318b74e6c22
+    observability:
+      monitors:
+        grafana_folder: RNfEDpLmz
+        primary_grafana_dashboard: patroni-main/patroni-overview
+
+  - name: patroni-registry
+    tier: db
+    friendly_name: Registry Postgres (Patroni)
+    label: PatroniRegistry
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/patroni-registry/
+        service:
+          - https://www.postgresql.org/docs/9.6/index.html
+        security: https://www.postgresql.org/support/security/
+      dependencies:
+        - service: consul
+      components:
+        - patroni
+      logging:
+        - name: Postgres
+          permalink: https://log.gprd.gitlab.net/goto/d0f8993486c9007a69d85e3a08f1ea7c # TODO: Update when provisioned in gprd
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3669d551a595a3a5cf1e9318b74e6c22 # TODO: Update when provisioned in gprd
+    observability:
+      monitors:
+        grafana_folder: RNfEDpLmz # TODO: Update when provisioned
+        primary_grafana_dashboard: patroni-main/patroni-overview
+
+  - name: patroni-ci
+    tier: db
+    friendly_name: CI Postgres (Patroni)
+    label: PatroniCI
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/patroni-ci/
+        service:
+          - https://www.postgresql.org/docs/9.6/index.html
+        security: https://www.postgresql.org/support/security/
+      dependencies:
+        - service: consul
+      components:
+        - patroni
+      logging:
+        - name: Postgres
+          permalink: https://log.gprd.gitlab.net/goto/d0f8993486c9007a69d85e3a08f1ea7c # TODO: Update when provisioned in gprd
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3669d551a595a3a5cf1e9318b74e6c22 # TODO: Update when provisioned in gprd
+    observability:
+      monitors:
+        grafana_folder: RNfEDpLmz # TODO: Update when provisioned
+        primary_grafana_dashboard: patroni-ci-main/patroni-ci-overview
+
+  - name: patroni-sec
+    tier: db
+    friendly_name: Sec Postgres (Patroni)
+    label: PatroniSec
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/patroni-sec/
+        service:
+          - https://www.postgresql.org/docs/9.6/index.html
+        security: https://www.postgresql.org/support/security/
+      dependencies:
+        - service: consul
+      components:
+        - patroni
+      logging:
+        - name: Postgres
+          permalink: https://log.gprd.gitlab.net/goto/d0f8993486c9007a69d85e3a08f1ea7c # TODO: Update when provisioned in gprd
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3669d551a595a3a5cf1e9318b74e6c22 # TODO: Update when provisioned in gprd
+    observability:
+      monitors:
+        grafana_folder: RNfEDpLmz # TODO: Update when provisioned
+        primary_grafana_dashboard: patroni-main/patroni-overview
+
+  - name: pingdom
+    tier: inf
+    friendly_name: Pingdom
+    label: Pingdom
+    owner: observability
+    technical:
+      project:
+        - https://www.pingdom.com/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/pingdom/
+        service:
+          - https://www.pingdom.com/synthetic-monitoring/
+      logging:
+        - name: PagerDuty logs
+          permalink: https://nonprod-log.gitlab.net/app/r/s/Q3aOK
+  - name: plantuml
+    tier: sv
+    friendly_name: PlantUML
+    label: PlantUML
+    owner: source_code
+    technical:
+      project:
+        - https://plantuml.com/
+      documents:
+        architecture: https://docs.gitlab.com/ee/administration/integration/plantuml.html
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/plantuml/overview.md
+        sre_guide: https://runbooks.gitlab.com/plantuml/
+        developer_guide: https://docs.gitlab.com/ee/administration/integration/plantuml.html#enable-plantuml-integration
+        security: https://www.postgresql.org/support/security/
+      logging:
+        - name: Access Logs
+          permalink: https://console.cloud.google.com/logs/query;query=resource.labels.target_proxy_name%3D%22k8s-tps-plantuml-plantuml--58df01f69d082883%22%0Aresource.type%3D%22http_load_balancer%22;timeRange=PT30M?project=gitlab-production
+    observability:
+      monitors:
+        grafana_folder: plantuml
+        primary_grafana_dashboard: plantuml-main/plantuml-overview
+
+  - name: postgres-archive
+    tier: db
+    friendly_name: Postgres DR Archive
+    label: PostgresArchive
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        sre_guide: https://runbooks.gitlab.com/postgres-archive/
+        service:
+          - https://www.postgresql.org/docs/9.6/index.html
+        security: https://www.postgresql.org/support/security/
+      logging:
+        - name: postgres
+          permalink: https://log.gprd.gitlab.net/goto/0b7a4ff726bfd3e4eb4b51da82979efc
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/4a5ab78f128dcf1b40ad16b75e521609
+    observability:
+      monitors:
+        grafana_folder: RNfEDpLmz
+        primary_grafana_dashboard: 000000144/postgresql-overview
+
+  - name: postgres-dr-delayed
+    tier: db
+    friendly_name: Postgres DR Delayed Replica
+    label: PostgresDelayed
+    owner: database_operations
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#database-architecture
+        service:
+          - https://www.postgresql.org/docs/9.6/index.html
+        security: https://www.postgresql.org/support/security/
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3fea946a232d2288e90e575c912fa3e7
+    observability:
+      monitors:
+        grafana_folder: RNfEDpLmz
+        primary_grafana_dashboard: 000000144/postgresql-overview
+
+  - name: psql-timings
+    tier: inf
+    friendly_name: PSQL Timings
+    label: PsqlTimings
+    owner: database_operations
+    technical:
+      documents:
+        service:
+          - https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/initializers/rspec_profiling.rb
+          - https://github.com/foraker/rspec_profiling
+          - https://gitlab.com/gitlab-com/gitlab-profiler
+  - name: monitoring
+    tier: inf
+    friendly_name: Monitoring
+    label: Prometheus
+    owner: observability
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles
+      documents:
+        architecture: https://github.com/prometheus/prometheus/blob/7632e976c0617f6206565541c6d91c02c6e12ed5/README.md#architecture-overview
+        sre_guide: https://runbooks.gitlab.com/monitoring/
+        developer_guide: https://docs.gitlab.com/ee/development/prometheus_metrics
+        service:
+          - https://github.com/prometheus/prometheus/blob/7632e976c0617f6206565541c6d91c02c6e12ed5/README.md
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3a0b51d10d33c9558765e97640acb325
+        - name: monitoring
+          permalink: https://log.gprd.gitlab.net/goto/09f7c84d5f36e3df0d03382dc350cddf
+    observability:
+      monitors:
+        grafana_folder: monitoring
+        primary_grafana_dashboard: monitoring-main/monitoring-overview
+
+  - name: thanos
+    tier: inf
+    friendly_name: thanos
+    label: Thanos
+    owner: observability
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles
+      documents:
+        architecture: https://runbooks.gitlab.com/thanos/architecture.md/
+        sre_guide: https://runbooks.gitlab.com/thanos/
+        service:
+          - https://thanos.io/tip/thanos/design.md/#architecture
+      dependencies:
+        - service: prometheus
+        - service: google-cloud-storage
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/3a0b51d10d33c9558765e97640acb325
+        - name: gstg
+          permalink: https://nonprod-log.gitlab.net/goto/73178d30-ab9a-11ed-9af2-6131f0ee4ce6
+        - name: ops
+          permalink: https://nonprod-log.gitlab.net/goto/c3052140-ab9a-11ed-9af2-6131f0ee4ce6
+        - name: pre
+          permalink: https://nonprod-log.gitlab.net/goto/f5420010-ab9a-11ed-9af2-6131f0ee4ce6
+    observability:
+      monitors:
+        grafana_folder: thanos
+        primary_grafana_dashboard: thanos-main/thanos-overview
+
+  - name: topology-rest
+    tier: sv
+    friendly_name: Topology Service Rest
+    label: TopologyServiceRest
+    owner: cells_infrastructure
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/cells/topology-service
+        - https://gitlab.com/gitlab-com/gl-infra/cells/topology-service-deployer
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/cells/topology_service/#architecture
+      logging:
+        - name: stg
+          permalink: https://dashboards.gitlab.net/goto/XBaVEuCHR?orgId=1
+        - name: prod
+          permalink: https://dashboards.gitlab.net/goto/AFzSEXCHR?orgId=1
+    observability:
+      monitors:
+        primary_grafana_dashboard: topology-service-main/topology-service-overview
+
+  - name: topology-grpc
+    tier: sv
+    friendly_name: Topology Service gRPC
+    label: TopologyServiceGRPC
+    owner: cells_infrastructure
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/cells/topology-service
+        - https://gitlab.com/gitlab-com/gl-infra/cells/topology-service-deployer
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/cells/topology_service/#architecture
+      logging:
+        - name: stg
+          permalink: https://dashboards.gitlab.net/goto/oOFNEuCHR?orgId=1
+        - name: prod
+          permalink: https://dashboards.gitlab.net/goto/VErIPujHg?orgId=1
+    observability:
+      monitors:
+        primary_grafana_dashboard: topology-service-main/topology-service-overview
+
+  - name: topology-spanner
+    tier: db
+    friendly_name: Topology Service Cloud Spanner
+    label: TopologyServiceSpanner
+    owner: cells_infrastructure
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/cells/topology-service
+        - https://gitlab.com/gitlab-com/gl-infra/cells/topology-service-deployer
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/cells/topology_service/#architecture
+      logging:
+        - name: Cloud Spanner Logs
+          permalink: https://console.cloud.google.com/logs/query?project=gitlab-runway-topo-svc-prod
+    observability:
+      monitors:
+        primary_grafana_dashboard: topology-spanner-main/topology-spanner-overview
+
+  - name: redis
+    tier: db
+    friendly_name: Persistent Redis
+    label: Redis
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+      logging:
+        - name: Redis
+          permalink: https://log.gprd.gitlab.net/goto/27a6bf4e347ef9da754f06eb0a54aedc
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/e107ce00a9adede2e130d0c8ec1a2ac7
+    observability:
+      monitors:
+        grafana_folder: redis
+        primary_grafana_dashboard: redis-main/redis-overview
+
+  - name: runway-db-example
+    tier: db
+    friendly_name: Example Runway-managed Postgres
+    label: RunwayPostgresExample
+    owner: runway
+    technical:
+      project:
+        - https://github.com/postgres/postgres
+      documents:
+        architecture: https://docs.runway.gitlab.com/reference/blueprints/postgres/
+        sre_guide: https://runbooks.gitlab.com/cloud-sql/
+        developer_guide: https://docs.gitlab.com/ee/development/database/
+        service:
+          - https://www.postgresql.org/
+          - https://cloud.google.com/sql/docs/postgres
+      logging:
+        - name: gcp
+          permalink: https://cloudlogging.app.goo.gl/yUkd8JGYdPJUcNyq9
+    observability:
+      monitors:
+        primary_grafana_dashboard: runway-db-example-main/runway-db-example-overview
+
+  - name: runway-redis-example
+    tier: db
+    friendly_name: Example Runway-managed Redis
+    label: RunwayRedisExample
+    owner: runway
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+          - https://cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview
+    observability:
+      monitors:
+        grafana_folder: redis
+        primary_grafana_dashboard: runway-redis-example-main/runway-redis-example-overview
+
+  - name: redis-pubsub
+    tier: db
+    friendly_name: Redis Pub/Sub
+    label: RedisPubsub
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis-pubsub/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://gitlab.com/gitlab-cookbooks/gitlab-redis-cluster
+    observability:
+      monitors:
+        grafana_folder: redis
+        primary_grafana_dashboard: redis-pubsub-main/redis-pubsub-overview
+
+  - name: redis-actioncable
+    tier: db
+    friendly_name: Redis ActionCable
+    label: RedisActionCable
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis-actioncable/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://gitlab.com/gitlab-cookbooks/gitlab-redis-cluster
+    observability:
+      monitors:
+        grafana_folder: redis
+        primary_grafana_dashboard: redis-actioncable-main/redis-actioncable-overview
+
+  - name: redis-cluster-shared-state
+    tier: db
+    friendly_name: Redis Cluster SharedState
+    label: RedisClusterSharedState
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis-cluster-shared-state/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://gitlab.com/gitlab-cookbooks/gitlab-redis-cluster
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-shared-state-main/redis-cluster-shared-state-overview
+
+  - name: redis-cluster-feature-flag
+    tier: db
+    friendly_name: Redis Cluster Feature Flag
+    label: RedisClusterFeatureFlag
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis-cluster-feature-flag/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-feature-flag-main/redis-cluster-feature-flag-overview
+
+  - name: redis-cluster-cache
+    tier: db
+    friendly_name: Redis Cluster Cache
+    label: RedisClusterCache
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis-cache/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-cache-main/redis-cluster-cache-overview
+
+  - name: redis-cluster-ratelimiting
+    tier: db
+    friendly_name: Redis Cluster RateLimiting
+    label: RedisClusterRateLimiting
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-ratelimiting-main/redis-cluster-ratelimiting-overview
+
+  - name: redis-cluster-registry
+    tier: db
+    friendly_name: Redis Cluster Registry
+    label: RedisClusterRegistry
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-registry/redis-cluster-registry-overview
+
+  - name: redis-cluster-chat-cache
+    tier: db
+    friendly_name: Redis Cluster Chat Cache
+    label: RedisClusterChatCache
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/redis-cluster/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-chat-cache-main/redis-cluster-chat-cache-overview
+
+  - name: redis-cluster-database-lb
+    tier: db
+    friendly_name: Redis Cluster Database Loadbalancing
+    label: RedisClusterDbLoadBalancing
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/redis-cluster/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-database-lb-main/redis-cluster-database-lb-overview
+
+  - name: redis-cluster-repo-cache
+    tier: db
+    friendly_name: Redis Cluster Repo Cache
+    label: RedisClusterRepoCache
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/redis-cluster/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-repo-cache-main/redis-cluster-repo-cache-overview
+
+  - name: redis-cluster-sessions
+    tier: db
+    friendly_name: Redis Cluster Sessions
+    label: RedisClusterSessions
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/redis-cluster/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-sessions-main/redis-cluster-sessions-overview
+
+  - name: redis-sidekiq
+    tier: db
+    friendly_name: Redis Sidekiq
+    label: RedisSidekiq
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis-sidekiq/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/80a1ff609f91b0fb2b770a3a70784be0
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-sidekiq-main/redis-sidekiq-overview
+
+  - name: redis-cluster-queues-meta
+    tier: db
+    friendly_name: Redis Cluster Queues Meta
+    label: RedisClusterQueuesMeta
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/redis/redis
+      documents:
+        sre_guide: https://runbooks.gitlab.com/redis/redis-cluster/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-cluster-queues-meta-main/redis-cluster-queues-meta-overview
+
+  - name: memorystore-redis-tracechunks
+    tier: db
+    friendly_name: Memorystore Redis TraceChunks
+    label: MemorystoreRedisTraceChunks
+    owner: tenant_services
+    technical:
+      project:
+        - https://cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview
+      documents:
+        sre_guide: https://runbooks.gitlab.com/memorystore-redis-tracechunks/
+        developer_guide: https://docs.gitlab.com/ee/development/redis.html#redis-guidelines
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+          - https://cloud.google.com/memorystore/docs/redis
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/a10c2cd2b710f9eb65b13b9a2a328d51
+    observability:
+      monitors:
+        primary_grafana_dashboard: memorystore-redis-tracechunks-main/memorystore-redis-tracechunks-overview
+
+  - name: redis-registry-cache
+    tier: db
+    friendly_name: Redis Registry Cache
+    label: RedisRegistryCache
+    owner: tenant_services
+    technical:
+      project:
+        - https://github.com/antirez/redis/
+      documents:
+        service:
+          - https://redis.io/documentation
+          - https://docs.gitlab.com/omnibus/settings/redis.html
+      logging:
+        - name: Redis
+          permalink: https://log.gprd.gitlab.net/goto/04b1f050-44d0-11ed-8d37-e9a2f393ea2a
+    observability:
+      monitors:
+        primary_grafana_dashboard: redis-registry-cache-main/redis-registry-cache-overview
+
+  - name: registry
+    tier: sv
+    friendly_name: Container Registry
+    teams:
+      - container_registry
+    label: Registry
+    owner: container_registry
+    business:
+      SLA:
+        overall_sla_weighting: 1 # If this exists, this service will be included in the overall SLA, using this value as a weighted average
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/container-registry
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/registry-gke/overview.md
+        sre_guide: https://runbooks.gitlab.com/registry/
+        developer_guide: https://docs.gitlab.com/ee/development/packages/#package-registry-development
+        service:
+          - https://gitlab.com/gitlab-org/container-registry/-/blob/master/README.md
+      dependencies:
+        - service: web # For JWT authentication
+        - service: patroni-registry
+        - service: pgbouncer-registry
+        - service: redis-registry-cache
+      logging:
+        - name: Registry
+          permalink: https://log.gprd.gitlab.net/goto/9ec8a738ca23a17a9d7b61b4c3a9c96e
+        - name: haproxy
+          permalink: https://console.cloud.google.com/logs/viewer?project=gitlab-production&interval=PT1H&resource=gce_instance&customFacets=labels.%22compute.googleapis.com%2Fresource_name%22&advancedFilter=labels.tag%3D%22haproxy%22%0Alabels.%22compute.googleapis.com%2Fresource_name%22%3A%22fe-registry-%22
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/goto/d614a5576099ff797be559c89fe88baa
+    observability:
+      monitors:
+        grafana_folder: Ymoh2MEmk
+        primary_grafana_dashboard: registry-main/registry-overview
+
+  - name: runway
+    tier: inf
+    friendly_name: Runway Platform
+    label: Runway
+    owner: runway
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/platform/runway
+      documents:
+        architecture: https://gitlab.com/gitlab-com/gl-infra/platform/runway/docs/-/blob/master/architecture.md
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/180
+        sre_guide: https://gitlab.com/gitlab-com/gl-infra/platform/runway/docs/-/blob/master/scalability.md
+        developer_guide: https://gitlab-com.gitlab.io/gl-infra/platform/runway/runwayctl/manifest.schema.html
+      logging:
+        - name: stackdriver
+          permalink: https://console.cloud.google.com/logs
+    observability:
+      monitors:
+        primary_grafana_dashboard: runway-main/runway-overview
+
+  - name: nat
+    tier: inf
+    friendly_name: NAT
+    label: NAT
+    owner: networking_and_incident_management
+    technical:
+      documents:
+        design: https://cloud.google.com/nat/docs/overview
+        sre_guide: https://runbooks.gitlab.com/nat/
+      logging:
+        - name: dropped packet logs
+          permalink: https://cloudlogging.app.goo.gl/XvxRJx3ECzThD87x7
+    observability:
+      monitors:
+        primary_grafana_dashboard: nat-main/nat-overview
+
+  - name: sentry
+    tier: inf
+    friendly_name: Monitoring
+    label: Sentry
+    owner: observability
+    technical:
+      project:
+        - https://github.com/getsentry/sentry
+      documents:
+        sre_guide: https://runbooks.gitlab.com/sentry/
+        developer_guide: https://docs.gitlab.com/ee/operations/error_tracking.html
+      logging:
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/b4618f79f80f44cb21a32623a275a0e6
+    observability:
+      monitors:
+        grafana_folder: sentry
+        primary_grafana_dashboard: sentry-main/sentry-overview
+
+  - name: sidekiq
+    tier: sv
+    friendly_name: Sidekiq Background Jobs
+    teams:
+      - create
+      - deploy
+      - geo
+      - gitaly
+      - manage
+      - plan
+    label: Sidekiq
+    owner: tenant_services
+    business:
+      SLA:
+        overall_sla_weighting: 0 # Treated as a primary service, but with a zero weight for now
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-ce
+        - https://gitlab.com/gitlab-org/gitlab-ee
+      documents:
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/sidekiq/index.md
+        sre_guide: https://runbooks.gitlab.com/sidekiq/
+        developer_guide: https://docs.gitlab.com/ee/development/sidekiq/#sidekiq-guides
+        service:
+          - https://github.com/mperham/sidekiq/blob/master/README.md
+      dependencies:
+        - service: postgres
+        - service: gitaly
+        - service: redis
+      logging:
+        - name: Sidekiq
+          permalink: https://log.gprd.gitlab.net/goto/d7e4791e63d2a2b192514ac821c9f14f
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/goto/86fbcd537588abef69339a352ef81d72
+        - name: Puma
+          permalink: https://log.gprd.gitlab.net/goto/a2601cff0b6f000339e05cdb9deab58b
+        - name: Unstructured
+          permalink: https://console.cloud.google.com/logs/viewer?project=gitlab-production&interval=PT1H&resource=gce_instance&advancedFilter=jsonPayload.hostname%3A%22sidekiq%22%0Alabels.tag%3D%22unstructured.production%22&customFacets=labels.%22compute.googleapis.com%2Fresource_name%22
+        - name: system
+          permalink: https://log.gprd.gitlab.net/goto/72d0f3fdfd8db18db9800cc04d8b6f55
+    observability:
+      monitors:
+        grafana_folder: c7nMugpmz
+        primary_grafana_dashboard: sidekiq-main/sidekiq-overview
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22sidekiq%22
+
+  - name: sqlmesh-catalog
+    tier: db
+    friendly_name: SQLMesh Catalog
+    label: sqlmesh-catalog
+    owner: observability
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/data/sqlmesh-catalog
+      documents:
+        developer_guide: https://gitlab.com/gitlab-com/gl-infra/data/sqlmesh-catalog/-/blob/main/README.md?ref_type=heads
+      logging:
+        - name: ci
+          permalink: https://gitlab.com/gitlab-com/gl-infra/data/sqlmesh-catalog/-/pipelines
+  - name: cloud-cost-analysis
+    tier: db
+    friendly_name: Cloud Cost Analysis (SQLMesh Catalog)
+    label: cloud-cost-analysis
+    owner: cloud_cost_utilization
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/data/sqlmesh-catalog
+      documents:
+        developer_guide: https://gitlab.com/gitlab-com/gl-infra/data/sqlmesh-catalog/-/blob/main/README.md?ref_type=heads
+      logging:
+        - name: ci
+          permalink: https://gitlab.com/gitlab-com/gl-infra/data/sqlmesh-catalog/-/pipelines
+  - name: version
+    tier: sv
+    friendly_name: version.gitlab.com
+    label: Version
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-services/version.gitlab.com
+      documents:
+        service:
+          - https://gitlab.com/gitlab-org/gitlab-services/version.gitlab.com/-/blob/main/README.md
+  - name: hackystack
+    tier: inf
+    friendly_name: Hackystack
+    label: hackystack
+    owner: corpsec
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-security/identity/eng/hackystack-enhanced
+      logging:
+        - name: logs
+          permalink: https://gitlab.com # TODO: Placeholder
+  - name: about
+    tier: sv
+    friendly_name: about.gitlab.com
+    label: About
+    owner: digital_experience
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/www-gitlab-com
+      documents:
+        service:
+          - https://runbooks.gitlab.com/uncategorized/about-gitlab-com/
+      logging:
+        - name: stackdriver
+          permalink: https://console.cloud.google.com/logs
+  - name: design
+    tier: sv
+    friendly_name: design.gitlab.com
+    label: Design
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-services/design.gitlab.com
+      documents:
+        service:
+          - https://gitlab.com/gitlab-org/gitlab-services/design.gitlab.com/blob/master/README.md
+  - name: pubsub
+    tier: inf
+    friendly_name: Pubsub for Logging
+    label: PubSub
+    owner: observability
+    technical:
+      project:
+        - https://cloud.google.com/pubsub/docs/overview
+        - https://ops.gitlab.net/gitlab-com/gl-infra/terraform-modules/google/pubsubbeat
+        - https://gitlab.com/gitlab-cookbooks/gitlab-elk
+        - https://runbooks.gitlab.com/howto/logging/
+      logging:
+        - name: stackdriver
+          permalink: https://console.cloud.google.com/logs
+        - name: multiple indexes in Kibana
+          permalink: https://log.gprd.gitlab.net/goto/2fc394521558a0bfed59f791295ffe51
+    observability:
+      monitors:
+        primary_grafana_dashboard: USVj3qHmk/logging
+
+  - name: ci-orchestration
+    tier: sv
+    friendly_name: CI Orchestration
+    label: CI Orchestration
+    owner: pipeline_execution
+    teams:
+      - pipeline_execution
+    observability:
+      monitors:
+        primary_grafana_dashboard: ci-orchestration-main/ci-orchestration-overview
+
+  - name: ci-runners
+    tier: sv
+    friendly_name: CI Runners
+    label: CI Runners
+    owner: runner_core
+    teams:
+      - runner_core
+      - runners_platform
+    business:
+      SLA:
+        overall_sla_weighting: 0 # Treated as a primary service, but with a zero weight for now
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab-runner
+      documents:
+        sre_guide: https://runbooks.gitlab.com/ci-runners/
+        developer_guide: https://docs.gitlab.com/runner/development/#contribute-to-gitlab-runner-development
+        service:
+          - https://gitlab.com/gitlab-org/gitlab-runner/blob/master/README.md
+        security: https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/security/index.md
+      logging:
+        - name: shared runners
+          permalink: https://log.gprd.gitlab.net/goto/b9aed2474a7ffe194a10d4445a02893a
+    observability:
+      monitors:
+        grafana_folder: bpcbFeIiz
+        primary_grafana_dashboard: ci-runners-main/ci-runners-overview
+      alerts:
+        - alert_link: https://alerts.gitlab.net/#/alerts?silenced=false&inhibited=false&filter=%7Bchannel%3D%22ci-cd%22%7D
+
+  - name: stackdriver
+    tier: inf
+    friendly_name: Stackdriver Metrics
+    label: Stackdriver
+    owner: observability
+    observability:
+      monitors:
+        primary_grafana_dashboard: USVj3qHmk/logging
+
+  - name: cloudflare
+    tier: lb
+    friendly_name: Cloudflare Web Application Firewall
+    label: Cloudflare
+    owner: networking_and_incident_management
+    technical:
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/cloudflare
+        sre_guide: https://runbooks.gitlab.com/cloudflare/
+    observability:
+      monitors:
+        primary_grafana_dashboard: cloudflare-main
+
+  - name: vault
+    tier: inf
+    friendly_name: Hashicorp Vault for Infrastructure
+    label: Vault
+    owner: runway
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/vault/
+      logging:
+        - name: Vault
+          permalink: https://nonprod-log.gitlab.net/goto/331c9c10-21df-11ed-af31-918941b0065a
+    observability:
+      monitors:
+        primary_grafana_dashboard: vault-main/vault-overview
+
+  - name: teleport
+    tier: inf
+    friendly_name: Teleport Access Platform
+    label: TeleportCore
+    owner: infrasec_team
+    technical:
+      project:
+        - https://ops.gitlab.net/gitlab-com/gl-infra/config-mgmt/-/tree/main/environments/teleport-production
+        - https://gitlab.com/gitlab-cookbooks/gitlab-teleport
+        - https://gitlab.com/gitlab-com/gl-infra/argocd/apps/-/tree/main/services/teleport-cluster
+        - https://gitlab.com/gitlab-com/gl-infra/argocd/apps/-/tree/main/services/teleport-agent
+      documents:
+        architecture: https://runbooks.gitlab.com/teleport/#architecture
+        sre_guide: https://runbooks.gitlab.com/teleport/teleport_admin/
+  - name: jaeger
+    tier: inf
+    friendly_name: Jaeger
+    label: Jaeger
+    owner: observability
+    technical:
+      project:
+        - https://www.jaegertracing.io/
+        - https://github.com/jaegertracing/jaeger
+        - https://github.com/jaegertracing/jaeger-operator
+        - https://docs.gitlab.com/ee/development/distributed_tracing.html
+      documents:
+        architecture: https://www.jaegertracing.io/docs/latest/architecture/
+        sre_guide: https://runbooks.gitlab.com/jaeger/
+        developer_guide: https://docs.gitlab.com/ee/development/distributed_tracing.html
+        service:
+          - https://www.jaegertracing.io/docs/latest/
+        security: https://www.jaegertracing.io/docs/latest/security/
+      dependencies:
+        - service: elasticsearch
+    observability:
+      monitors:
+        primary_grafana_dashboard: jaeger-main/jaeger-overview
+
+  - name: woodhouse
+    tier: sv
+    friendly_name: Woodhouse
+    label: Woodhouse
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/woodhouse
+      documents:
+        sre_guide: https://runbooks.gitlab.com/woodhouse/
+        developer_guide: https://gitlab.com/gitlab-com/gl-infra/woodhouse/-/blob/master/README.md
+      logging:
+        - name: Woodhouse
+          permalink: https://cloudlogging.app.goo.gl/wYmS4kzq3PNHnt8aA
+    observability:
+      monitors:
+        primary_grafana_dashboard: woodhouse/woodhouse-overview
+
+  - name: woodhouse-slack
+    tier: sv
+    friendly_name: Woodhouse Slack bot
+    label: WoodhouseSlack
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/woodhouse
+      logging:
+        - name: Woodhouse GCP logs
+          permalink: https://cloudlogging.app.goo.gl/8fxWBxq18peA4ssE6
+  - name: kas
+    tier: sv
+    friendly_name: GitLab Relay (KAS)
+    label: KAS
+    owner: deploy_environments
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/cluster-integration/gitlab-agent
+      documents:
+        architecture: https://gitlab.com/gitlab-org/cluster-integration/gitlab-agent/-/blob/master/doc/architecture.md#high-level-architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/kubernetes-agent
+        sre_guide: https://runbooks.gitlab.com/kas/
+        developer_guide: https://gitlab.com/gitlab-org/cluster-integration/gitlab-agent/-/blob/master/doc/developing.md
+        service:
+          - https://docs.gitlab.com/ee/user/clusters/agent/
+      dependencies:
+        - service: api
+        - service: gitaly
+        - service: redis
+      logging:
+        - name: kas
+          permalink: https://log.gprd.gitlab.net/goto/b8204a41999cc1a136fa12c885ce8d22
+    observability:
+      monitors:
+        primary_grafana_dashboard: kas/kas
+
+  - name: websockets
+    tier: sv
+    friendly_name: Websockets
+    label: Websockets
+    owner: reliability_unowned
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab
+        - https://gitlab.com/gitlab-org/gitlab-workhorse
+      documents:
+        sre_guide: https://runbooks.gitlab.com/websockets/
+        developer_guide: https://docs.gitlab.com/ee/development/workhorse/channel.html#introduction-to-websockets
+    observability:
+      monitors:
+        primary_grafana_dashboard: websockets-main/websockets3a-overview
+
+  # Owned by Code Creation, as all current traffic for the service is for Code Suggestions.
+  # However if other teams add endpoints under api/v4/ai_assisted
+  # we may need to revisit service ownership.
+  # For more context: https://gitlab.com/gitlab-org/gitlab/-/issues/545030#note_2682339909
+  - name: ai-assisted
+    tier: sv
+    friendly_name: AI-Assisted
+    label: AI-Assisted
+    owner: ai_coding
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab
+        - https://gitlab.com/gitlab-org/gitlab-workhorse
+      documents:
+        sre_guide: https://runbooks.gitlab.com/ai-assisted/
+        developer_guide: https://docs.gitlab.com/ee/development/workhorse/channel.html
+    observability:
+      monitors:
+        primary_grafana_dashboard: ai-assisted-main/ai-assisted
+
+  - name: cloud-sql
+    tier: inf
+    friendly_name: Google Cloud SQL
+    label: CloudSQL
+    owner: database_operations
+    technical:
+      documents:
+        design: https://cloud.google.com/sql/docs/features#postgres
+        sre_guide: https://runbooks.gitlab.com/cloud-sql/
+      logging:
+        - name: Cloud SQL logs
+          permalink: https://cloudlogging.app.goo.gl/uJN6NWcjtK8mwaN89
+    observability:
+      monitors:
+        grafana_folder: cloud-sql
+        primary_grafana_dashboard: cloud-sql-main/cloud-sql-overview
+
+  - name: external-dns
+    tier: sv
+    friendly_name: ExternalDNS
+    label: ExternalDNS
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://github.com/kubernetes-sigs/external-dns
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles/-/tree/master/releases/external-dns
+      documents:
+        sre_guide: https://runbooks.gitlab.com/external-dns/
+      logging:
+        - name: Stackdriver logs
+          permalink: https://cloudlogging.app.goo.gl/UY7qbsc5KoZZALtT7
+    observability:
+      monitors:
+        primary_grafana_dashboard: external-dns-main/external-dns-overview
+
+  - name: gitlab-com-artifact-registry
+    tier: inf
+    friendly_name: Artifact Registry
+    label: ArtifactRegistry
+    owner: release-and-deploy
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/gitlab-com-artifact-registry/overview/
+  - name: gitlab-com-pkgs
+    tier: inf
+    friendly_name: Package GCS Bucket
+    label: PackageGCSBucket
+    owner: operate
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/gitlab-com-pkgs/
+
+  - name: pulp
+    tier: inf
+    friendly_name: Pulp (pulp.pre.gitlab.net)
+    label: Pulp
+    owner: build
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/charts/-/tree/main/gitlab/pulp
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles/-/tree/master/releases/pulp
+      documents:
+        architecture: https://ops.gitlab.net/gitlab-com/gl-infra/terraform-modules/applications/pulp/-/blob/main/ARCHITECTURE.md?ref_type=heads
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/257
+      logging:
+        - name: Content
+          permalink: https://nonprod-log.gitlab.net/app/r/s/DuzJG
+        - name: API
+          permalink: https://nonprod-log.gitlab.net/app/r/s/2Bwu3
+        - name: Worker
+          permalink: https://nonprod-log.gitlab.net/app/r/s/9QcWy
+        - name: Pulp Operator
+          permalink: https://nonprod-log.gitlab.net/app/r/s/vYGex
+        - name: Ingress Controller - Application Logs
+          permalink: https://nonprod-log.gitlab.net/app/r/s/pHNy4
+        - name: Ingress Controller - Request Logs
+          permalink: https://nonprod-log.gitlab.net/app/r/s/oJ5FX
+        - name: SQL Proxy
+          permalink: https://nonprod-log.gitlab.net/app/r/s/6jXtT
+    observability:
+      monitors:
+        grafana_folder: pulp
+        primary_grafana_dashboard: pulp-main/pulp-overview
+
+  - name: internal-api
+    friendly_name: GitLab Internal API
+    tier: sv
+    teams:
+      - create
+      - deploy
+      - geo
+      - manage
+      - plan
+    label: Internal-API
+    owner: api
+    business:
+      SLA:
+        overall_sla_weighting: 5
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab
+      documents:
+        design: https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/879
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/delivery/-/issues/2787
+        sre_guide: https://runbooks.gitlab.com/internal-api/
+        developer_guide: https://docs.gitlab.com/ee/development/internal_api
+        service:
+          - https://docs.gitlab.com/ce/api/
+          - https://docs.gitlab.com/ee/api/
+      dependencies:
+        - service: consul
+        - service: postgres
+        - service: gitaly
+        - service: redis
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/goto/82dff8e0-a6d3-11ed-9f43-e3784d7fe3ca
+        - name: Workhorse
+          permalink: https://log.gprd.gitlab.net/goto/624babb0-a6d3-11ed-9f43-e3784d7fe3ca
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/goto/ecea3b70-a6d2-11ed-85ed-e7557b0a598c
+    observability:
+      monitors:
+        primary_grafana_dashboard: internal-api-main/internal-api-overview
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22rails%22
+
+  - name: ci-jobs-api
+    friendly_name: GitLab CI Jobs API
+    tier: sv
+    teams:
+      - pipeline_execution
+      - runner_core
+      - runners_platform
+    label: CI Jobs API
+    owner: pipeline_execution
+    business:
+      SLA:
+        overall_sla_weighting: 5
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab
+      documents:
+        design: https://gitlab.com/gitlab-com/gl-infra/production-engineering/-/issues/27855
+        architecture: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/production-architecture/#service-architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/delivery/-/issues/2787
+        sre_guide: https://runbooks.gitlab.com/ci-jobs-api
+        developer_guide: https://docs.gitlab.com/ee/development/internal_api
+        service:
+          - https://docs.gitlab.com/ce/api/
+          - https://docs.gitlab.com/ee/api/
+      dependencies:
+        - service: consul
+        - service: postgres
+        - service: gitaly
+        - service: redis
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/app/r/s/ERn2k
+        - name: Workhorse
+          permalink: https://log.gprd.gitlab.net/app/r/s/7KerK
+        - name: Kubernetes
+          permalink: https://log.gprd.gitlab.net/app/r/s/Is2nm
+    observability:
+      monitors:
+        primary_grafana_dashboard: ci-jobs-api-main/ci-jobs-api-overview
+        sentry_slug: gitlab/gitlabcom/?query=program%3A%22rails%22
+
+  - name: switchboard
+    friendly_name: Switchboard
+    tier: sv
+    teams:
+      - switchboard
+    label: Switchboard
+    owner: switchboard
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/gitlab-dedicated/switchboard
+      documents:
+        architecture: https://gitlab.com/gitlab-com/gl-infra/gitlab-dedicated/team/-/blob/main/architecture/Architecture.md#managing-gitlab-dedicated
+      logging:
+        - name: Rails
+          permalink: https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#logsV2:log-groups/log-group/production-switchboard
+  - name: ops-gitlab-net
+    tier: sv
+    friendly_name: ops.gitlab.net
+    label: OpsGitlabNet
+    owner: fleet_management
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/k8s-workloads/gitlab-helmfiles/-/tree/master/releases/gitlab
+    observability:
+      monitors:
+        grafana_folder: ops-gitlab-net
+        primary_grafana_dashboard: ops-gitlab-net-main/ops-gitlab-net-overview
+
+  - name: dev-gitlab-org
+    tier: sv
+    friendly_name: dev.gitlab.org
+    label: DevGitlabOrg
+    owner: release-and-deploy
+    technical:
+      project:
+        - https://ops.gitlab.net/gitlab-com/gl-infra/config-mgmt/-/tree/main/environments/dev
+        - https://gitlab.com/gitlab-com/gl-infra/chef-repo/-/blob/master/roles/dev-gitlab-org.json
+        - https://runbooks.gitlab.com/dev-gitlab-org/
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/issues/118
+      logging:
+        - name: Rails
+          permalink: https://nonprod-log.gitlab.net/app/r/s/FUSMg
+        - name: Gitaly
+          permalink: https://nonprod-log.gitlab.net/app/r/s/DUsV1
+        - name: GitLab Shell
+          permalink: https://nonprod-log.gitlab.net/app/r/s/nDLCx
+        - name: Sidekiq
+          permalink: https://nonprod-log.gitlab.net/app/r/s/k0z53
+    observability:
+      monitors:
+        sentry_slug: https://new-sentry.gitlab.net/organizations/gitlab/projects/gitlabcom/?environment=dev&project=3
+
+  - name: istio
+    tier: inf
+    friendly_name: Istio
+    label: Istio
+    owner: networking_and_incident_management
+    technical:
+      project:
+        - https://github.com/istio/istio
+      documents:
+        architecture: https://istio.io/latest/docs/ops/deployment/architecture/
+        sre_guide: https://runbooks.gitlab.com/istio/
+        service:
+          - https://gitlab.com/gitlab-com/gl-infra/k8s-mgmt/components/-/tree/main/istio
+        security: https://istio.io/latest/docs/concepts/security/
+      logging:
+        - name: istiod (Control Plane)
+          permalink: https://dashboards.gitlab.net/goto/thvr5ISSR?orgId=1
+        - name: istio-gateway
+          permalink: https://dashboards.gitlab.net/goto/OAw6cISSR?orgId=1
+        - name: istio-internal-gateway
+          permalink: https://dashboards.gitlab.net/goto/IdERpIISR?orgId=1
+        - name: istio-cni-node
+          permalink: https://dashboards.gitlab.net/goto/sdWmpISSg?orgId=1
+    observability:
+      monitors:
+        grafana_folder: istio
+        primary_grafana_dashboard: istio-istio_control_plane/istio-istio-control-plane-dashboard
+
+  - name: gitlab-static
+    tier: inf
+    friendly_name: gitlab-static.net zone hosted on Cloudflare
+    label: GitlabStaticNet
+    owner: reliability_unowned
+    technical:
+      documents:
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/gitlab-static
+        sre_guide: https://runbooks.gitlab.com/gitlab-static/
+    observability:
+      monitors:
+        primary_grafana_dashboard: gitlab-static-main
+
+  - name: omnibus
+    tier: inf
+    friendly_name: GitLab Omnibus Package
+    label: omnibus
+    owner: reliability_unowned
+    teams:
+      - deploy
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/omnibus-gitlab
+      documents:
+        architecture: https://docs.gitlab.com/omnibus/architecture/
+        developer_guide: https://gitlab.com/gitlab-org/omnibus-gitlab/-/blob/master/doc/development/index.md
+    observability:
+      monitors:
+        primary_grafana_dashboard: gitlab-omnibus-versions
+
+  - name: memorystore
+    tier: inf
+    friendly_name: Google Cloud Memorystore
+    label: GoogleCloudMemorystore
+    owner: reliability_unowned
+    technical:
+      documents:
+        design: https://cloud.google.com/memorystore
+        sre_guide: https://runbooks.gitlab.com/memorystore/
+      logging:
+        - name: Google Cloud Memorystore Logs
+          permalink: https://cloudlogging.app.goo.gl/n6GuqLwLek4w5LBv8
+    observability:
+      monitors:
+        grafana_folder: memorystore
+        primary_grafana_dashboard: memorystore-main/memorystore-overview
+
+  - name: mimir
+    tier: inf
+    friendly_name: Grafana Mimir
+    label: Mimir
+    owner: observability
+    technical:
+      documents:
+        architecture: https://runbooks.gitlab.com/mimir/#architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/214
+        sre_guide: https://runbooks.gitlab.com/mimir/#runbooks
+      logging:
+        - name: Elasticsearch
+          permalink: https://nonprod-log.gitlab.net/app/r/s/BLV6G
+    observability:
+      monitors:
+        grafana_folder: Mimir
+        primary_grafana_dashboard: mimir-main/mimir3a-overview
+
+  - name: glgo
+    tier: sv
+    friendly_name: Identity layer service for the Google Cloud integration
+    label: glgo
+    teams:
+      - container_registry
+    owner: container_registry
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/architecture/gitlab-gcp-integration/glgo
+      documents:
+        architecture: https://gitlab.com/gitlab-org/architecture/gitlab-gcp-integration/design-doc#high-level-architecture
+        service:
+          - https://gitlab.com/gitlab-org/architecture/gitlab-gcp-integration/glgo/-/blob/main/README.md
+      logging:
+        - name: glgo
+          permalink: https://console.cloud.google.com/run/detail/us-east1/glgo/logs?project=gitlab-runway-production
+    observability:
+      monitors:
+        primary_grafana_dashboard: glgo-main/glgo-overview
+
+  - name: token-rotation-management
+    tier: inf
+    friendly_name: Token rotation management
+    label: TokenRotationManagement
+    owner: security_operations
+  - name: pd-event-logger-7760xa
+    tier: inf
+    friendly_name: Logs PagerDuty incident events to ElasticSearch
+    label: PDEventLogger
+    owner: reliability_unowned
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/pd-event-logger
+      logging:
+        - name: stackdriver
+          permalink: https://console.cloud.google.com/run/detail/us-central1/pd-event-logger-7760xa/logs?project=gitlab-runway-production
+  - name: wiz-runtime-sensor
+    tier: inf
+    friendly_name: Wiz Sensor
+    label: WizSensor
+    owner: infrasec_team
+    technical:
+      documents:
+        architecture: https://internal.gitlab.com/handbook/security/product_security/infrastructure_security/tooling/wiz/#22-architecture
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/208/
+        sre_guide: https://runbooks.gitlab.com/uncategorized/wiz-runtime-sensor/
+  - name: secret-detection
+    tier: sv
+    friendly_name: Detects secret leaks in the given payloads
+    label: SecretDetection
+    owner: secret_detection
+    teams:
+      - secret_detection
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/security-products/secret-detection/secret-detection-service
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/secret_detection/decisions/004_secret_detection_scanner_service
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/225
+        service:
+          - https://gitlab.com/gitlab-org/security-products/secret-detection/secret-detection-service/-/blob/main/README.md
+      logging:
+        - name: secret-detection
+          permalink: https://console.cloud.google.com/run/detail/us-east1/secret-detection/logs?project=gitlab-runway-production
+    observability:
+      monitors:
+        primary_grafana_dashboard: secret-detection-main/secret-detection3a-overview
+
+  - name: sast-service
+    tier: sv
+    friendly_name: SAST Scanner Service for SAST in the IDE
+    label: SastService
+    owner: static_analysis
+    teams:
+      - static_analysis
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/secure/sast-ide-integration
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/sast_ide_integration/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/merge_requests/226
+        service:
+          - https://gitlab.com/gitlab-org/secure/sast-scanner-service
+      logging:
+        - name: sast-service
+          permalink: https://console.cloud.google.com/run/detail/us-central1/sast-service/logs?project=gitlab-runway-staging
+    observability:
+      monitors:
+        primary_grafana_dashboard: sast-service-main/sast-service-overview
+
+  - name: spamcheck
+    tier: sv
+    friendly_name: Spamcheck Service
+    label: SpamcheckService
+    owner: authorization
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/modelops/anti-abuse/spam/spamcheck
+        - https://gitlab.com/gitlab-org/modelops/anti-abuse/spam/spam-classifier
+      documents:
+        sre_guide: https://runbooks.gitlab.com/spamcheck/
+      logging:
+        - name: stackdriver
+          permalink: https://cloudlogging.app.goo.gl/bdSg6UmtgiwMTBKs6
+  - name: engineering-portal
+    tier: sv
+    friendly_name: Engineering Portal
+    label: EngineeringPortal
+    owner: proj-engineering-portal
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/engineering-portal
+      documents:
+        architecture: https://gitlab.com/gitlab-com/gl-infra/engineering-portal/-/blob/main/README.md#architecture
+        sre_guide: https://runbooks.gitlab.com/engineering-portal/
+      logging:
+        - name: stackdriver
+          permalink: https://cloudlogging.app.goo.gl/VxaeYiShZwJN9i1Z7
+      dependencies:
+        - service: runway
+    observability:
+      monitors:
+        primary_grafana_dashboard: engineering-portal-main/engineering-portal-overview
+
+  - name: glql
+    tier: inf
+    friendly_name: GitLab Query Language (GLQL)
+    label: glql
+    owner: knowledge
+    technical:
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/glql
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/blob/master/gitlab-query-language/index.md
+        sre_guide: https://runbooks.gitlab.com/glql/
+        developer_guide: https://docs.gitlab.com/user/glql
+      sub_components:
+        - elasticsearch
+        - graphql
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/app/r/s/brsve
+  - name: data-server-rebuild-ansible
+    tier: sv
+    friendly_name: Data-Server Rebuild Ansible
+    label: DataServerRebuild
+    owner: data-analytics
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/data-server-rebuild-ansible
+  - name: repository-mirroring
+    tier: sv
+    friendly_name: Repository Mirroring
+    owner: source_code
+    label: RepositoryMirroring
+    technical:
+      logging:
+        - name: Mirrors by project in Kibana
+          permalink: https://log.gprd.gitlab.net/app/r/s/E5R17
+        - name: Mirror errors in Kibana
+          permalink: https://log.gprd.gitlab.net/app/r/s/apZLs
+    observability:
+      monitors:
+        primary_grafana_dashboard: source-code-management-mirrors
+
+  - name: workhorse
+    tier: sv
+    friendly_name: Workhorse
+    owner: source_code
+    label: Workhorse
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/gitlab
+        - https://gitlab.com/gitlab-org/gitlab-workhorse
+      logging:
+        - name: Workhorse
+          permalink: https://log.gprd.gitlab.net/goto/66979d90ca195652b7a4d10d22ca2db7
+  - name: incident-io
+    tier: inf
+    friendly_name: Incident.io
+    owner: networking_and_incident_management
+    label: IncidentIO
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/incident-io/incident-management/
+  - name: secret-revocation
+    tier: sv
+    friendly_name: Secret Revocation
+    label: SecretRevocation
+    owner: secret_detection
+    teams:
+      - secret_detection
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/security-products/secret-detection/secret-revocation-service
+      documents:
+        service:
+          - https://gitlab.com/gitlab-org/security-products/secret-detection/secret-revocation-service/-/blob/main/README.md
+      logging:
+        - name: secret-revocation
+          permalink: https://console.cloud.google.com/run/detail/us-east1/secret-revocation/logs?project=gitlab-runway-production
+    observability:
+      monitors:
+        primary_grafana_dashboard: runway-service/runway3a-runway-service-metrics
+
+  - name: secret-revc-worker
+    tier: sv
+    friendly_name: Secret Revocation Worker
+    label: SecretRevcWorker
+    owner: secret_detection
+    teams:
+      - secret_detection
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/security-products/secret-detection/secret-revocation-service
+      documents:
+        service:
+          - https://gitlab.com/gitlab-org/security-products/secret-detection/secret-revocation-service/-/blob/main/README.md
+      logging:
+        - name: secret-revc-worker
+          permalink: https://console.cloud.google.com/run/detail/us-east1/secret-revc-worker/logs?project=gitlab-runway-production
+    observability:
+      monitors:
+        primary_grafana_dashboard: runway-service/runway3a-runway-service-metrics
+
+  - name: workspaces
+    tier: inf
+    friendly_name: Remote Development Workspaces
+    label: workspaces
+    owner: remote_development
+    technical:
+      documents:
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/workspaces/
+        sre_guide: https://runbooks.gitlab-static.net/workspaces/
+        developer_guide: https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/lib/remote_development/README.md
+      logging:
+        - name: Rails
+          permalink: https://log.gprd.gitlab.net/app/r/s/cfU5g
+    observability:
+      monitors:
+        primary_grafana_dashboard: stage-groups-remote_development
+
+  - name: secrets-manager
+    tier: sv
+    friendly_name: OpenBao for GitLab Secrets Manager
+    label: RunwayOpenBao
+    owner: pipeline_security
+    teams:
+      - pipeline_security
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/govern/secrets-management/gitlab-secrets-manager-container
+      documents:
+        design: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/secret_manager/decisions/009_request_flows/
+        architecture: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/secret_manager/
+        readiness_review: https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/openbao
+        service:
+          - https://openbao.org/docs/
+          - https://openbao.org/api-docs/
+        security: https://openbao.org/docs/internals/security/
+      dependencies:
+        - service: vault
+      logging:
+        - name: secrets-manager
+          permalink: https://console.cloud.google.com/run/detail/us-east1/secrets-manager/logs?project=gitlab-runway-production
+    observability:
+      monitors:
+        primary_grafana_dashboard: secrets-manager-main/secrets-manager-overview
+  - name: fleet-management
+    tier: inf
+    friendly_name: Fleet Management
+    owner: runway
+    label: fleet-management
+    technical:
+      documents:
+        sre_guide: https://runbooks.gitlab.com/fleet-management/
+      logging:
+        - name: gprd chef-client
+          permalink: https://log.gprd.gitlab.net/app/r/s/u0B41
+  - name: tracing-app-ruby
+    friendly_name: Distributed Tracing Sample App - Ruby
+    tier: inf
+    owner: observability
+    label: tracing-app-ruby
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/observability/tracing-app-ruby
+      documents:
+        developer_guide: https://gitlab.com/gitlab-com/gl-infra/observability/tracing-app-ruby/-/blob/main/README.md?ref_type=heads
+      logging:
+        - name: service overview dashboard
+          permalink: https://dashboards.gitlab.net/dashboards?query=tracing-app-ruby
+  - name: sample-collector
+    tier: inf
+    friendly_name: Distributed Tracing Sample Collector
+    owner: observability
+    label: sample-collector
+    technical:
+      project:
+        - https://gitlab.com/gitlab-com/gl-infra/observability/distributed-tracing-sample-collector
+      documents:
+        developer_guide: https://gitlab.com/gitlab-com/gl-infra/observability/distributed-tracing-sample-collector/-/blob/main/README.md?ref_type=heads
+      logging:
+        - name: service overview dashboard
+          permalink: https://dashboards.gitlab.net/dashboards?query=sample-collector
+  - name: orbit
+    tier: inf
+    friendly_name: Orbit
+    label: Orbit
+    owner: knowledge_graph
+    technical:
+      project:
+        - https://gitlab.com/gitlab-org/orbit/knowledge-graph
+      documents:
+        design: https://handbook.gitlab.com/handbook/engineering/architecture/design-documents/gitlab_knowledge_graph/
+        architecture:
+        readiness_review:

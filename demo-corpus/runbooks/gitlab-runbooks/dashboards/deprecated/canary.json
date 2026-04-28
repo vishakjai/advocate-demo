@@ -1,0 +1,1354 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 615,
+  "links": [
+    {
+      "icon": "external link",
+      "tags": [],
+      "title": "using the canary",
+      "type": "link",
+      "url": "https://about.gitlab.com/handbook/engineering/#canary-testing"
+    },
+    {
+      "icon": "external link",
+      "tags": [],
+      "title": "browser script",
+      "tooltip": "button for setting the canary cookie",
+      "type": "link",
+      "url": "https://gitlab.com/gitlab-com/infrastructure/raw/master/onboarding/browser-scripts/canary.js"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 25,
+      "panels": [],
+      "title": "Version",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 11,
+        "x": 0,
+        "y": 1
+      },
+      "id": 27,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus"
+          },
+          "expr": "topk(1, count(omnibus_build_info{environment=~\"$environment\"}) by (version))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "{{ version }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Majority $environment Version",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 11,
+        "x": 11,
+        "y": 1
+      },
+      "id": 28,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus"
+          },
+          "expr": "topk(1, count(omnibus_build_info{environment=~\"$environment\", stage=\"cny\"}) by (version))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "{{ version }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Canary Version",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 4,
+      "panels": [],
+      "title": "HAProxy",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "uid": "$prometheus"
+      },
+      "description": "",
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 2,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 2,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": true,
+        "hideZero": true,
+        "max": true,
+        "min": true,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "maxPerRow": 2,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "/.*Front.*/",
+          "transform": "negative-Y"
+        },
+        {
+          "alias": "/.*1.*/",
+          "color": "#6ED0E0"
+        },
+        {
+          "alias": "/.*2.*/",
+          "color": "#7EB26D"
+        },
+        {
+          "alias": "/.*3.*/",
+          "color": "#1F78C1"
+        },
+        {
+          "alias": "/.*4.*/",
+          "color": "#CCA300"
+        },
+        {
+          "alias": "/.*5.*/",
+          "color": "#890F02"
+        },
+        {
+          "alias": "/.*other.*/",
+          "color": "#806EB7"
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus"
+          },
+          "expr": "sum by (code, backend) (\n  backend_code:haproxy_server_http_responses_total:irate1m{backend=\"canary_web\"}\n)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Backend {{ code }} {{ backend }}",
+          "metric": "",
+          "refId": "B",
+          "step": 30
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Canary backend status codes",
+      "tooltip": {
+        "msResolution": true,
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 30,
+      "panels": [],
+      "title": "Canary Workhorse",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 32,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_workhorse_http_requests_total{environment=\"$environment\",job=\"gitlab-workhorse-web\", stage=\"cny\", route!=\"^/-/\"}[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "canary web",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_workhorse_http_requests_total{environment=\"$environment\",job=\"gitlab-workhorse-api\",stage=\"cny\", route!=\"^/-/\"}[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "canary api",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_workhorse_http_requests_total{environment=\"$environment\",job=\"gitlab-workhorse-git\",stage=\"cny\", route!=\"^/-/\"}[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "canary git",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Workhorse req/sec",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 33,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_workhorse_http_requests_total{environment=\"$environment\",job=\"gitlab-workhorse-web\", stage=\"cny\"}[1m])) by (route,method)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "canary web {{ method }} {{ route }} ",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_workhorse_http_requests_total{environment=\"$environment\",job=\"gitlab-workhorse-api\",stage=\"cny\"}[1m])) by (route, method)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "canary api  {{ method }} {{ route }} ",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_workhorse_http_requests_total{environment=\"$environment\",job=\"gitlab-workhorse-git\",stage=\"cny\"}[1m])) by (route)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "canary git {{ route }}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Workhorse req/sec by method and route",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Latencies",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 27
+      },
+      "id": 18,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": false,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "dsType": "influxdb",
+          "expr": "avg_over_time(status:rails_requests_completed_seconds:p50{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"cny\"}[5m])",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "avg {{ stage }}",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max_over_time(status:rails_requests_completed_seconds:p50{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"cny\"}[5m])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "max {{ stage }}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg_over_time(status:rails_requests_completed_seconds:p50{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"main\"}[5m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "avg {{ stage }}",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max_over_time(status:rails_requests_completed_seconds:p50{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"main\"}[5m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "max {{ stage }}",
+          "refId": "D"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "p50 latencies for 200s",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 27
+      },
+      "id": 21,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": false,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "dsType": "influxdb",
+          "expr": "avg_over_time(status:rails_requests_completed_seconds:p95{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"cny\"}[5m])",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "avg {{ stage }}",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max_over_time(status:rails_requests_completed_seconds:p95{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"cny\"}[5m])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "max {{ stage }}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg_over_time(status:rails_requests_completed_seconds:p95{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"main\"}[5m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "avg {{ stage }}",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max_over_time(status:rails_requests_completed_seconds:p95{ environment=\"$environment\", type=\"web\", status=\"200\", stage=\"main\"}[$__interval])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "max {{ stage }}",
+          "refId": "D"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "p90 latencies for 200s",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 6,
+      "panels": [],
+      "title": "Rails",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 35
+      },
+      "id": 8,
+      "options": {
+        "dataLinks": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_transaction_event_rails_exception_total{environment=\"$environment\",  stage=\"cny\"}[$__interval]))",
+          "format": "time_series",
+          "interval": "30s",
+          "intervalFactor": 1,
+          "legendFormat": "cny",
+          "refId": "A"
+        }
+      ],
+      "title": "Exceptions Rate",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 35
+      },
+      "id": 10,
+      "options": {
+        "dataLinks": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "sum(rate(gitlab_transaction_event_rails_exception_total{environment=\"$environment\",stage=\"cny\"}[$__interval])) by (controller)",
+          "format": "time_series",
+          "interval": "30s",
+          "intervalFactor": 1,
+          "legendFormat": "{{ controller }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Exceptions Rate by Controller",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
+      "id": 14,
+      "panels": [],
+      "title": "VM stats",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      },
+      "id": 12,
+      "maxPerRow": 6,
+      "options": {
+        "dataLinks": []
+      },
+      "repeat": "type",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg(avg_over_time(instance:node_cpu_in_use:ratio{environment=\"$environment\", type=\"web\", stage!=\"cny\"}[$__interval]))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "avg",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "max(max_over_time(instance:node_cpu_in_use:ratio{environment=\"$environment\", type=\"web\", stage!=\"cny\"}[$__interval]))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "max",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "min(min_over_time(instance:node_cpu_in_use:ratio{environment=\"$environment\", type=\"web\", stage!=\"cny\"}[$__interval]))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "min",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "avg_over_time(instance:node_cpu_in_use:ratio{environment=\"$environment\", type=\"web\", stage=\"cny\"}[$__interval])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "avg-cny",
+          "refId": "D"
+        }
+      ],
+      "title": "web canary cpu",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "uid": "Global"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 52
+      },
+      "id": 23,
+      "options": {
+        "dataLinks": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "dsType": "influxdb",
+          "expr": "node_memory_MemTotal{fqdn=\"$node\"} - node_memory_MemFree{fqdn=\"$node\"} - node_memory_Buffers{fqdn=\"$node\"} - node_memory_Cached{fqdn=\"$node\"}",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "Used",
+          "metric": "",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "step": 10,
+          "tags": []
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "dsType": "influxdb",
+          "expr": "node_memory_SwapTotal{fqdn=\"$node\"} - node_memory_SwapFree{fqdn=\"$node\"}",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "Swap",
+          "metric": "",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "step": 10,
+          "tags": []
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "dsType": "influxdb",
+          "expr": "node_memory_MemTotal{fqdn=\"$node\"}",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "intervalFactor": 2,
+          "legendFormat": "Total",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "step": 10,
+          "tags": []
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "node_memory_SwapTotal{fqdn=\"$node\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Swap Total",
+          "refId": "D",
+          "step": 10
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "node_memory_MemTotal_bytes{fqdn=\"$node\"} - node_memory_MemFree_bytes{fqdn=\"$node\"} - node_memory_Buffers_bytes{fqdn=\"$node\"} - node_memory_Cached_bytes{fqdn=\"$node\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Used",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "node_memory_SwapTotal_bytes{fqdn=\"$node\"} - node_memory_SwapFree_bytes{fqdn=\"$node\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Swap",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "node_memory_MemTotal_bytes{fqdn=\"$node\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Total",
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "uid": "Global"
+          },
+          "expr": "node_memory_SwapTotal_bytes{fqdn=\"$node\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Swap Total",
+          "refId": "H"
+        }
+      ],
+      "title": "Memory Overview",
+      "type": "graph"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "unmanaged"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "gprd",
+          "value": "gprd"
+        },
+        "includeAll": false,
+        "name": "environment",
+        "options": [
+          {
+            "selected": true,
+            "text": "gprd",
+            "value": "gprd"
+          },
+          {
+            "selected": false,
+            "text": "gstg",
+            "value": "gstg"
+          }
+        ],
+        "query": "gprd,gstg",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "includeAll": false,
+        "name": "prometheus",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "/prometheus-01-inf-[[environment]]/",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "prometheus-app-01-inf-gprd",
+          "value": "PC84C3A6298CABB57"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "name": "prometheus_app",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "/prometheus-app-01-inf-[[environment]]/",
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Canary",
+  "uid": "llfd4b2ik",
+  "version": 30
+}

@@ -1,0 +1,39 @@
+groups:
+  - name: runway-cert-manager-sync.rules
+    interval: 5m
+    rules:
+      # Pod is down
+      - alert: RunwayCertManagerSyncDown
+        expr: |
+          kube_deployment_status_replicas_available{deployment="cert-manager-sync", cloud_runtime="eks"} == 0
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: runway
+        annotations:
+          title: Runway cert-manager-sync Failure
+          grafana_datasource_id: mimir-gitlab-gprd
+          runbook: runway/cert-manager-sync/
+          summary: "Runway cert-manager-sync is down in {{ $labels.env }}/{{ $labels.k8s_cluster_name }}"
+          description: |
+            This service (cert-manager-sync) runs on Runway EKS clusters and is in charge of keeping certificate objects (managed by cert-manager) in-sync with AWS ACM.
+            This SLI means that no running replicas were detected for cert-manager-sync/cert-manager-sync in environment {{ $labels.env }} on cluster {{ $labels.k8s_cluster_name }}. This should be looked into as failure to run "cert-manager-sync" means certificates could expire and cause downtime for workloads.
+
+      # Pod exists but not ready
+      - alert: RunwayCertManagerSyncNotReady
+        expr: |
+          kube_pod_status_ready{pod=~"cert-manager-sync.*", condition="true", cloud_runtime="eks"} == 0
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: runway
+        annotations:
+          title: Runway cert-manager-sync Failure
+          grafana_datasource_id: mimir-gitlab-gprd
+          runbook: runway/cert-manager-sync/
+          summary: "Runway cert-manager-sync is not ready in {{ $labels.env }}/{{ $labels.k8s_cluster_name }}"
+          description: |
+            This service (cert-manager-sync) runs on Runway EKS clusters and is in charge of keeping certificate objects (managed by cert-manager) in-sync with AWS ACM.
+            This SLI means that {{ $labels.pod }} is not in ready state for cert-manager-sync/cert-manager-sync in environment {{ $labels.env }} on cluster {{ $labels.k8s_cluster_name }}. This should be looked into as failure to run "cert-manager-sync" means certificates could expire and cause downtime for workloads.

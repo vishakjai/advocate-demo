@@ -1,0 +1,11 @@
+63ebac5a2f1e00f81f04a06920838159d269a54d:.rubocop_todo.yml:generic-api-key:167
+410732123d18432e9358b83e4bd5c509638ab852:docs/cells/breakglass.md:gitlab-deploy-token:117
+410732123d18432e9358b83e4bd5c509638ab852:docs/cells/breakglass.md:gitlab-deploy-token:159
+f8df77191dc8afccfe4ea7092cc26605f1a000dc:docs/cells/breakglass.md:gitlab-deploy-token:157
+f8df77191dc8afccfe4ea7092cc26605f1a000dc:docs/cells/breakglass.md:gitlab-deploy-token:179
+a7420bda69f4b8c456bafbd514cfabfb1436b75a:docs/product_analytics/clickhouse-backup-restore.md:curl-auth-user:34
+29b2f039e00003aa00e0fb4498fe42d775ac5af5:docs/clickhouse/backup-restore.md:curl-auth-user:27
+29b2f039e00003aa00e0fb4498fe42d775ac5af5:docs/clickhouse/backup-restore.md:curl-auth-user:34
+29b2f039e00003aa00e0fb4498fe42d775ac5af5:docs/clickhouse/backup-restore.md:curl-auth-user:41
+53ac50db9900d6c82879b622cd1dad71ca165016:troubleshooting/alertmanager-notification-failures.md:slack-webhook-url:26
+c0c6625e541c7be25088a8b9685779a6a2869aed:troubleshooting/alertmanager-notification-failures.md:slack-webhook-url:26

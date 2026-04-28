@@ -1,0 +1,40 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.datamodel.answers.InitInfoAnswerElement",
+      "parseStatus" : {
+        "configs/as1r1.cfg" : "FAILED",
+        "configs/as1r2.cfg" : "PASSED",
+        "configs/as2r1.cfg" : "PASSED",
+        "configs/cumulus_nclu_range" : "FAILED",
+        "configs/vrf_import_and_ip_prefix_routes_import.cfg" : "PASSED",
+        "vrf_import_and_ip_prefix_routes_import" : "FAILED"
+      },
+      "warnings" : {
+        "configs/vrf_import_and_ip_prefix_routes_import.cfg" : {
+          "Red flags" : [
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "No hostname set in configs/vrf_import_and_ip_prefix_routes_import.cfg\n"
+            }
+          ]
+        },
+        "internet" : { }
+      }
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.InitInfoQuestionPlugin$InitInfoQuestion",
+    "differential" : false,
+    "environmentBgpTables" : false,
+    "includeOneTableKeys" : true,
+    "summary" : false,
+    "verboseError" : false
+  },
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

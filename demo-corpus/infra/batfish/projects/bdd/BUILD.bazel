@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "bdd",
+    actual = "//projects/bdd/src/main/java/net/sf/javabdd",
+)

@@ -1,0 +1,47 @@
+# See https://www.vaultproject.io/internals/telemetry for more details about Vault/
+
+groups:
+  - name: vault.rules
+    rules:
+      - alert: NoActiveVaultInstance
+        expr: up{job="vault-active", env="pre"} == 0
+        for: 10m
+        labels:
+          severity: s3
+          alert_type: symptom
+        annotations:
+          grafana_datasource_id: mimir-gitlab-pre
+          title: No active Vault node
+          description: >
+            Vault has no active node. This could mean that the pods are failing to
+            start, or Vault is unable to unseal or the Vault cluster lost quorum.
+          runbook: vault/troubleshooting/
+
+      - alert: VaultSealed
+        expr: vault_core_unsealed{job="vault-active", env="pre"} == 0
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+        annotations:
+          grafana_datasource_id: mimir-gitlab-pre
+          title: All Vault nodes sealed
+          description: >
+            All Vault nodes are sealed. This could mean that the pods are failing to
+            start, or Vault is unable to unseal or the Vault cluster lost quorum.
+          runbook: vault/troubleshooting/
+
+      - alert: VaultLowFailureTolerance
+        expr: |
+          vault_autopilot_failure_tolerance{env="pre"} < 2
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+        annotations:
+          grafana_datasource_id: mimir-gitlab-pre
+          title: Low failure tolerance for Vault cluster
+          description: >
+            The Vault cluster failure tolerance is diminished. It can only lose
+            {{ $value }} more nodes while maintaining quorum.
+          runbook: vault/troubleshooting/

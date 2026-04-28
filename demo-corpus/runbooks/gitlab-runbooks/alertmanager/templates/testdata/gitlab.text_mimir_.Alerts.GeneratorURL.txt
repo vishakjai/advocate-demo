@@ -1,0 +1,6 @@
+:fire: Alerts :fire:
+*<https://dashboards.gitlab.net/explore?schemaVersion=1&orgId=1&panes=%7B%2200v%22%3A%7B%22datasource%22%3A%22mimir-gitlab-gprd%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22sum+by+%28env%2Cenvironment%2Ctier%2Cstage%2Cregion%29+%28%5Cn++rate%28gitlab_workhorse_http_requests_total%7Bcode%3D~%5C%22%5E5.%2A%5C%22%2Cenvironment%3D%5C%22gprd%5C%22%2Cjob%3D~%5C%22gitlab-workhorse%7Cgitlab-workhorse-git%5C%22%2Cregion%3D%5C%22us-east1-d%5C%22%2Croute%21%3D%5C%22%5E%2F-%2Fhealth%24%5C%22%2Croute%21%3D%5C%22%5E%2F-%2F%28readiness%7Cliveness%29%24%5C%22%2Croute%21%3D%5C%22%5E%2Fapi%2F%5C%22%2Croute%21%3D%5C%22%5C%5C%5C%5CA%2Fapi%2Fv4%2Fjobs%2Frequest%5C%5C%5C%5Cz%5C%22%2Croute%21%3D%5C%22%5E%2Fapi%2Fv4%2Fjobs%2Frequest%5C%5C%5C%5Cz%5C%22%2Cstage%3D%5C%22main%5C%22%2Ctype%3D%5C%22git%5C%22%7D%5B5m%5D%29%5Cn%29%22%2C%22range%22%3Atrue%2C%22instant%22%3Atrue%2C%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22mimir-gitlab-gprd%22%7D%2C%22editorMode%22%3A%22code%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-1h%22%2C%22to%22%3A%22now%22%7D%7D%7D|%!s(<nil>)>*
+%!s(<nil>)
+
+%!s(<nil>)
+

@@ -1,0 +1,194 @@
+{
+  "gstg": {
+    "name": "gstg-gitlab-gke",
+    "project": "gitlab-staging-1",
+    "region": "us-east1",
+    "ssh_proxy": "console-01-sv-gstg.c.gitlab-staging-1.internal"
+  },
+  "gstg-us-east1-b": {
+    "name": "gstg-us-east1-b",
+    "project": "gitlab-staging-1",
+    "region": "us-east1-b",
+    "ssh_proxy": "console-01-sv-gstg.c.gitlab-staging-1.internal"
+  },
+  "gstg-us-east1-c": {
+    "name": "gstg-us-east1-c",
+    "project": "gitlab-staging-1",
+    "region": "us-east1-c",
+    "ssh_proxy": "console-01-sv-gstg.c.gitlab-staging-1.internal"
+  },
+  "gstg-us-east1-d": {
+    "name": "gstg-us-east1-d",
+    "project": "gitlab-staging-1",
+    "region": "us-east1-d",
+    "ssh_proxy": "console-01-sv-gstg.c.gitlab-staging-1.internal"
+  },
+  "gstg-gitlab-36dv2": {
+    "name": "gitlab-36dv2",
+    "project": "gitlab-staging-1",
+    "region": "us-east1",
+    "ssh_proxy": "console-01-sv-gstg.c.gitlab-staging-1.internal"
+  },
+  "gprd": {
+    "name": "gprd-gitlab-gke",
+    "project": "gitlab-production",
+    "region": "us-east1",
+    "ssh_proxy": "console-01-sv-gprd.c.gitlab-production.internal"
+  },
+  "gprd-us-east1-b": {
+    "name": "gprd-us-east1-b",
+    "project": "gitlab-production",
+    "region": "us-east1-b",
+    "ssh_proxy": "console-01-sv-gprd.c.gitlab-production.internal"
+  },
+  "gprd-us-east1-c": {
+    "name": "gprd-us-east1-c",
+    "project": "gitlab-production",
+    "region": "us-east1-c",
+    "ssh_proxy": "console-01-sv-gprd.c.gitlab-production.internal"
+  },
+  "gprd-us-east1-d": {
+    "name": "gprd-us-east1-d",
+    "project": "gitlab-production",
+    "region": "us-east1-d",
+    "ssh_proxy": "console-01-sv-gprd.c.gitlab-production.internal"
+  },
+  "gprd-gitlab-3okls": {
+    "name": "gitlab-3okls",
+    "project": "gitlab-production",
+    "region": "us-east1",
+    "ssh_proxy": "console-01-sv-gprd.c.gitlab-production.internal"
+  },
+  "stgsub": {
+    "name": "stgsub-customers-gke",
+    "project": "gitlab-subscriptions-staging",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "stgsub-ref": {
+    "name": "stgsub-ref-customers-gke",
+    "project": "gitlab-subscriptions-stg-ref",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "prdsub": {
+    "name": "prdsub-customers-gke",
+    "project": "gitlab-subscriptions-prod",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "analytics-eventsdot-stg": {
+    "name": "events-dot-stg",
+    "project": "gl-analy-evtsdot-stg-0d67dbbc",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "analytics-eventsdot-prod": {
+    "name": "eventsdot-prod",
+    "project": "analytics-eventsdot-prod",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "orbit-stg": {
+    "name": "orbit-stg",
+    "project": "gl-orbit-stg",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "orbit-prd": {
+    "name": "orbit-prd",
+    "project": "gl-orbit-prd",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "pre": {
+    "name": "pre-gitlab-gke",
+    "project": "gitlab-pre",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "ops": {
+    "name": "ops-gitlab-gke",
+    "project": "gitlab-ops",
+    "region": "us-east1",
+    "ssh_proxy": "bastion-01-inf-ops.c.gitlab-ops.internal"
+  },
+  "ops-central": {
+    "name": "ops-central",
+    "project": "gitlab-ops",
+    "region": "us-central1",
+    "ssh_proxy": "bastion-01-inf-ops.c.gitlab-ops.internal"
+  },
+  "db-benchmarking": {
+    "name": "db-benchmarking-gitlab-gke",
+    "project": "gitlab-db-benchmarking",
+    "region": "us-east1",
+    "ssh_proxy": "bastion-01-inf-db-benchmarking.c.gitlab-db-benchmarking.internal"
+  },
+  "release": {
+    "name": "release-gitlab-gke",
+    "project": "gitlab-release",
+    "region": "us-east1",
+    "ssh_proxy": "bastion-01-inf-release.c.gitlab-release.internal"
+  },
+  "runway-staging-gke-asia-northeast3": {
+    "name": "runway-gke-stg-asia-northeast3",
+    "project": "gitlab-runway-staging",
+    "region": "asia-northeast3",
+    "ssh_proxy": null
+  },
+  "runway-staging-gke-europe-west1": {
+    "name": "runway-gke-stg-europe-west1",
+    "project": "gitlab-runway-staging",
+    "region": "europe-west1",
+    "ssh_proxy": null
+  },
+  "runway-staging-gke-us-east1": {
+    "name": "runway-gke-stg-us-east1",
+    "project": "gitlab-runway-staging",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "runway-production-gke-asia-northeast3": {
+    "name": "runway-gke-prd-asia-northeast3",
+    "project": "gitlab-runway-production",
+    "region": "asia-northeast3",
+    "ssh_proxy": null
+  },
+  "runway-production-gke-europe-west1": {
+    "name": "runway-gke-prd-europe-west1",
+    "project": "gitlab-runway-production",
+    "region": "europe-west1",
+    "ssh_proxy": null
+  },
+  "runway-production-gke-us-east1": {
+    "name": "runway-gke-prd-us-east1",
+    "project": "gitlab-runway-production",
+    "region": "us-east1",
+    "ssh_proxy": null
+  },
+  "gitlab-ci-gitlab-org-experimental": {
+    "name": "gitlab-org-experimental",
+    "project": "gitlab-ci-155816",
+    "region": "us-east1-d",
+    "ssh_proxy": "bastion-01-inf-ci.c.gitlab-ci-155816.internal"
+  },
+  "gitlab-ci-gitlab-org-experimental-kata": {
+    "name": "gitlab-org-experimental-kata",
+    "project": "gitlab-ci-155816",
+    "region": "us-east1-d",
+    "ssh_proxy": "bastion-01-inf-ci.c.gitlab-ci-155816.internal"
+  },
+  "gitlab-ci-gitlab-org-experimental-gvisor": {
+    "name": "gitlab-org-experimental-gvisor",
+    "project": "gitlab-ci-155816",
+    "region": "us-east1-d",
+    "ssh_proxy": "bastion-01-inf-ci.c.gitlab-ci-155816.internal"
+  },
+  "gitlab-ci-gitlab-org-runners-v4-deployer": {
+    "name": "gitlab-org-runners-v4-deployer",
+    "project": "gitlab-ci-155816",
+    "region": "us-east1-d",
+    "ssh_proxy": "bastion-01-inf-ci.c.gitlab-ci-155816.internal"
+  }
+}

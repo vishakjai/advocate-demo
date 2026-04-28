@@ -1,0 +1,20 @@
+groups:
+- name: logging.rules
+  rules:
+  - alert: LoggingVisibilityDiminished
+    expr: |
+      avg_over_time(stackdriver_pubsub_subscription_pubsub_googleapis_com_subscription_oldest_unacked_message_age{subscription_id!~".*fluentd-archiver"}[30m]) > 1000
+    for: 1h
+    labels:
+      severity: s2
+      team: observability
+      pager: pagerduty
+      alert_type: symptom
+      type: logging
+    annotations:
+      description: >
+        PubSub messages are queuing up.
+        There are currently {{ $value }} unacked messages in the subscription {{ $labels.subscription_id }}.
+        This will lead to Elastic lagging behind with the log data.
+      runbook: logging/troubleshooting/
+      title: PubSub queuing high on {{ $labels.subscription_id }}

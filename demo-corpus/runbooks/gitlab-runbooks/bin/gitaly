@@ -1,0 +1,693 @@
+#!/usr/bin/env bash
+# SC2154
+
+set -efo pipefail
+
+source "$(dirname "$0")/.admin_pat.lib.sh"
+
+usage() {
+  case $1 in
+  storages)
+    cat <<HELP >&2
+USAGE:
+  glsh gitaly storages [SUBCOMMAND]
+
+SUBCOMMANDS:
+  list       List storages and their weights
+  validate   Validate a storage by performing a project move
+HELP
+    ;;
+  storages_list)
+    cat <<HELP >&2
+USAGE:
+  glsh gitaly storages list -e [gstg,gprd]
+
+Example:
+  # list storages and their weights in staging
+  glsh gitaly storages list -e gstg
+HELP
+    exit 2
+    ;;
+  storages_validate)
+    cat <<HELP >&2
+Creates a test project on a storage, moves it to a new storage and does some validation to ensure
+the new storage is functioning properly.
+
+USAGE:
+  glsh gitaly storages validate -e [gstg,gprd] [-s [source storage]] <storage names>
+
+  -e [gstg,gprd]           Environment to validate
+  -s [source storage]      (optional) Create a project on a source storages and then move it to the destination storage
+  <storage names>          One or more storage names to validate
+
+Example:
+  # Create a test project on the storage named nfs-file24 and move it to gitaly-01-stor-gstg.c.gitlab-gitaly-gstg-164c.internal
+  glsh gitaly storages validate -e gstg -s nfs-file24 gitaly-01-stor-gstg.c.gitlab-gitaly-gstg-164c.internal
+  # Create a test project on the storage named nfs-file24 and validate it
+  glsh gitaly storages validate -e gstg nfs-file24
+
+Note:
+  To list available storages use \`glsh gitaly storage list -e [gstg,gprd]\`
+HELP
+    exit 2
+    ;;
+
+  repositories)
+    cat <<HELP >&2
+USAGE:
+  glsh gitaly repositories [SUBCOMMAND]
+
+SUBCOMMANDS:
+  move       Move repositories to a different storage
+  checksum   Clone a repository and generate a checksum from the contents
+HELP
+    ;;
+
+  repositories_move)
+    cat <<HELP >&2
+USAGE:
+  glsh gitaly repositories move -e [gstg,gprd] [-d [destination storage]] <project names>
+
+  -e [gstg,gprd]            Environment to validate
+  -d [destination storage]  (optional) Destination storage, if not specified will use weights for the move
+  <project names>           Full project path to move
+
+Example:
+  # Move a test project on staging
+  glsh gitaly repositories move -e gstg -d nfs-file-cny01 jarv/registry-test
+  # Move proj/path1 and proj/path2 to any available storage (weight>0)
+  glsh gitaly repositories move -e gstg proj/path1 proj/path2
+  # Move proj/path1 and proj/path2 to storage gitaly-02-stor-gstg.c.gitlab-gitaly-gstg-380a.internal
+  glsh gitaly repositories move -e gstg -d gitaly-02-stor-gstg.c.gitlab-gitaly-gstg-380a.internal proj/path1 proj/path2
+
+Note:
+  To list available storages use \`glsh gitaly storage list -e [gstg,gprd]\`
+HELP
+    exit 2
+    ;;
+
+  repositories_checksum)
+    cat <<HELP >&2
+
+Clones a project and generates an md5sum based on it's contents. Either specify a storage name
+to clone the first repository found on the storage, or a project path to clone a specific repository.
+
+USAGE:
+  glsh gitaly repositories checksum -e [gstg,gprd] [-s [storage name]] [-p [project name]] [-g [group name]]
+
+  -e [gstg,gprd]            Environment to validate
+  -s [storage name]         (optional)* Storage name to select a project from to checksum. It looks for the oldest repository on the storage.
+  -p [project name]         (optional)* Project name to checksum
+  -g [group name]           (optional)  Group filter for the repository when used with the -s flag
+
+  * Either project name or storage name is required
+
+Example:
+  # Generate a checksum of a repository in the gitlab-com group on gitaly-02-stor-gstg.c.gitlab-gitaly-gstg-164c.internal
+  glsh gitaly repositories checksum -s gitaly-02-stor-gstg.c.gitlab-gitaly-gstg-164c.internal -e gstg -g gitlab-com
+
+Note:
+  To list available storages use \`glsh gitaly storage list -e [gstg,gprd]\`
+HELP
+    exit 2
+    ;;
+  *)
+    cat <<HELP >&2
+USAGE:
+  glsh gitaly [SUBCOMMAND]
+
+SUBCOMMANDS:
+  storages       Manage storages
+  repositories   Manage repositories
+HELP
+
+    ;;
+  esac
+}
+
+###################################################
+# Lists repository storages by querying
+# '/application/settings` via the API
+#
+# glsh gitaly storages list
+###################################################
+storages_list() {
+  local env
+
+  while getopts "h?e:" opt; do
+    case "$opt" in
+    h | \?)
+      usage "${FUNCNAME[0]}"
+      ;;
+    e)
+      env=${OPTARG}
+      ;;
+    esac
+  done
+
+  [[ -z ${env:-} ]] && usage "${FUNCNAME[0]}"
+  local pat
+  pat=$(admin_pat)
+
+  local curl_opts jq_opts
+  curl_opts=(
+    --silent --fail-with-body --show-error
+    --header "PRIVATE-TOKEN: $pat"
+    --header "Content-Type: application/json"
+    "$(api_for_env)/application/settings"
+  )
+  jq_opts=(
+    --raw-output
+    '.repository_storages_weighted | to_entries | map([.key, .value] | @tsv)[]'
+  )
+
+  local resp storages_csv
+  if ! resp=$(curl "${curl_opts[@]}" 2>&1); then
+    echo_err "✘ curl exited non-zero!"
+    echo_err "        $resp"
+    exit 1
+  fi
+  storages_csv=$(jq "${jq_opts[@]}" <<<"$resp")
+
+  printf "%-60s %s\n" "STORAGE" "WEIGHT"
+  printf -- '-%.0s' {1..67}
+  echo ""
+  while IFS= read -r line; do
+    printf "%-60s %s\n" "$(cut -f1 <<<"$line")" "$(cut -f2 <<<"$line")"
+  done <<<"$storages_csv"
+}
+
+###################################################
+# Validates a new storage by creating a test
+# project and moving it to the storages provided
+# on the commandline
+#
+# glsh gitaly storages validate
+###################################################
+storages_validate() {
+  local env src_storage
+  local date_ts
+  date_ts=$(date +%Y%M%d-%H%M%S)
+
+  while getopts "h?e:s:" opt; do
+    case "$opt" in
+    h | \?)
+      usage "${FUNCNAME[0]}"
+      ;;
+    e)
+      env=${OPTARG}
+      ;;
+    s)
+      src_storage=${OPTARG}
+      ;;
+    esac
+  done
+  shift "$((OPTIND - 1))"
+
+  [[ -z ${env:-} ]] && usage "${FUNCNAME[0]}"
+
+  if [[ $# -eq 0 ]]; then
+    echo_err "No destination storages specified!"
+    echo_err ""
+    usage "${FUNCNAME[0]}"
+  fi
+
+  local pat
+  pat=$(admin_pat)
+
+  trap cleanup_tmp_files EXIT
+  echo "Creating projects:"
+  echo ""
+
+  for dst_storage in "$@"; do
+    local project_name
+    project_name="glsh-$(whoami)-${dst_storage}-${date_ts}"
+    echo "  $dst_storage:"
+
+    local storage_create
+    if [[ -n ${src_storage} ]]; then
+      storage_create="$src_storage"
+    else
+      storage_create="$dst_storage"
+    fi
+    printf "    creating on %s..." "$storage_create"
+    local create_resp project_id
+    create_resp=$(create_project "$project_name" "$storage_create")
+    echo "✔"
+    project_id="$(jq -r '.id' <<<"$create_resp")"
+
+    if [[ -n $src_storage ]]; then
+      printf "    moving to %s..." "$dst_storage"
+      local move_resp move_id
+      move_resp=$(move_project "$project_id" "$dst_storage")
+      move_id="$(jq -r '.id' <<<"$move_resp")"
+      wait_move_finished "$project_id" "$move_id" "$web_url"
+    fi
+
+    printf "    checking project..."
+    local info_resp storage_chk http_url_to_repo
+    info_resp=$(project_info "$project_id")
+    storage_chk="$(jq -r '.repository_storage' <<<"$info_resp")"
+    http_url_to_repo="$(jq -r '.http_url_to_repo' <<<"$info_resp")"
+    if [[ $storage_chk == "$dst_storage" ]]; then
+      echo "✔"
+    else
+      echo "✘"
+      echo ""
+      echo "    Storage '$storage_chk' for $project_name doesn't match destination storage '$dst_storage'!"
+      exit 1
+    fi
+
+    printf "    validating..."
+    validate_project "$http_url_to_repo"
+    echo "✔"
+  done
+}
+
+###################################################
+# Moves an existing project to the one of the shards
+# taking new projects
+#
+# glsh repositories move
+###################################################
+repositories_move() {
+  local env dst_storage
+  while getopts "h?e:d:" opt; do
+    case "$opt" in
+    h | \?)
+      usage "${FUNCNAME[0]}"
+      ;;
+    e)
+      env=${OPTARG}
+      ;;
+    d)
+      dst_storage=${OPTARG}
+      ;;
+    esac
+  done
+  shift "$((OPTIND - 1))"
+
+  [[ -z ${env:-} ]] && usage "${FUNCNAME[0]}"
+  local pat
+  pat=$(admin_pat)
+
+  if [[ $# -eq 0 ]]; then
+    echo "No projects specified!" >&2
+    usage "${FUNCNAME[0]}"
+  fi
+
+  local info_resp cur_storage web_url project_id
+  local move_resp move_id info_resp new_storage
+  echo "Moving the following projects to ${dst_storage:-any storage that is available}"
+  for proj in "$@"; do
+    echo "  $proj"
+    echo -n "    getting info..."
+    info_resp=$(project_info "$proj")
+    cur_storage="$(jq -r '.repository_storage' <<<"$info_resp")"
+    web_url="$(jq -r '.web_url' <<<"$info_resp")"
+    project_id="$(jq -r '.id' <<<"$info_resp")"
+    echo "[current_storage=$cur_storage]"
+    echo -n "    moving..."
+    move_resp=$(move_project "$project_id" "${dst_storage:-}")
+    move_id="$(jq -r '.id' <<<"$move_resp")"
+    wait_move_finished "$project_id" "$move_id" "$web_url"
+    echo -n "    confirming move..."
+    info_resp=$(project_info "$proj")
+    new_storage="$(jq -r '.repository_storage' <<<"$info_resp")"
+    echo "[new_storage=$new_storage]"
+  done
+}
+
+repositories_checksum() {
+  local storage dst_storage group
+  while getopts "h?s:p:g:e:" opt; do
+    case "$opt" in
+    h | \?)
+      usage "${FUNCNAME[0]}"
+      ;;
+    s)
+      storage=${OPTARG}
+      ;;
+    p)
+      project=${OPTARG}
+      ;;
+    g)
+      group=${OPTARG}
+      ;;
+    e)
+      env=${OPTARG}
+      ;;
+    esac
+  done
+  shift "$((OPTIND - 1))"
+
+  [[ -z $project ]] && [[ -z $storage ]] || [[ -z ${env:-} ]] && usage "${FUNCNAME[0]}"
+
+  if [[ -n $storage ]]; then
+    local pat
+    pat="$(admin_pat)"
+    project_json="$(find_project_on_storage "$storage" "$group")"
+    clone_url="$(jq -r .ssh_url_to_repo <<<"$project_json")"
+    project="$(jq -r '.path_with_namespace' <<<"$project_json")"
+  else
+    # shellcheck disable=SC2154
+    clone_url="git@${gitlab_host}/${project}.git"
+  fi
+  project_name="$(awk -F'/' '{print $NF}' <<<"$project")"
+  temp_dir="$(mktemp -d)"
+  mkdir -p "$temp_dir/$project"
+
+  echo "Cloning repository: $project"
+  git clone "$clone_url" "$temp_dir/$project"
+
+  pushd "$temp_dir/$project" >/dev/null
+  # shellcheck disable=SC2155
+  local sums="$(git ls-files | sort | xargs md5sum)"
+  popd >/dev/null
+
+  echo "Project ${project_name}: $(md5sum <<<"$sums")"
+  rm -rf "$temp_dir"
+}
+
+################## Helper Functions #####################
+
+###################################################
+# Runs on script exit to cleanup any temporary files
+# that were created for storage validation.
+#
+###################################################
+cleanup_tmp_files() {
+  # If there are any temp files left, remove them
+  rm -rf /tmp/glsh-validate-*
+}
+
+###################################################
+# Validates a project that has already been created
+# by cloning it into a temporary directory, making
+# a change to the README.md, pushing, then
+# clones it again and validates the change was made
+#
+# Arguments:
+#   http_url_to_repo: repository to clone
+#     e.g, "https://example.com:diaspora/diaspora-client.git"
+#
+###################################################
+validate_project() {
+  local http_url_to_repo="$1"
+  local proj_dir
+  local token_url="https://pat:${pat}@${http_url_to_repo/https:\/\//}"
+
+  proj_dir=$(mktemp -d /tmp/glsh-validate-XXXX)
+  test_string="Updating repository for test by $(whoami) using glsh"
+
+  printf "[cloning]."
+  git clone --quiet "$token_url" "${proj_dir}"
+  pushd "$proj_dir" >/dev/null
+  printf "[updating]."
+  echo -e "\n\n$test_string" >>"README.md"
+  git add "README.md"
+  git commit --quiet -am "Update README to test $new_storage"
+  printf "[pushing]."
+  git push --quiet "$token_url" main >/dev/null 2>&1
+  popd >/dev/null
+  rm -rf "$proj_dir"
+
+  printf "[re-cloning]."
+  git clone --quiet "${token_url}" "${proj_dir}"
+  pushd "$proj_dir" >/dev/null
+  printf "[checking]."
+  if ! grep -q "$test_string" README.md; then
+    echo ✘
+    echo ""
+    echo "Unable to find '$test_string' in README.md, validation failed!"
+    echo "full contents:"
+    cat "$proj_dir/README.md"
+    exit 1
+  fi
+  popd >/dev/null
+  rm -rf "$proj_dir"
+}
+
+###################################################
+# Creates a new project and echos the
+# JSON response
+#
+# Arguments:
+#   project_name: project name to create
+#   repository_storage: (optional) storage to place
+#                       the project
+#
+# Notes:
+#   If $repository_storage is not set the repository
+#   will be created on any available storage
+#
+###################################################
+create_project() {
+  local project_name="$1"
+  local repository_storage="${2:-}"
+  local curl_opts
+
+  local storage_json_fragment=""
+
+  if [[ -n $repository_storage ]]; then
+    storage_json_fragment=$(printf '"repository_storage": "%s", ' "$repository_storage")
+  fi
+
+  curl_opts=(
+    --silent --fail-with-body --show-error
+    --request POST
+    --header "PRIVATE-TOKEN: $pat"
+    --header "Content-Type: application/json"
+    --data
+    "$(printf '{"name": "%s", %s "description": "Created via [glsh](https://gitlab.com/gitlab-com/runbooks/-/blob/master/bin/gitaly)", "initialize_with_readme": "true"}' "$project_name" "$storage_json_fragment")"
+    "$(api_for_env)/projects"
+  )
+
+  local resp project_id
+  if ! resp=$(curl "${curl_opts[@]}" 2>&1); then
+    echo_err "✘ curl exited non-zero!"
+    echo_err "        $resp"
+    exit 1
+  fi
+  project_id="$(jq -r '.id' <<<"$resp")"
+
+  echo "$resp"
+}
+
+###################################################
+# Using the move API, moves a project to a new storage
+# and echos the JSON response
+#
+# Arguments:
+#   project_id: Project ID to move
+#   dst_storage: (optional) destination storage
+#
+# Note:
+#  If $dst_storage is unset the move api will move the
+#  project to any free storage using storage weights
+###################################################
+move_project() {
+  local project_id="$1"
+  local dst_storage="${2:-}"
+
+  local curl_opts
+  curl_opts=(
+    --silent --fail-with-body --show-error
+    --request POST
+    --header "PRIVATE-TOKEN: $pat"
+    --header "Content-Type: application/json"
+    "$(api_for_env)/projects/${project_id}/repository_storage_moves"
+  )
+  [[ -n $dst_storage ]] && curl_opts+=(--data "$(printf '{"destination_storage_name": "%s"}' "$dst_storage")")
+
+  local resp
+  if ! resp=$(curl "${curl_opts[@]}" 2>&1); then
+    echo_err "✘ curl exited non-zero!"
+    echo_err "        $resp"
+    exit 1
+  fi
+  echo "$resp"
+}
+
+###################################################
+# Checks the project move status using the move
+# API and waits for up to 1 hour for the move to succeed
+#
+# Arguments:
+#   project_id: Project ID to status
+#   move_id: Project Move ID to status
+#   web_url: Web URL (only used for logging in case of failure)
+###################################################
+wait_move_finished() {
+  local project_id="$1"
+  local move_id="$2"
+  local web_url="$3"
+  local curl_opts
+  curl_opts=(
+    --silent --fail-with-body --show-error
+    --header "PRIVATE-TOKEN: $pat"
+    --header "Content-Type: application/json"
+    "$(api_for_env)/projects/${project_id}/repository_storage_moves/${move_id}"
+  )
+
+  local resp move_state
+  for _ in {0..3600}; do
+    if ! resp=$(curl "${curl_opts[@]}" 2>&1); then
+      echo_err "✘ curl exited non-zero!"
+      echo_err "        $resp"
+      exit 1
+    fi
+    move_state="$(jq -r '.state' <<<"$resp")"
+    case $move_state in
+    finished)
+      echo "[$move_state].✔"
+      return
+      ;;
+    initial | scheduled | started | replicated)
+      echo -n "[$move_state]."
+      ;;
+    *)
+      echo_err ""
+      echo_err "Error moving project ${web_url}, got unexpected state: $move_state, aborting!"
+      exit 1
+      ;;
+    esac
+    sleep 1
+  done
+
+  echo_err ""
+  echo_err "Timeout waiting for the move to succeed for project ${web_url}, aborting! Note that the move will continue running in the background."
+  exit 1
+}
+
+###################################################
+# Gets a single project and echos the JSON response
+#
+# Arguments:
+#   proj: project ID OR full project path to retrieve
+#
+# Note:
+#   $proj will be URL encoded automatically
+###################################################
+project_info() {
+  local proj="$1"
+  # url encode the project name
+  proj=$(echo -n "$proj" | jq -sRr @uri)
+
+  local curl_opts
+  curl_opts=(
+    --silent --fail-with-body --show-error
+    --header "PRIVATE-TOKEN: $pat"
+    --header "Content-Type: application/json"
+    "$(api_for_env)/projects/$proj"
+  )
+
+  local resp
+  if ! resp=$(curl "${curl_opts[@]}" 2>&1); then
+    echo_err "✘ curl exited non-zero!"
+    echo_err "        $resp"
+    exit 1
+  fi
+  echo "$resp"
+}
+
+find_project_on_storage() {
+  local storage="$1"
+  local group="$2"
+  local curl_opts
+
+  # shellcheck disable=SC2206
+  curl_uri="$(api_for_env)/projects?repository_storage=${storage}&order_by=created_at&sort=asc"
+
+  if [[ -n $group ]]; then
+    curl_uri="${curl_uri}&search=${group}/"
+  fi
+
+  # shellcheck disable=SC2206
+  curl_opts=(
+    --silent --fail-with-body --show-error
+    --header "PRIVATE-TOKEN: $pat"
+    --header "Content-Type: application/json"
+    $curl_uri
+  )
+
+  local resp
+  if ! resp=$(curl "${curl_opts[@]}" 2>&1); then
+    echo_err "✘ curl exited non-zero!"
+    echo_err "        $resp"
+    exit 1
+  fi
+
+  echo "$resp" | jq '.[0]'
+}
+
+###################################################
+# echos the API URL depending on which environment
+# is set
+###################################################
+api_for_env() {
+  echo "https://$(gitlab_host)/api/v4"
+}
+
+###################################################
+# echos the host for the corresponding environment
+###################################################
+gitlab_host() {
+  case $env in
+  gprd)
+    echo "gitlab.com"
+    ;;
+  gstg)
+    echo "staging.gitlab.com"
+    ;;
+  *)
+    echo_err "Invalid environment '$env', must be 'gprd' or 'gstg'."
+    exit 1
+    ;;
+  esac
+}
+
+echo_err() {
+  echo "$1" >&2
+}
+
+main() {
+  case $1 in
+  storages)
+    case $2 in
+    list)
+      shift 2
+      storages_list "$@"
+      ;;
+    validate)
+      shift 2
+      storages_validate "$@"
+      ;;
+    *)
+      usage storages
+      ;;
+    esac
+    ;;
+  repositories)
+    case $2 in
+    move)
+      shift 2
+      repositories_move "$@"
+      ;;
+
+    checksum)
+      shift 2
+      repositories_checksum "$@"
+      ;;
+    *)
+      usage repositories
+      ;;
+    esac
+    ;;
+  *)
+    usage
+    ;;
+  esac
+}
+
+main "$@"

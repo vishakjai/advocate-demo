@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'optimist'
+gem 'google-cloud-compute'
+gem 'google-cloud-resource_manager'
+gem 'mixlib-shellout'
+gem 'git'
+gem 'rubocop'
+gem 'gitlab-styles'

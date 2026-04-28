@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+require_relative '../lib/jsonnet_wrapper'
+
+CHECK = "✅"
+STOP = "🛑"
+WHITE = "⚪️"
+MINUS = "➖"
+
+Evaluation = Struct.new(:level, :message)
+
+def evaluate(level, criterion)
+  message =
+    case criterion['result']
+    when 'passed'
+      "#{CHECK} #{criterion['name']}"
+    when 'failed'
+      "#{STOP} #{criterion['name']}"
+    when 'skipped'
+      "#{WHITE} (skipped) #{criterion['name']}. Reason: #{Array(criterion['evidence']).join(', ')}"
+    else
+      "#{MINUS} (#{criterion['result']}) #{criterion['name']}"
+    end
+  Evaluation.new(level, message)
+end
+
+# Validate the maturity model so that the mandatory level for all services is Level 1
+def validate(maturity_model, required_level, *filters)
+  $stdout.puts "Validating service maturity model."
+  $stdout.puts
+  $stdout.puts "The maturity model itself is part of the metrics catalog, and uses information from the metrics catalog and the service catalog to score each service. To achieve a particular level in the maturity model, a service must meet all the criteria for that level and all previous levels."
+  $stdout.puts "The maturity model is a proxy to indicate how \"mature\" a service is. A service is more mature doesn't mean it is bug-free or more reliable. It means we have enough knowledge upon a service and able to observe, tackle, or even predict its failure points."
+  $stdout.puts "It's valuable for all services to be at a higher Level. Level 1 is a mandatory level for new services joining the system. Fore more information, please visit https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/587."
+  $stdout.puts
+
+  failures = []
+  maturity_model.each do |service, model|
+    next if !filters.empty? && !filters.include?(service)
+
+    # The current required level is 1
+    if model['levelNumber'] >= required_level
+      puts "- #{service} (Level #{model['levelNumber']})"
+      next
+    end
+
+    evaluation = model['details'].flat_map do |level|
+      level['criteria'].map do |criterion|
+        break [] if level['number'] > required_level
+
+        evaluate(level, criterion)
+      end
+    end
+
+    failures << [service, model, evaluation]
+  end
+
+  $stdout.puts
+
+  failures.each do |service, model, evaluation|
+    puts "- #{service} (Level #{model['levelNumber']})"
+    evaluation.each do |e|
+      puts "  (#{e.level['name']}) #{e.message}"
+    end
+    $stdout.puts
+  end
+
+  if failures.empty?
+    $stdout.puts "✅ All services are above the mandatory level!"
+    exit 0
+  end
+
+  $stdout.puts "There are #{failures.length} services under Level #{required_level}. Please visit the corresponding service definition files (in metrics-catalog/services/ folder) and fulfill the missing information. Thank you."
+
+  exit 1
+end
+
+begin
+  maturity_model = JsonnetWrapper.new.parse(File.join(__dir__, "..", "service-maturity", "maturity.jsonnet"))
+  validate(maturity_model, 1, *ARGV)
+rescue StandardError => e
+  warn [e.message, *e.backtrace].join("\n")
+  exit 1
+end

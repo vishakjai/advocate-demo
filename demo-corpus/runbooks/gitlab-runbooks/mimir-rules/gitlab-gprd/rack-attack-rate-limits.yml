@@ -1,0 +1,22 @@
+groups:
+  - name: RackAttack
+    rules:
+      - alert: RackAttackRateLimitMissing
+        expr: |
+          (
+            absent(gitlab_rack_attack_throttle_limit{env="gprd", event_name="throttle_authenticated_api"})
+              or absent(gitlab_rack_attack_throttle_limit{env="gprd", event_name="throttle_unauthenticated_api"})
+              or absent(gitlab_rack_attack_throttle_limit{env="gprd", event_name="throttle_authenticated_web"})
+              or absent(gitlab_rack_attack_throttle_limit{env="gprd", event_name="throttle_unauthenticated_web"})
+          )
+        for: 6h
+        labels:
+          severity: s4
+          alert_type: cause
+          team: networking_and_incident_management
+        annotations:
+          title: "RackAttack throttle configurations are missing"
+          description: |
+            One or more RackAttack throttle configurations are not reporting metrics.
+            Missing throttles could include: authenticated_api, unauthenticated_api, authenticated_web, or unauthenticated_web.
+          grafana_dashboard_id: rate-limiting/rate-limiting-overview

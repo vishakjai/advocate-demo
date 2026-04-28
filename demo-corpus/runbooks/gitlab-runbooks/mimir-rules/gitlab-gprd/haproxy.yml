@@ -1,0 +1,117 @@
+groups:
+  - name: redundancy.rules
+    rules:
+      - alert: FeLoadBalancerLossOfRedundancy
+        expr: avg(up{tier="lb",job="scrapeConfig/monitoring/prometheus-agent-haproxy", env="gprd"} * 100) by (type, environment) < 80
+        for: 5m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: >
+            {{ $labels.type }} has lost redundancy. Only {{ $value }}% of servers are online.
+          runbook: frontend/gitlab-com-is-down/
+          title: Loss of Redundancy
+
+      - alert: FeLoadBalancerMissingNodes
+        expr: |
+          sum (up{tier="lb",job="scrapeConfig/monitoring/prometheus-agent-haproxy", env="gprd"}) by (type) == 0
+          > 0
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: >
+            {{ $labels.type }} have no instances online to serve traffic.
+          runbook: frontend/gitlab-com-is-down/
+          title: No Frontend Available
+
+  - name: haproxy availability
+    interval: 60s
+    rules:
+      - record: instance:haproxy_availability:ratio
+        expr: >
+          sgn(avg_over_time(haproxy_process_uptime_seconds{env="gprd"}[1m]))
+      - record: backend:haproxy_backend_availability:ratio
+        expr: >
+          avg without (fqdn, instance, zone) (
+            avg_over_time(haproxy_backend_status{state="UP", env="gprd"}[1m])
+          )
+      - record: server:haproxy_server_availability:ratio
+        expr: >
+          avg without (fqdn, instance, zone, backend) (
+            avg_over_time(haproxy_server_status{state="UP", env="gprd"}[1m])
+          )
+
+  - name: haproxy traffic
+    rules:
+      - record: backend_code:haproxy_server_http_responses_total:irate1m
+        expr: >
+          sum without (fqdn, instance, server, zone) (
+            irate(haproxy_server_http_responses_total{env="gprd"}[1m])
+          )
+      - record: backend_code:haproxy_server_http_responses_total:rate5m
+        expr: >
+          sum without (fqdn, instance, server, zone) (
+            rate(haproxy_server_http_responses_total{env="gprd"}[5m])
+          )
+      - record: frontend_code:haproxy_frontend_http_responses_total:irate1m
+        expr: >
+          sum without (fqdn, instance, zone) (
+            irate(haproxy_frontend_http_responses_total{env="gprd"}[1m])
+          )
+      - record: job_frontend:haproxy_frontend_bytes_in_total:irate1m
+        expr: >
+          sum without (fqdn, instance, zone) (
+            irate(haproxy_frontend_bytes_in_total{env="gprd"}[1m])
+          )
+      - record: job_frontend:haproxy_frontend_bytes_out_total:irate1m
+        expr: >
+          sum without (fqdn, instance, zone) (
+            irate(haproxy_frontend_bytes_out_total{env="gprd"}[1m])
+          )
+      - record: job_backend:haproxy_backend_response_errors_total:irate1m
+        expr: >
+          sum without (fqdn, instance, zone) (
+            irate(haproxy_backend_response_errors_total{env="gprd"}[1m])
+          )
+      - record: job_frontend:haproxy_frontend_request_errors_total:irate1m
+        expr: >
+          sum without (fqdn, instance, zone) (
+            irate(haproxy_frontend_request_errors_total{env="gprd"}[1m])
+          )
+
+      - alert: HighWebErrorRate
+        expr: |
+          sum by (environment) (backend_code:haproxy_server_http_responses_total:irate1m{backend=~"web|main_web",code="5xx",tier="lb", env="gprd"})
+          - sum by (environment) (backend_code:haproxy_server_http_responses_total:irate1m{backend=~"web|main_web",code!="5xx",tier="lb", env="gprd"})
+          > 0
+        for: 15s
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: symptom
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          runbook: frontend/haproxy/
+          title: High Error Rate on Front End Web
+          description: |
+            We are having more 5xx returns than any other reply.
+            Web traffic is being impacted and the service is probably down.
+            Have you thought about turning it off and on again?
+
+      - alert: HAProxyHighCPU
+        expr: haproxy_process_idle_time_percent{env="gprd"} < 5
+        for: 15m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          runbook: frontend/haproxy/
+          title: HAProxy process high CPU usage on {{ $labels.fqdn }}

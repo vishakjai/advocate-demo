@@ -1,0 +1,14 @@
+groups:
+- name: Wiz Errors
+  rules:
+  - alert: WizRSContainersRestartsOOMKills
+    expr: sum by (cluster, pod) (container_oom_events_total{env='pre', container='wiz-sensor'} > 2)
+    for: 15m
+    labels:
+      severity: s4
+      alert_type: cause
+      team: infrasec_team
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      description: The Wiz Runtime Sensors are running out of memory, {{ $labels.pod }}.
+      title: Wiz Runtime Sensors getting OOMkilled.

@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# load BigQuery logpush logs into BigQuery
+#
+# shellcheck disable=SC1003
+
+set -eufo pipefail
+
+cd "$(dirname "$0")/.."
+
+GOOGLE_PROJECT=gitlab-production
+BUCKET_NAME=gitlab-gprd-cloudflare-logpush
+
+# Parse arguments
+DRY_RUN=""
+ARGS=()
+SHOW_HELP=false
+
+for arg in "$@"; do
+  if [[ $arg == "--dry-run" ]]; then
+    DRY_RUN="true"
+  elif [[ $arg == "--help" || $arg == "-h" ]]; then
+    SHOW_HELP=true
+  elif [[ $arg == --* ]]; then
+    echo "Error: Invalid option '$arg'"
+    echo "Run '$(basename "$0") --help' for usage information."
+    exit 1
+  else
+    ARGS+=("$arg")
+  fi
+done
+
+# Display help if requested, no arguments provided, or incorrect number of arguments
+if [[ $SHOW_HELP == true ]] || [ ${#ARGS[@]} -ne 2 ]; then
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS] <type> <date>
+
+Load Cloudflare logpush logs into BigQuery for a specific date.
+
+Options:
+  --dry-run  Show the command that would be executed without running it
+  --help, -h Show this help message
+
+Arguments:
+  type    Log type: 'http' or 'spectrum'
+  date    Date in Ymd format (e.g., $(date '+%Y%m%d') for today)
+
+Examples:
+  glsh cloudflare-bq-load http $(date '+%Y%m%d')
+  glsh cloudflare-bq-load spectrum $(date '+%Y%m%d')
+  glsh cloudflare-bq-load --dry-run http $(date '+%Y%m%d')
+  glsh cloudflare-bq-load http --dry-run $(date '+%Y%m%d')
+  glsh cloudflare-bq-load http $(date '+%Y%m%d') --dry-run
+
+This will load logs from:
+  gs://$BUCKET_NAME/v2/<type>/dt=<date>/*.log.gz
+into:
+  cloudflare_logs_gprd_native.<type>
+  (partitioned by EdgeStartTimestamp for http, Timestamp for spectrum)
+EOF
+  if [[ $SHOW_HELP == true ]]; then
+    exit 0
+  else
+    exit 1
+  fi
+fi
+
+TYPE="${ARGS[0]}"
+DATE="${ARGS[1]}"
+
+# Validate log type
+if [[ $TYPE != "http" && $TYPE != "spectrum" ]]; then
+  echo "Error: Invalid log type '$TYPE'. Must be 'http' or 'spectrum'."
+  exit 1
+fi
+
+# Set partitioning field based on log type
+if [[ $TYPE == "http" ]]; then
+  PARTITION_FIELD="EdgeStartTimestamp"
+else
+  PARTITION_FIELD="Timestamp"
+fi
+
+if [[ -n $DRY_RUN ]]; then
+  echo "Dry run mode - would execute:"
+  echo
+  echo 'bq load \'
+  echo "  --project_id $GOOGLE_PROJECT \\"
+  echo '  --source_format NEWLINE_DELIMITED_JSON \'
+  echo "  --time_partitioning_field $PARTITION_FIELD \\"
+  echo '  --time_partitioning_type HOUR \'
+  echo "  \"cloudflare_logs_gprd_native.${TYPE}\" \\"
+  echo "  \"gs://$BUCKET_NAME/v2/$TYPE/dt=$DATE/*.log.gz\" \\"
+  echo "  \"docs/cloudflare/schema-${TYPE}.json\""
+else
+  bq load \
+    --project_id $GOOGLE_PROJECT \
+    --source_format NEWLINE_DELIMITED_JSON \
+    --time_partitioning_field $PARTITION_FIELD \
+    --time_partitioning_type HOUR \
+    "cloudflare_logs_gprd_native.${TYPE}" \
+    "gs://$BUCKET_NAME/v2/$TYPE/dt=$DATE/*.log.gz" \
+    "docs/cloudflare/schema-${TYPE}.json"
+fi

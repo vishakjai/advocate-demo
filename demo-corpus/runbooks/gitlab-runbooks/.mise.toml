@@ -1,0 +1,11 @@
+[settings]
+legacy_version_file = false
+
+[tools]
+# Please continue to use `.tool-versions` to specify tools, rather than adding them directly here.
+
+[plugins]
+# Use this section to configure the source of any custom mise/asdf plugin
+amtool = 'https://gitlab.com/gitlab-com/gl-infra/asdf-promtool.git'
+jsonnet-tool = 'https://gitlab.com/gitlab-com/gl-infra/asdf-gl-infra.git'
+mimirtool = 'https://github.com/asdf-community/asdf-mimirtool'

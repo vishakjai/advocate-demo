@@ -1,0 +1,977 @@
+teams:
+  - name: sre_reliability
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/infrastructure/team/reliability/#core-infra
+    slack_channel: production
+    engagement_policy:
+    oncall_schedule: https://gitlab.pagerduty.com/schedules#P22HQSG
+    pagerduty_service: GitLab Production
+
+  - name: create
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/development/dev/create/
+    slack_channel: g_create
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+
+  - name: deploy_environments
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/development/ops/deploy/environments/
+    slack_channel: g_environments
+    slack_alerts_channel: feed_alerts_configure
+    product_stage_group: environments
+    send_slo_alerts_to_team_slack_channel: true
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: cd-section
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+    # product_stage_group: deploy_environments
+    # ignored_components:
+    # - graphql_query
+
+  - name: geo
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/dev-backend/geo/
+    slack_group: S7MCS90HE
+    slack_channel: g_geo
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+    product_stage_group: geo
+    ignored_components:
+      - graphql_query
+
+  - name: gitaly
+    cloud_cost:
+      cost_owner: SUP-ORG-169
+    url: https://about.gitlab.com/handbook/engineering/dev-backend/gitaly/
+    manager: jcaigitlab
+    manager_slack: jcai
+    slack_group: S4VUVB937
+    slack_alerts_channel: gitaly-alerts
+    product_stage_group: gitaly
+    pagerduty_service: Gitaly
+    ignored_components:
+      - graphql_query
+
+  - name: manage
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/dev-backend/manage/
+    slack_channel: g_manage
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+
+  - name: plan
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/dev-backend/manage/
+    slack_channel: s_plan
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+
+  - name: verify
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/devops/verify/
+    slack_alerts_channel: s_verify_alerts
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: support
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/support/
+    slack_channel: support_gitlab-com
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: https://gitlab.pagerduty.com/schedules#PIQ317K
+
+  - name: container_registry
+    cloud_cost:
+      cost_owner: SUP-ORG-11949
+    url: https://about.gitlab.com/handbook/engineering/development/ops/package/container-registry/
+    slack_group: SPVTTQVRP
+    slack_channel: g_container-registry
+    slack_alerts_channel: g_container-registry_alerts
+    send_slo_alerts_to_team_slack_channel: true
+    product_stage_group: container_registry
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: ci-section
+    ignored_components:
+      - graphql_query
+
+  - name: package_registry
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/development/ops/package/package-registry/
+    slack_group: S045WEFN607
+    slack_channel: g_package-registry
+    slack_alerts_channel: g_package-registry_alerts
+    send_slo_alerts_to_team_slack_channel: true
+    product_stage_group: package_registry
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: ci-section
+    ignored_components:
+      - graphql_query
+
+  - name: runner_core
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: runner_core
+    slack_alerts_channel: alerts-ci-cd
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: ci-section
+    ignored_components:
+      - graphql_query
+
+  - name: ci_functions_platform
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: ci_functions_platform
+    slack_alerts_channel: g_runner
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: g_runner
+    ignored_components:
+      - graphql_query
+
+  - name: runners_platform
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/production-engineering/runners-platform/
+    manager: kkyrala
+    manager_slack: kkyrala
+    slack_group: S09C9T58KKQ
+    label: team::Runners Platform
+    product_stage_group: runners_platform
+    slack_channel: g_runners_platform
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: g_runners_platform_alerts
+    ignored_components:
+      - graphql_query
+
+  # From https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/344
+  - name: gitlab-pages
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: gitlab-pages
+
+  - name: data-analytics
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/business-ops/data-team/platform/
+    slack_channel: data-engineering
+    slack_alerts_channel: data-prom-alerts
+    oncall_schedule: https://about.gitlab.com/handbook/business-ops/data-team/how-we-work/duties/
+
+  # Workhorse is a virtual team
+  - name: workhorse
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: workhorse
+
+  # Rapid Action Intercom
+  - name: rapid-action-intercom
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: rapid-action-intercom
+
+  - name: pipeline_validation
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: f_pipeline_validation_service
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: anti_abuse
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: feed_pipeline_abuse_alerts
+    send_slo_alerts_to_team_slack_channel: true
+    product_stage_group: anti-abuse
+
+  - name: subtransaction_troubleshooting
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: subtransaction_troubleshooting
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: authentication
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: g_sscs_authentication
+    slack_error_budget_channel: g_sscs_authentication
+    send_error_budget_weekly_to_slack: true
+    send_slo_alerts_to_team_slack_channel: false
+    product_stage_group: authentication
+    slack_group: S0A76EAJSJH
+    ignored_components:
+      - graphql_query
+
+  - name: authorization
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: g_sscs_authorization
+    slack_error_budget_channel: g_sscs_authorization
+    send_error_budget_weekly_to_slack: true
+    send_slo_alerts_to_team_slack_channel: false
+    product_stage_group: authorization
+    slack_group: S0A6UET8X4P
+    ignored_components:
+      - graphql_query
+
+  - name: authorization_spamcheck
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: feed_spamcheck_alerts
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: global_search
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    manager: changzhengliu
+    manager_slack: cliu
+    slack_group: S02302V3ZS5
+    label: group::global search
+    slack_alerts_channel: g_global_search_alerts
+    slack_error_budget_channel: g_global_search
+    send_error_budget_weekly_to_slack: true
+    product_stage_group: global_search
+    alerts:
+      - gstg
+    ignored_components:
+      - graphql_query
+
+  - name: activation
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: activation
+    slack_error_budget_channel: g_activation
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: ai_coding
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/ai/ai-coding/
+    manager: mnohr
+    manager_slack: mnohr
+    slack_group: C0A50D1QNRE
+    label: group::ai coding
+    slack_alerts_channel: g_mlops-alerts
+    product_stage_group: ai_coding
+    ignored_components:
+      - graphql_query
+      - runway_ingress # TODO: Remove when fixed: https://gitlab.com/gitlab-com/gl-infra/platform/runway/team/-/issues/174
+    slack_error_budget_channel: g_mlops-alerts
+    send_error_budget_weekly_to_slack: true
+
+  - name: duo_chat
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/development/data-science/ai-powered/duo-chat/
+    manager: juan-silva
+    manager_slack: jsilva
+    slack_group: S06K71TRXDW
+    label: group::duo chat
+    slack_alerts_channel: g_mlops-alerts
+    product_stage_group: duo_chat
+    ignored_components:
+      - graphql_query
+    slack_error_budget_channel: duo-chat-lounge
+    send_error_budget_weekly_to_slack: true
+
+  - name: agent_foundations
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/ai/agent-foundations/
+    manager: bastirehm
+    manager_slack: srehm
+    label: group::duo workflow
+    slack_alerts_channel: g_duo_agent_platform_prometheus_alerts
+    product_stage_group: agent_foundations
+    ignored_components:
+      - graphql_query
+    slack_error_budget_channel: g_duo_agent_platform_prometheus_alerts
+    send_error_budget_weekly_to_slack: true
+
+  - name: workflow_catalog
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/ai/data-science/ai-powered/workflow-catalog/
+    manager: samdbeckham
+    manager_slack: sbeckham
+    label: group::workflow_catalog
+    product_stage_group: workflow_catalog
+    ignored_components:
+      - graphql_query
+
+  - name: code_review
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/development/dev/create/code-review/
+    product_stage_group: code_review
+    slack_channel: g_create_code-review
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: g_create_code-review
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: g_create_code-review_alerts
+    ignored_components:
+      - graphql_query
+
+  - name: compliance
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: compliance
+    slack_error_budget_channel: g_sscs_compliance
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: composition_analysis
+    cloud_cost:
+      cost_owner: SUP-ORG-10310
+    product_stage_group: composition_analysis
+    slack_error_budget_channel: g_ast-composition-analysis
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: acquisition
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: acquisition
+    slack_error_budget_channel: g_acquisition
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: database_frameworks
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: database_frameworks
+    slack_alerts_channel: g_database_frameworks
+    ignored_components:
+      - graphql_query
+
+  - name: dataops
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: dataops
+    ignored_components:
+      - graphql_query
+
+  - name: dynamic_analysis
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: dynamic_analysis
+    slack_error_budget_channel: g_ast-dynamic-analysis
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: remote_development
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/devops/dev/create/remote-development/
+    manager: adebayo_a
+    manager_slack: aadesanya
+    slack_group: S01FTSQNEQY
+    product_stage_group: remote_development
+    slack_channel: f_workspaces
+    slack_error_budget_channel: f_workspaces
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: engagement
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: engagement
+    slack_error_budget_channel:
+      - g_engagement
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: import
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/devops/dev/create/import/
+    manager: adebayo_a
+    manager_slack: aadesanya
+    product_stage_group: import
+    slack_channel: g_import
+    slack_error_budget_channel: g_import
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: provision
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: provision
+    ignored_components:
+      - graphql_query
+
+  - name: mlops
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: mlops
+    ignored_components:
+      - graphql_query
+
+  - name: mobile_devops
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: mobile_devops
+    ignored_components:
+      - graphql_query
+
+  - name: platform_insights
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: platform_insights
+    slack_alerts_channel: g_monitor_platform_insights_infra_alerts
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: g_analytics_platform_insights
+    alerts:
+      - gstg
+    ignored_components:
+      - graphql_query
+
+  - name: knowledge_graph
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: knowledge_graph
+    ignored_components:
+      - graphql_query
+
+
+  - name: optimize
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: optimize
+    slack_error_budget_channel: g_analytics_optimize
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: pipeline_authoring
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: pipeline_authoring
+    send_slo_alerts_to_team_slack_channel: true
+    send_error_budget_weekly_to_slack: true
+    slack_channel: g_pipeline-authoring_alerts
+    slack_error_budget_channel: ci-section
+    ignored_components:
+      - graphql_query
+
+  - name: pipeline_execution
+    cloud_cost:
+      cost_owner: SUP-ORG-569
+    product_stage_group: pipeline_execution
+    slack_channel: g_pipeline-execution
+    slack_alerts_channel: g_pipeline-execution_alerts
+    slack_error_budget_channel: ci-section
+    send_slo_alerts_to_team_slack_channel: true
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: analytics_instrumentation
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: analytics_instrumentation
+    slack_error_budget_channel: g_analytics_instrumentation_alerts
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: product_planning
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: product_planning
+    slack_alerts_channel: g_product-planning
+    slack_error_budget_channel:
+      - g_product-planning
+      - s_plan
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: project_management
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: project_management
+    slack_error_budget_channel:
+      - g_project-management
+      - s_plan
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: organizations
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: organizations
+    ignored_components:
+      - graphql_query
+    slack_alerts_channel: g_organizations
+
+  - name: source_code
+    cloud_cost:
+      cost_owner: SUP-ORG-518
+    url: https://handbook.gitlab.com/handbook/engineering/development/dev/create/source-code-be/
+    product_stage_group: source_code
+    slack_channel: g_create_source-code
+    send_error_budget_weekly_to_slack: true
+    slack_error_budget_channel: g_create_source-code
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: g_create_source-code_alerts
+    ignored_components:
+      - graphql_query
+
+  - name: static_analysis
+    cloud_cost:
+      cost_owner: SUP-ORG-572
+    product_stage_group: static_analysis
+    slack_channel: g_ast-static-analysis
+    slack_alerts_channel: g_ast-static-analysis-alerts
+    slack_error_budget_channel: g_ast-static-analysis
+    send_error_budget_weekly_to_slack: true
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: secret_detection
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: secret_detection
+    slack_error_budget_channel: g_ast-secret-detection
+    send_error_budget_weekly_to_slack: true
+    slack_alerts_channel: g_ast-secret-detection
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: pipeline_security
+    cloud_cost:
+      cost_owner: SUP-ORG-533
+    product_stage_group: pipeline_security
+    slack_channel: g_sscs_pipeline-security
+    slack_group: S0A79U2SDFU
+    slack_alerts_channel: g_sscs_pipeline-security_alerts
+    slack_error_budget_channel: g_sscs_pipeline-security_alerts
+    send_error_budget_weekly_to_slack: true
+    ignored_components:
+      - graphql_query
+
+  - name: security_insights
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: security_insights
+    ignored_components:
+      - graphql_query
+    slack_error_budget_channel: g_srm_security_insights
+    send_error_budget_weekly_to_slack: true
+
+  - name: security_infrastructure
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: security_infrastructure
+
+  - name: ast
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/development/sec/secure/
+    slack_alerts_channel: g_srm_security_infrastructure
+
+  - name: security_platform_management
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: security_platform_management
+    slack_error_budget_channel: g_srm-security-platform-management
+    send_error_budget_weekly_to_slack: true
+
+  - name: ai_framework
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/engineering/development/data-science/ai-framework/
+    manager: wortschi
+    manager_slack: mwortschack
+    slack_group: S05TBERMWPP
+    label: group::ai framework
+    product_stage_group: ai_framework
+    ignored_components:
+      - graphql_query
+    slack_error_budget_channel: g_mlops-alerts
+    send_error_budget_weekly_to_slack: true
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: g_mlops-alerts
+
+  - name: subscription_management
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: subscription_management
+    ignored_components:
+      - graphql_query
+
+  - name: utilization
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: utilization
+    ignored_components:
+      - graphql_query
+
+  - name: seat_management
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/development/fulfillment/seat-management/
+    manager: rhardarson
+    manager_slack: rhardarson
+    product_stage_group: seat_management
+    ignored_components:
+      - graphql_query
+
+  - name: vulnerability_research
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: vulnerability_research
+    ignored_components:
+      - graphql_query
+
+  - name: fulfillment_platform
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: fulfillment_platform
+    slack_alerts_channel: s_fulfillment_status
+    send_slo_alerts_to_team_slack_channel: true
+    ignored_components:
+      - graphql_query
+
+  - name: security_policies
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: security_policies
+    slack_error_budget_channel: g_srm_security_policies
+    send_error_budget_weekly_to_slack: true
+
+  - name: knowledge
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: knowledge
+    slack_error_budget_channel:
+      - g_knowledge
+      - s_plan
+    send_error_budget_weekly_to_slack: true
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: g_knowledge
+
+  - name: cells_infrastructure
+    cloud_cost:
+      cost_owner: SUP-ORG-476
+    product_stage_group: cells_infrastructure
+    manager: nhxnguyen
+    manager_slack: nnguyen
+    slack_alerts_channel: g_cells_infrastructure
+    send_slo_alerts_to_team_slack_channel: true
+
+  # Infrastructure Reliability
+
+  - name: reliability_unowned
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/
+    label: team::Unowned
+
+  - name: database_operations
+    cloud_cost:
+      cost_owner: SUP-ORG-116
+    product_stage_group: database_operations
+    url: https://about.gitlab.com/handbook/engineering/infrastructure/team/reliability/database-reliability.html#ownership
+    manager: alexives
+    manager_slack: alexives
+    slack_group: S02VA24E9JA
+    label: team::Database Reliability
+    slack_channel: g_database_operations
+    slack_alerts_channel: dbo_alerts
+
+  # Security
+
+  - name: trust_and_safety
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/security/security-operations/trustandsafety/
+
+  - name: infrasec_team
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/security/product-security/infrastructure-security/
+    slack_group: S01VCBYEG8H
+    slack_alerts_channel: infrasec-notifications
+    label: "Infrastructure Security Team"
+
+  - name: security_operations
+    cloud_cost:
+      cost_owner: SUP-ORG-397
+    url: https://handbook.gitlab.com/handbook/security/security-operations
+
+  - name: corpsec
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/security/corporate/
+
+  # Marketing
+
+  - name: developer_relations
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/marketing/developer-relations/
+    slack_channel: developer-relations
+
+  # UX
+
+  - name: technical_writing
+    cloud_cost:
+      cost_owner: SUP-ORG-380
+    url: https://handbook.gitlab.com/handbook/product/ux/technical-writing/
+    slack_channel: docs
+
+  # Test and Tools Infrastructure Team
+
+  - name: test_tools_infrastructure
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://about.gitlab.com/handbook/marketing/developer-relations/
+    slack_alerts_channel: test-tools-infrastructure-team
+
+  # Tenant Services
+  - name: tenant_services
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/tenant-scale/tenant-services/
+    manager: jarv
+    manager_slack: jjarvis
+    label: "group::tenant services"
+    product_stage_group: "tenant_services"
+    slack_alerts_channel: g_tenant_services
+
+  # ClickHouse (virtual)
+  - name: clickhouse
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_channel: f_clickhouse
+    slack_alerts_channel: f_clickhouse_infra_alerts
+    url: https://gitlab.com/groups/gitlab-org/maintainers/clickhouse/-/group_members?with_inherited_permissions=exclude
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+    send_slo_alerts_to_team_slack_channel: true
+
+  # Delivery
+
+  - name: release-and-deploy
+    cloud_cost:
+      cost_owner: SUP-ORG-10359
+    slack_alerts_channel: g_delivery_alerts
+    send_slo_alerts_to_team_slack_channel: true
+    product_stage_group: release-and-deploy
+    manager: dawsmith
+    manager_slack: DaveSmith
+    slack_group: S0ASV55JL57
+    label: group::release-and-deploy
+    ignored_components:
+      - graphql_query
+    alerts:
+      - cellsdev
+
+  - name: build
+    cloud_cost:
+      cost_owner: SUP-ORG-413
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/core-platform/systems/distribution/#distribution-build-team
+    slack_group: S08NZ7XJNKY
+    slack_channel: g_distribution
+    engagement_policy: # Link to doc that talks about engagement and escalation policy
+    oncall_schedule: # Link to pagerduty oncall schedule
+    product_stage_group: build
+    ignored_components:
+      - graphql_query
+
+  - name: operate
+    cloud_cost:
+      cost_owner: SUP-ORG-172
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/gitlab-delivery/operate/
+    slack_group: S0980Q4180P
+    slack_channel: g_operate
+    product_stage_group: operate
+    send_slo_alerts_to_team_slack_channel: true
+    ignored_components:
+      - graphql_query
+
+  # Virtual team of release managers
+  - name: release-management
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: f_upcoming_release
+    slack_group: S0127FU8PDE
+
+  # Dedicated
+
+  - name: switchboard
+    cloud_cost:
+      cost_owner: SUP-ORG-220
+    product_stage_group: switchboard
+    slack_group: S05LBRPD17F
+    slack_channel: g_dedicated_switchboard
+
+  - name: environment_automation
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: environment_automation
+    slack_group: S05LNHMUD3L
+    slack_channel: f_gitlab_dedicated
+
+  - name: pubsec_services
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: pubsec_services
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/team/gitlab-dedicated/us-public-sector-services/
+    manager: mckgl
+    manager_slack: mkirkevold
+    label: "team::US PubSec"
+    slack_channel: g_dedicated-us-pubsec
+
+  # Production Engineering
+
+  - name: runway
+    cloud_cost:
+      cost_owner: SUP-ORG-406
+    product_stage_group: runway
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/team/runway/
+    manager: jtoto-gtl
+    manager_slack: jtoto
+    slack_group: S09CN4X4GF3
+    label: team::Runway
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: f_runway_alerts
+    alerts:
+      - gprd
+      - production
+
+  - name: fleet_management
+    cloud_cost:
+      cost_owner: SUP-ORG-654
+    product_stage_group: fleet_management
+    url: https://handbook.gitlab.com/handbook/product/categories/features/#fleet-management
+    manager: sabrams
+    manager_slack: sabrams
+    slack_group: C0ACE4T2R6W
+    label: "group::Fleet Management"
+    send_slo_alerts_to_team_slack_channel: true
+    slack_alerts_channel: f_fleet_alerts
+    alerts:
+      - gprd
+      - production
+
+  - name: observability
+    cloud_cost:
+      cost_owner: SUP-ORG-10442
+    product_stage_group: observability
+    url: https://about.gitlab.com/handbook/engineering/infrastructure/team/scalability/#scalabilityobservability
+    manager: lmcandrew
+    manager_slack: lmcandrew
+    slack_group: S04T0MZ236J
+    label: team::Observability
+    slack_alerts_channel: g_infra_observability_alerts
+    send_slo_alerts_to_team_slack_channel: true
+    alerts:
+      - thanos
+      - ops
+      - gstg
+
+  - name: cloud_cost_utilization
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: cloud_cost_utilization
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/production-engineering/cloud-cost-utilization/
+    manager: lmcandrew
+    manager_slack: lmcandrew
+    slack_group: C09MUMXRECC
+    label: "team::Cloud Cost Utilization"
+
+  - name: networking_and_incident_management
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: networking_and_incident_management
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/production-engineering/networking-and-incident-management/
+    manager: sabrams
+    manager_slack: sabrams
+    slack_group: S09CN3KQV5X
+    label: "group::Networking & Incident Management"
+    slack_alerts_channel: g_networking_and_incident_management
+    send_slo_alerts_to_team_slack_channel: false
+    alerts:
+      - ops
+
+  # Developer Experience
+
+  - name: development_tooling
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: development_tooling
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/developer-experience/development-tooling/
+    slack_channel: g_development_tooling
+    slack_alerts_channel: g_development_tooling
+
+  - name: development_analytics
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: development_analytics
+    url: https://about.gitlab.com/handbook/engineering/infrastructure-platforms/developer-experience/development-analytics/
+    slack_group: S084VES4GRW
+    slack_channel: g_development_analytics
+    slack_alerts_channel: g_development_analytics
+
+  - name: performance_enablement
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: performance_enablement
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/developer-experience/performance-enablement/
+    slack_group: S084PS9JN85
+    slack_channel: g_performance_enablement
+    slack_alerts_channel: g_performance_enablement
+
+  - name: test_governance
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: test_governance
+    url: https://handbook.gitlab.com/handbook/engineering/infrastructure-platforms/developer-experience/test-governance/
+    slack_group: S01869UCTCP
+    slack_channel: g_test_governance
+    slack_alerts_channel: g_test_governance
+
+  - name: api
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: api
+
+  - name: proj-engineering-portal
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    slack_alerts_channel: proj-engineering-portal
+    send_slo_alerts_to_team_slack_channel: true
+
+  - name: localization
+    cloud_cost:
+      cost_owner: NOT_ASSIGNED
+    product_stage_group: localization
+    url: https://handbook.gitlab.com/handbook/marketing/localization/
+    ignored_components:
+      - graphql_query
+
+# Digital Experience (Marketing)
+
+  - name: digital_experience
+    cloud_cost:
+      cost_owner: SUP-ORG-12479
+    url: https://handbook.gitlab.com/handbook/marketing/digital-experience/
+    slack_group: CN8AVSFEY
+    slack_channel: digital-experience-team

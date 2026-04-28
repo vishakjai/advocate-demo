@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "batfish",
+    actual = "//projects/batfish/src/main/java/org/batfish",
+)
+
+alias(
+    name = "batfish_testlib",
+    actual = "//projects/batfish/src/test/java:batfish_testlib",
+)

@@ -1,0 +1,41 @@
+groups:
+  # Alerts for cellsdev and cellsprod are separated because they will probably use different thresholds
+  - name: Patch processing has stopped in a ring in cellsdev
+    rules:
+      - alert: PatchProcessingStoppedInARing
+        expr: >
+          sum by (ring, amp) (delivery_tissue_patches_queued_current{amp="cellsdev", patch_status="pending"}) > 0 and sum by (ring, amp) (delivery_tissue_patches_queued_current{amp="cellsdev", patch_status="in rollout"}) ==  0
+        # Ring deployment to cellsdev usually takes about 30 minutes
+        # https://ops.gitlab.net/gitlab-com/gl-infra/cells/tissue/-/pipelines/5235891
+        for: 60m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: release-and-deploy
+          env: cellsdev
+        annotations:
+          grafana_datasource_id: mimir-gitlab-ops
+          title: "Patch processing has stopped in ring {{ $labels.ring }} ({{ $labels.amp }}) "
+          description: "{{ $labels.amp }} Amp environment's ring {{ $labels.ring }} has at least one pending patch but no patch in rollout, indicating that the patch queue is not being processed anymore"
+          grafana_dashboard_id: cells-tissue/cells3a-tissue-ring-deployments
+          grafana_dashboard_link: https://dashboards.gitlab.net/d/cells-tissue/cells3a-tissue-ring-deployments
+          runbook: cells/patching
+  - name: Patch has failed in a ring in cellsdev
+    rules:
+      - alert: PatchFailedInARing
+        expr: >
+          sum by (ring, amp) (delivery_tissue_patches_queued_current{amp="cellsdev", patch_status="failed"}) > 0
+        # Failed patch should be alerted on immediately
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: release-and-deploy
+          env: cellsdev
+        annotations:
+          grafana_datasource_id: mimir-gitlab-ops
+          title: "Patch has failed in ring {{ $labels.ring }}"
+          description: "There is at least one patch in the failed status in ring {{ $labels.ring }} in the {{ $labels.amp }} Amp environment."
+          grafana_dashboard_id: cells-tissue/cells3a-tissue-ring-deployments
+          grafana_dashboard_link: https://dashboards.gitlab.net/d/cells-tissue/cells3a-tissue-ring-deployments
+          runbook: cells/patching/debugging

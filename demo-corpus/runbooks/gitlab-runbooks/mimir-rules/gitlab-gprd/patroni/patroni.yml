@@ -1,0 +1,98 @@
+groups:
+  - name: patroni.yml
+    rules:
+      - alert: PatroniErrors
+        expr: rate(patroni_errors_total{env="gprd"}[1m]) > 1
+        for: 5m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: Patroni on {{$labels.fqdn}} is logging errors, this can mean it can't start PostgreSQL.
+          title: Patroni is logging errors
+          runbook: patroni/patroni-management/
+      - alert: PatroniIsDown
+        expr: namedprocess_namegroup_num_procs{groupname="patroni", env="gprd"} == 0
+        for: 5m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: Patroni on {{$labels.fqdn}} seems to be down, which means that PostgreSQL is probably down there as well.
+          title: Patroni is down
+          runbook: patroni/patroni-management/
+      - alert: PatroniXminAgeTooLarge
+        expr: pg_txid_xmin_age{env="gprd"} > 500000
+        for: 45m
+        labels:
+          severity: s3
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: The xmin horizon is too old on {{$labels.fqdn}}.
+          title: Long-running transactions detected on Patroni
+          runbook: patroni/pg_xid_xmin_age_alert/
+      - alert: PatroniConsulMultipleMaster
+        expr: |
+          max by (env, service_id, service_name) (
+            sum by(env, service_id, service_name, pod) (
+            consul_catalog_service_node_healthy{env="gprd",service_id=~".+-master",service_name=~"patroni|patroni-.*"}
+            )
+          ) > 1
+        for: 2m
+        labels:
+          severity: s1
+          pager: pagerduty
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: The patroni consul service {{$labels.service_id}} has more than one master.
+          title: Patroni Consul service has more than one master registered.
+          runbook: patroni/patroni-management/
+      - alert: PostgresSplitBrain
+        expr: count by(env, type, job) (pg_replication_is_replica{type!="", env="gprd"} == 0) > 1
+        for: 1m
+        labels:
+          severity: s1
+          pager: pagerduty
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: More than one postgres instance in read-write mode for cluster {{$labels.type}}.
+          title: More than one postgres instance in read-write mode.
+          runbook: patroni/alerts/PostgresSplitBrain/
+      - alert: PatroniScrapeFailuresDBBloat
+        expr: min(up{fqdn=~"patroni.*", job=~".*-database-bloat", env="gprd"}) by (fqdn, env) == 0
+        for: 20m
+        labels:
+          severity: s2
+          pager: pagerduty
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: Prometheus is failing to scrape {{$labels.job}} on {{$labels.fqdn}} - check PostgreSQL logs for timed out queries.
+          title: Failing prometheus scrapes for database bloat against a Patroni node.
+          runbook: patroni/alerts/PatroniScrapeFailures/
+      - alert: PatroniScrapeFailures
+        expr: min(up{fqdn=~"patroni.*", job!~".*pgbouncer|.*-database-bloat", env="gprd"}) by (fqdn, env) == 0
+        for: 2m
+        labels:
+          severity: s1
+          pager: pagerduty
+          alert_type: cause
+          team: database_operations
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: Prometheus is failing to scrape at least one exporter on {{$labels.fqdn}}.
+          title: Failing prometheus scrapes against a Patroni node.
+          runbook: patroni/alerts/PatroniScrapeFailures/

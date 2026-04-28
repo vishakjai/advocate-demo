@@ -1,0 +1,14 @@
+groups:
+- name: airflow.rules
+  rules:
+  - alert: AirflowDown
+    expr: avg_over_time(probe_success{job="scrapeConfig/monitoring/prometheus-agent-blackbox", instance="https://airflow.gitlabdata.com"}[10m]) * 100 < 75
+    labels:
+      alert_type: symptom
+      severity: s4
+      team: data-analytics
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      title: Airflow is down
+      description: >
+        Blackbox probes for {{ $labels.instance }} have been failing for about 10 minutes.

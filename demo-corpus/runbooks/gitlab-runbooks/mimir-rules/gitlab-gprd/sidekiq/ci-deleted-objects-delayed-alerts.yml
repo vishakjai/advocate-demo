@@ -1,0 +1,55 @@
+groups:
+  - name: ci_deleted_objects_delayed_percentage
+    interval: 1m
+    rules:
+      - alert: CIDeletedObjectsHighDelayedPercentage
+        expr: |
+          (
+            sum(rate(ci_deleted_objects_total{environment="gprd", delayed="true"}[5m]))
+            / (sum(rate(ci_deleted_objects_total{environment="gprd"}[5m])) > 0) * 100
+          ) > 25
+        for: 15m
+        labels:
+          severity: s4
+          alert_type: symptom
+          type: sidekiq
+          component: ci_deleted_objects_processing
+          team: pipeline_execution
+          stage: verify
+          feature_category: continuous_integration
+        annotations:
+          title: "High percentage of CI deleted objects are delayed"
+          description: |
+            More than 25% of CI deleted objects are exceeding the 12-hour deletion threshold.
+            Current delayed percentage: {{ $value | printf "%.1f" }}%
+
+            This indicates the Ci::DeleteObjectsWorker may be falling behind.
+          runbook: ci_deleted_objects_processing/deleted_objects_processing_triage.md
+          grafana_dashboard_id: stage-groups-pipeline_execution
+          grafana_dashboard_link: https://dashboards.gitlab.net/d/stage-groups-pipeline_execution
+
+      - alert: CIDeletedObjectsCriticalDelayedPercentage
+        expr: |
+          (
+            sum(rate(ci_deleted_objects_total{environment="gprd", delayed="true"}[5m]))
+            / (sum(rate(ci_deleted_objects_total{environment="gprd"}[5m])) > 0) * 100
+          ) > 50
+        for: 15m
+        labels:
+          severity: s3
+          alert_type: symptom
+          type: sidekiq
+          component: ci_deleted_objects_processing
+          team: pipeline_execution
+          stage: verify
+          feature_category: continuous_integration
+        annotations:
+          title: "Critical: Majority of CI deleted objects are delayed"
+          description: |
+            More than 50% of CI deleted objects are exceeding the 12-hour deletion threshold.
+            Current delayed percentage: {{ $value | printf "%.1f" }}%
+
+            The Ci::DeleteObjectsWorker is significantly behind and requires immediate attention.
+          runbook: ci_deleted_objects_processing/deleted_objects_processing_triage.md
+          grafana_dashboard_id: stage-groups-pipeline_execution
+          grafana_dashboard_link: https://dashboards.gitlab.net/d/stage-groups-pipeline_execution

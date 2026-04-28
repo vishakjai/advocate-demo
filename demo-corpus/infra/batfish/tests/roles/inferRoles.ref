@@ -1,0 +1,16 @@
+[
+  {
+    "class" : "org.batfish.question.InferRolesQuestionPlugin$InferRolesAnswerElement",
+    "roleMapping" : {
+      "regex" : "([a-zA-Z]+)[0-9]+([a-zA-Z]+)[0-9]+",
+      "roleDimensionGroups" : {
+        "auto0" : [
+          2
+        ],
+        "auto1" : [
+          1
+        ]
+      }
+    }
+  }
+]

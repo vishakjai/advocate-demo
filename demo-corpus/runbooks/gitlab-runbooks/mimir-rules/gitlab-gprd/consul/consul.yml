@@ -1,0 +1,24 @@
+groups:
+  - name: Consul Rules
+    rules:
+      - record: gitlab:consul_gke_oom_events
+        expr: >
+          (sum by (environment,type,stage,tier,deployment,container, reason) (kube_pod_container_status_last_terminated_reason:labeled{deployment="consul", reason="OOMKilled", env="gprd"} )
+          * on (container) group_left
+          sum by (container) (changes(kube_pod_container_status_restarts_total{container="consul", env="gprd"}[1m])  > 0))
+  - name: Consul Alerts
+    rules:
+      - alert: GKEConsulOutOfMemory
+        expr: gitlab:consul_gke_oom_events{env="gprd"} > 0
+        for: 15m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: >
+            The consul GKE containers are being OOM killed. These containers are used as service discovery. Any killed or evicted pods will result in errors for users.
+            Increase memory limits for these pods if possible.
+          runbook: consul/
+          title: Consul GKE containers are being OOM killed

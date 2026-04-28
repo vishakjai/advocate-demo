@@ -1,0 +1,39 @@
+groups:
+  - name: Zoekt Rules
+    rules:
+      - record: gitlab:zoekt_gke_oom_events
+        expr: >
+          (sum by (container, pod, env) (kube_pod_container_status_last_terminated_reason{pod=~"gitlab-gitlab-zoekt-[0-9]+", reason="OOMKilled", env="gstg"})
+          * on (container, pod, env) group_left
+          sum by (container, pod, env) (changes(kube_pod_container_status_restarts_total{pod=~"gitlab-gitlab-zoekt-[0-9]+", env="gstg"}[1m]) > 0))
+  - name: Zoekt Alerts
+    rules:
+      - alert: ZoektContainersRestartsDueToOOM
+        expr: gitlab:zoekt_gke_oom_events{env="gstg"} > 0
+        labels:
+          severity: s3
+          alert_type: cause
+          team: global_search
+          user_impacting: "yes"
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gstg
+          description: >
+            The zoekt `{{ $labels.container }}` container is being OOM killed and restarting. This will likely affect users performing code searches.
+          title: Zoekt GKE containers are being OOM killed
+      - alert: ZoektNodesOffline
+        expr: count(search_zoekt_nodes_status{environment="gstg"} == 0) > 0
+        for: 1h
+        labels:
+          severity: s3
+          alert_type: cause
+          feature_category: "global_search"
+          team: global_search
+          user_impacting: "yes"
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gstg
+          environment: "{{ $labels.environment }}"
+          grafana_dashboard_id: "zoekt-main/zoekt3a-overview"
+          grafana_panel_id: "62"
+          description: >
+            {{ $value }} Zoekt node(s) have been offline for more than 1 hour. This will affect users performing code searches.
+          title: Zoekt nodes are offline

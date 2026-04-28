@@ -1,0 +1,144 @@
+{
+  "edges": [
+    {
+      "node1": {
+        "hostname": "border01",
+        "interfaceName": "FastEthernet1/0"
+      },
+      "node2": {
+        "hostname": "core01",
+        "interfaceName": "FastEthernet1/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "core01",
+        "interfaceName": "FastEthernet1/0"
+      },
+      "node2": {
+        "hostname": "border01",
+        "interfaceName": "FastEthernet1/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border01",
+        "interfaceName": "FastEthernet1/1"
+      },
+      "node2": {
+        "hostname": "core02",
+        "interfaceName": "FastEthernet1/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "core02",
+        "interfaceName": "FastEthernet1/0"
+      },
+      "node2": {
+        "hostname": "border01",
+        "interfaceName": "FastEthernet1/1"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "core01",
+        "interfaceName": "FastEthernet0/0"
+      },
+      "node2": {
+        "hostname": "core02",
+        "interfaceName": "FastEthernet0/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "core02",
+        "interfaceName": "FastEthernet0/0"
+      },
+      "node2": {
+        "hostname": "core01",
+        "interfaceName": "FastEthernet0/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "core01",
+        "interfaceName": "FastEthernet1/1"
+      },
+      "node2": {
+        "hostname": "border11",
+        "interfaceName": "FastEthernet1/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border11",
+        "interfaceName": "FastEthernet1/0"
+      },
+      "node2": {
+        "hostname": "core01",
+        "interfaceName": "FastEthernet1/1"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "core02",
+        "interfaceName": "FastEthernet1/1"
+      },
+      "node2": {
+        "hostname": "border12",
+        "interfaceName": "FastEthernet1/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border12",
+        "interfaceName": "FastEthernet1/0"
+      },
+      "node2": {
+        "hostname": "core02",
+        "interfaceName": "FastEthernet1/1"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border11",
+        "interfaceName": "FastEthernet0/0"
+      },
+      "node2": {
+        "hostname": "border12",
+        "interfaceName": "FastEthernet0/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border12",
+        "interfaceName": "FastEthernet0/0"
+      },
+      "node2": {
+        "hostname": "border11",
+        "interfaceName": "FastEthernet0/0"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border11",
+        "interfaceName": "FastEthernet1/1"
+      },
+      "node2": {
+        "hostname": "border21",
+        "interfaceName": "FastEthernet1/1"
+      }
+    },
+    {
+      "node1": {
+        "hostname": "border21",
+        "interfaceName": "FastEthernet1/1"
+      },
+      "node2": {
+        "hostname": "border11",
+        "interfaceName": "FastEthernet1/1"
+      }
+    }
+  ]
+}

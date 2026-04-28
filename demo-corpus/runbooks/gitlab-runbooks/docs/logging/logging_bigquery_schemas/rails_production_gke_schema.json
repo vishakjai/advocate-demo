@@ -1,0 +1,530 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "action",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "cf_ray",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "component",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "content_length",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "controller",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "correlation_id",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "cpu_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_cached_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_host",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_port",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_primary_cached_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_primary_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_primary_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_primary_wal_cached_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_primary_wal_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_replica_cached_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_replica_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_replica_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_replica_wal_cached_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_replica_wal_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "db_write_count",
+    "type": "INTEGER"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "container_id",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "docker",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "environment",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "event",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "format",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "host",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "container_image",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "container_image_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "container_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "host",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "app",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "chart",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "deployment",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "gitlab_com_webservice_name",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "heritage",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "pod_template_hash",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "release",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "shard",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "stage",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "tier",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "type",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "master_url",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "namespace_id",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "name",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "namespace_labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "namespace_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "pod_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "pod_name",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "kubernetes",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "kubernetes_region",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "level",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "mem_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "mem_mallocs",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "mem_objects",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "mem_total_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "message",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_caller_id",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_client_id",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_feature_category",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_project",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_remote_ip",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_root_namespace",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "meta_user",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "method",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "path",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pid",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "queue_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "rack_attack_redis_count",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "rack_attack_redis_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_cache_calls",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_cache_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_cache_read_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_cache_write_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_calls",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_rate_limiting_calls",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_rate_limiting_duration_s",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_rate_limiting_read_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_rate_limiting_write_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_read_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "redis_write_bytes",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_ip",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "request_urgency",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "route",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "severity",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "shard",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "stage",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "status",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "subcomponent",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "tag",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "target_duration_s",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "throttle_safelist",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "tier",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "time",
+    "type": "TIMESTAMP"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "ua",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "user_id",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "username",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "view_duration_s",
+    "type": "FLOAT"
+  }
+]

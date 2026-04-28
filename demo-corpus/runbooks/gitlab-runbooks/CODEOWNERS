@@ -1,0 +1,15 @@
+# CODEOWNERS for versioning-related files.
+# Original discussion around reviewers from
+# See https://gitlab.com/gitlab-com/runbooks/-/issues/96#note_975210568
+#
+# NOTE: Although a group would be much more convenient here, GitLab doesn't support
+# Assigning MRs to groups (see https://gitlab.com/gitlab-org/gitlab/-/issues/197169)
+# and Renovate doesn't support resolving from groups to users
+# (https://github.com/renovatebot/renovate/issues/14777)
+.tool-versions @andrewn @pguinoiseau @sxuereb @jarv @reprazent
+.gitlab-ci-asdf-versions.yml @andrewn @pguinoiseau @sxuereb @jarv @reprazent
+/docs/ci-runners/ @gitlab-com/runner-group/saas @gitlab-org/reliability
+/docs/zoekt/ @gitlab-org/search-team/migration-maintainers @gitlab-org/reliability
+/docs/elastic/ @gitlab-org/search-team/migration-maintainers @gitlab-org/reliability
+/mimir-rules/ @gitlab-org/scalability/observability
+/mimir-rules-jsonnet/ @gitlab-org/scalability/observability

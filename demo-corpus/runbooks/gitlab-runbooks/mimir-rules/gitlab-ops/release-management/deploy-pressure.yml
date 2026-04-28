@@ -1,0 +1,19 @@
+groups:
+  - name: Release Management Number of undeployed commits
+    rules:
+      - alert: ReleaseManagementNumberOfUndeployedCommits
+        expr: >
+          delivery_auto_deploy_pressure{job="delivery-metrics", role="gstg-cny"} > 100
+        for: 60m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: release-and-deploy
+          alert_trigger: deploy_pressure_release_management
+        annotations:
+          grafana_datasource_id: mimir-gitlab-ops
+          title: "The number of commits to be deployed is high"
+          description: "There are over 100 commits not yet deployed to env {{ $labels.role }} in the last 60 minutes."
+          grafana_dashboard_id: delivery-release_management/delivery3a-release-management
+          grafana_dashboard_link: https://dashboards.gitlab.net/d/delivery-release_management/delivery3a-release-management
+          runbook: release-management/deploy_pressure/

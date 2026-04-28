@@ -1,0 +1,133 @@
+local resourceSaturationPoint = (import 'servicemetrics/metrics.libsonnet').resourceSaturationPoint;
+local metricsCatalog = import 'servicemetrics/metrics-catalog.libsonnet';
+
+// How much of the entire node's memory is Redis using; relevant in the context of OOM kills
+// and system constraints
+local commonDefinition = {
+  title: 'Redis Memory Utilization per Node',
+  severity: 's2',
+  horizontallyScalable: false,
+  resourceLabels: ['fqdn', 'instance', 'shard'],
+  query: |||
+    max by (%(aggregationLabels)s) (
+      label_replace(redis_memory_used_rss_bytes{%(selector)s}, "memtype", "rss","","")
+      or
+      label_replace(redis_memory_used_bytes{%(selector)s}, "memtype", "used","","")
+    )
+    /
+    avg by (%(aggregationLabels)s) (
+      node_memory_MemTotal_bytes{%(selector)s}
+    )
+  |||,
+};
+
+// How much of maxmemory (if configured) Redis is using; relevant
+// for special cases like sessions which have both maxmemory and eviction, but
+// don't want to actually reach that and start evicting under normal circumstances
+local maxMemoryDefinition = commonDefinition {
+  title: 'Redis Memory Utilization of Max Memory',
+  query: |||
+    (
+      max by (%(aggregationLabels)s) (
+        redis_memory_used_bytes{%(selector)s}
+      )
+      /
+      avg by (%(aggregationLabels)s) (
+        redis_memory_max_bytes{%(selector)s}
+      )
+    ) and on (fqdn) redis_memory_max_bytes{%(selector)s} != 0
+  |||,
+};
+
+local redisMemoryDefinition = commonDefinition {
+  description: |||
+    Redis memory utilization per node.
+
+    As Redis memory saturates node memory, the likelyhood of OOM kills, possibly to the Redis process,
+    become more likely.
+
+    For caches, consider lowering the `maxmemory` setting in Redis. For non-caching Redis instances,
+    this has been caused in the past by credential stuffing, leading to large numbers of web sessions.
+
+    This threshold is kept deliberately low, since Redis RDB snapshots could consume a significant amount of memory,
+    especially when the rate of change in Redis is high, leading to copy-on-write consuming more memory than when the
+    rate-of-change is low.
+  |||,
+  grafana_dashboard_uid: 'sat_redis_memory',
+  slos: {
+    soft: 0.65,
+    // Keep this low, since processes like the Redis RDB snapshot can put sort-term memory pressure
+    // Ideally we don't want to go over 75%, so alerting at 70% gives us due warning before we hit
+    //
+    hard: 0.70,
+  },
+};
+
+// All the redis except (memorystore-)redis-tracechunks; includes sessions as well as
+// the other sessions-specific metric below, as this measures something
+// subtly different and distinctly valid
+local excludedRedisInstances = ['memorystore-redis-tracechunks'];
+
+{
+  redis_memory: resourceSaturationPoint(redisMemoryDefinition {
+    appliesTo: std.filter(function(s) !std.member(excludedRedisInstances, s), metricsCatalog.findServicesWithTag(tag='redis-sentinel')),
+  }),
+
+  redis_cluster_memory: resourceSaturationPoint(redisMemoryDefinition {
+    appliesTo: std.filter(function(s) !std.member(excludedRedisInstances, s), metricsCatalog.findServicesWithTag(tag='redis-cluster')),
+    grafana_dashboard_uid: 'sat_redis_cluster_memory',
+    horizontallyScalable: true,
+  }),
+
+  redis_memory_cache: resourceSaturationPoint(maxMemoryDefinition {
+    appliesTo: ['redis-cluster-cache'],
+    description: |||
+      Redis maxmemory utilization per node
+
+      On the cache Redis we have maxmemory and an eviction policy as a
+      safety-valve, but do not want or expect to reach that limit under
+      normal circumstances; if we start evicting we will experience
+      performance problems , so we want to be alerted some time before
+      that happens.
+    |||,
+    grafana_dashboard_uid: 'sat_redis_memory_cache',
+    slos: {
+      soft: 0.70,
+      hard: 0.75,
+    },
+  }),
+
+  redis_memory_sessions: resourceSaturationPoint(maxMemoryDefinition {
+    appliesTo: ['redis-cluster-sessions'],  // No need for tags, this is specifically targeted
+    description: |||
+      Redis maxmemory utilization per node
+
+      On the sessions Redis we have maxmemory and an eviction policy as a safety-valve, but
+      do not want or expect to reach that limit under normal circumstances; if we start
+      evicting we will start logging out users slightly early (although only the longest
+      inactive sessions), so we want to be alerted some time before that happens.
+    |||,
+    grafana_dashboard_uid: 'sat_redis_memory_sessions',
+    slos: {
+      soft: 0.70,
+      hard: 0.75,
+    },
+  }),
+
+  redis_memory_shared_state: resourceSaturationPoint(maxMemoryDefinition {
+    appliesTo: ['redis-cluster-shared-state'],
+    description: |||
+      Redis maxmemory utilization per node
+
+      On the SharedState Redis we have maxmemory and a `noeviction` eviction policy.
+      Keys will not be evicted in this policy. If the memory utilization reaches maxmemory,
+      write requests will fail, so we want to be alerted some timne before that happens.
+    |||,
+    grafana_dashboard_uid: 'sat_redis_memory_shared_state',
+    slos: {
+      soft: 0.70,
+      hard: 0.75,
+    },
+  }),
+
+}

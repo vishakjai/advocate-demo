@@ -1,0 +1,17 @@
+groups:
+  - name: NATS Backup scheduled by velero
+    rules:
+      - alert: NATSBackupScheduleFailing
+        expr: velero_backup_last_status{schedule="velero-nats-backup", env="gprd"} != 1
+        for: 12h
+        labels:
+          severity: s2
+          alert_type: cause
+          team: sre_reliability
+          pager: pagerduty
+        annotations:
+          grafana_datasource_id: mimir-fulfillment-platform
+          title: "NATS Backup schedule has been failing for the last 12h"
+          description: "NATS cluster in {{ $labels.environment }} {{ $labels.stage }} has no backups taken in last 12h by velero backup schedule {{ $labels.schedule }}"
+          grafana_dashboard_id: nats-usage-billing
+          runbook: nats/

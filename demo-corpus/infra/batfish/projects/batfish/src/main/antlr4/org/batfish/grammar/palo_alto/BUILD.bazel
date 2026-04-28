@@ -1,0 +1,21 @@
+load("@rules_java//java:defs.bzl", "java_library")
+load("//skylark:antlr.bzl", "antlr_grammar")
+
+package(default_visibility = ["//visibility:public"])
+
+antlr_grammar(
+    name = "palo_alto_generated",
+    srcs = glob(["*.g4"]),
+    package = "org.batfish.grammar.palo_alto",
+)
+
+java_library(
+    name = "palo_alto",
+    srcs = [":palo_alto_generated"],
+    javacopts = ["-XepDisableAllChecks"],
+    deps = [
+        "//projects/batfish/src/main/java/org/batfish/grammar/palo_alto/parsing:palo_alto_base",
+        "//projects/common:parser_common",
+        "@maven//:org_antlr_antlr4_runtime",
+    ],
+)

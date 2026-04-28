@@ -1,0 +1,929 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": {
+    "list": []
+  },
+  "editable": false,
+  "gnetId": null,
+  "graphTooltip": 1,
+  "hideControls": false,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapse": false,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 2,
+      "panels": [],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": true,
+      "title": "Overall GitLab availability",
+      "titleSize": "h6",
+      "type": "row"
+    },
+    {
+      "datasource": "$PROMETHEUS_DS",
+      "description": "Availability",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "light-red",
+                "value": 0.95
+              },
+              {
+                "color": "orange",
+                "value": 0.99
+              },
+              {
+                "color": "light-orange",
+                "value": 0.995
+              },
+              {
+                "color": "yellow",
+                "value": 0.9994
+              },
+              {
+                "color": "light-yellow",
+                "value": 0.9995
+              },
+              {
+                "color": "green",
+                "value": 0.9998
+              }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 10
+      },
+      "id": 3,
+      "links": [],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7",
+      "targets": [
+        {
+          "expr": "sum(\n  sum by (type)(\n    sum_over_time(gitlab:availability:success:rate_1h{type=\"registry\"}[$__range]) * $registry_weight\n  )\n  or\n  sum by (type)(\n    sum_over_time(gitlab:availability:success:rate_1h{type=\"webservice\"}[$__range]) * $webservice_weight\n  )\n)\n/\nsum(\n  sum by (type)(\n    sum_over_time(gitlab:availability:ops:rate_1h{type=\"registry\"}[$__range]) * $registry_weight\n  )\n  or\n  sum by (type)(\n    sum_over_time(gitlab:availability:ops:rate_1h{type=\"webservice\"}[$__range]) * $webservice_weight\n  )\n)\n",
+          "format": "time_series",
+          "instant": true,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Overall availability",
+      "transparent": false,
+      "type": "stat"
+    },
+    {
+      "datasource": "$PROMETHEUS_DS",
+      "description": "Availability",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "displayName": "Budget Spent",
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 10
+      },
+      "id": 4,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7",
+      "targets": [
+        {
+          "expr": "(\n  1 - (\n    sum(\n      sum by (type)(\n        sum_over_time(gitlab:availability:success:rate_1h{type=\"registry\"}[$__range]) * $registry_weight\n      )\n      or\n      sum by (type)(\n        sum_over_time(gitlab:availability:success:rate_1h{type=\"webservice\"}[$__range]) * $webservice_weight\n      )\n    )\n    /\n    sum(\n      sum by (type)(\n        sum_over_time(gitlab:availability:ops:rate_1h{type=\"registry\"}[$__range]) * $registry_weight\n      )\n      or\n      sum by (type)(\n        sum_over_time(gitlab:availability:ops:rate_1h{type=\"webservice\"}[$__range]) * $webservice_weight\n      )\n    )\n  )\n) * $__range_ms\n",
+          "format": "time_series",
+          "instant": true,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transparent": false,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$PROMETHEUS_DS"
+      },
+      "description": "Availability over time, higher is better.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "SLA",
+            "axisPlacement": "left",
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 3,
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          },
+          "max": 1,
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsZero",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 16,
+        "x": 8,
+        "y": 10
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        }
+      },
+      "pluginVersion": "v11.4.0",
+      "targets": [
+        {
+          "expr": "clamp_min(clamp_max(clamp_max(\n  clamp_min(\n    sum(\n      sum by (type)(\n        sum_over_time(gitlab:availability:success:rate_1h{type=\"registry\"}[$__interval]) * $registry_weight\n      )\n      or\n      sum by (type)(\n        sum_over_time(gitlab:availability:success:rate_1h{type=\"webservice\"}[$__interval]) * $webservice_weight\n      )\n    )\n    /\n    sum(\n      sum by (type)(\n        sum_over_time(gitlab:availability:ops:rate_1h{type=\"registry\"}[$__interval]) * $registry_weight\n      )\n      or\n      sum by (type)(\n        sum_over_time(gitlab:availability:ops:rate_1h{type=\"webservice\"}[$__interval]) * $webservice_weight\n      )\n    ),\n    0\n  ),\n  1\n)\n,1),0)\n",
+          "format": "time_series",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "Overall SLA"
+        }
+      ],
+      "title": "Overall GitLab.com SLA over time period",
+      "type": "timeseries"
+    },
+    {
+      "collapse": false,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 6,
+      "panels": [],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": true,
+      "title": "GitLab Primary Service Availability",
+      "titleSize": "h6",
+      "type": "row"
+    },
+    {
+      "datasource": "$PROMETHEUS_DS",
+      "description": "Availability",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "light-red",
+                "value": 0.95
+              },
+              {
+                "color": "orange",
+                "value": 0.99
+              },
+              {
+                "color": "light-orange",
+                "value": 0.995
+              },
+              {
+                "color": "yellow",
+                "value": 0.9994
+              },
+              {
+                "color": "light-yellow",
+                "value": 0.9995
+              },
+              {
+                "color": "green",
+                "value": 0.9998
+              }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 15
+      },
+      "id": 7,
+      "links": [],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7",
+      "targets": [
+        {
+          "expr": "clamp_max(\n  clamp_min(\n    sum by () (\n      sum_over_time(gitlab:availability:success:rate_1h{type=~\"webservice\"}[$__range])\n    )\n    /\n    sum by () (\n      sum_over_time(gitlab:availability:ops:rate_1h{type=~\"webservice\"}[$__range])\n    ),\n    0\n  ),\n  1\n)\n",
+          "format": "time_series",
+          "instant": true,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "webservice availability",
+      "transparent": false,
+      "type": "stat"
+    },
+    {
+      "datasource": "$PROMETHEUS_DS",
+      "description": "Availability",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "displayName": "Budget Spent",
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 15
+      },
+      "id": 8,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7",
+      "targets": [
+        {
+          "expr": "(\n  1 - (\n    clamp_max(\n      clamp_min(\n        sum by () (\n          sum_over_time(gitlab:availability:success:rate_1h{type=~\"webservice\"}[$__range])\n        )\n        /\n        sum by () (\n          sum_over_time(gitlab:availability:ops:rate_1h{type=~\"webservice\"}[$__range])\n        ),\n        0\n      ),\n      1\n    )\n  )\n) * $__range_ms\n",
+          "format": "time_series",
+          "instant": true,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transparent": false,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$PROMETHEUS_DS"
+      },
+      "description": "Availability over time, higher is better.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "SLA",
+            "axisPlacement": "left",
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 3,
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          },
+          "max": 1,
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsZero",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 16,
+        "x": 8,
+        "y": 15
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        }
+      },
+      "pluginVersion": "v11.4.0",
+      "targets": [
+        {
+          "expr": "clamp_min(clamp_max(clamp_max(\n  clamp_min(\n    sum by () (\n      sum_over_time(gitlab:availability:success:rate_1h{type=~\"webservice\"}[$__interval])\n    )\n    /\n    sum by () (\n      sum_over_time(gitlab:availability:ops:rate_1h{type=~\"webservice\"}[$__interval])\n    ),\n    0\n  ),\n  1\n)\n,1),0)\n",
+          "format": "time_series",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "webservice SLA"
+        }
+      ],
+      "title": "webservice SLA over time period",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "$PROMETHEUS_DS",
+      "description": "Availability",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "light-red",
+                "value": 0.95
+              },
+              {
+                "color": "orange",
+                "value": 0.99
+              },
+              {
+                "color": "light-orange",
+                "value": 0.995
+              },
+              {
+                "color": "yellow",
+                "value": 0.9994
+              },
+              {
+                "color": "light-yellow",
+                "value": 0.9995
+              },
+              {
+                "color": "green",
+                "value": 0.9998
+              }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 20
+      },
+      "id": 10,
+      "links": [],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7",
+      "targets": [
+        {
+          "expr": "clamp_max(\n  clamp_min(\n    sum by () (\n      sum_over_time(gitlab:availability:success:rate_1h{type=~\"registry\"}[$__range])\n    )\n    /\n    sum by () (\n      sum_over_time(gitlab:availability:ops:rate_1h{type=~\"registry\"}[$__range])\n    ),\n    0\n  ),\n  1\n)\n",
+          "format": "time_series",
+          "instant": true,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "registry availability",
+      "transparent": false,
+      "type": "stat"
+    },
+    {
+      "datasource": "$PROMETHEUS_DS",
+      "description": "Availability",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "displayName": "Budget Spent",
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 20
+      },
+      "id": 11,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7",
+      "targets": [
+        {
+          "expr": "(\n  1 - (\n    clamp_max(\n      clamp_min(\n        sum by () (\n          sum_over_time(gitlab:availability:success:rate_1h{type=~\"registry\"}[$__range])\n        )\n        /\n        sum by () (\n          sum_over_time(gitlab:availability:ops:rate_1h{type=~\"registry\"}[$__range])\n        ),\n        0\n      ),\n      1\n    )\n  )\n) * $__range_ms\n",
+          "format": "time_series",
+          "instant": true,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transparent": false,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$PROMETHEUS_DS"
+      },
+      "description": "Availability over time, higher is better.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "SLA",
+            "axisPlacement": "left",
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 3,
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          },
+          "max": 1,
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsZero",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 16,
+        "x": 8,
+        "y": 20
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        }
+      },
+      "pluginVersion": "v11.4.0",
+      "targets": [
+        {
+          "expr": "clamp_min(clamp_max(clamp_max(\n  clamp_min(\n    sum by () (\n      sum_over_time(gitlab:availability:success:rate_1h{type=~\"registry\"}[$__interval])\n    )\n    /\n    sum by () (\n      sum_over_time(gitlab:availability:ops:rate_1h{type=~\"registry\"}[$__interval])\n    ),\n    0\n  ),\n  1\n)\n,1),0)\n",
+          "format": "time_series",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "registry SLA"
+        }
+      ],
+      "title": "registry SLA over time period",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "rows": [],
+  "schemaVersion": 16,
+  "style": "light",
+  "tags": [
+    "general",
+    "slas",
+    "service-levels"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "default",
+          "value": "default"
+        },
+        "hide": 0,
+        "label": null,
+        "name": "PROMETHEUS_DS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "text": "gprd",
+          "value": "gprd"
+        },
+        "datasource": "$PROMETHEUS_DS",
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": "label_values(gitlab_service_ops:rate_1h, environment)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "",
+        "multi": false,
+        "name": "webservice_weight",
+        "options": [
+          {
+            "text": "0",
+            "value": "0"
+          },
+          {
+            "text": "1",
+            "value": "1"
+          },
+          {
+            "text": "5",
+            "value": "5"
+          }
+        ],
+        "query": "0,1,5",
+        "refresh": 0,
+        "type": "custom"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "",
+        "multi": false,
+        "name": "registry_weight",
+        "options": [
+          {
+            "text": "0",
+            "value": "0"
+          },
+          {
+            "text": "1",
+            "value": "1"
+          },
+          {
+            "text": "5",
+            "value": "5"
+          }
+        ],
+        "query": "0,1,5",
+        "refresh": 0,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1M/M",
+    "to": "now-1d/d"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1m",
+      "5m",
+      "10m",
+      "15m",
+      "30m"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "utc",
+  "title": "Occurence SLAs",
+  "version": 0
+}

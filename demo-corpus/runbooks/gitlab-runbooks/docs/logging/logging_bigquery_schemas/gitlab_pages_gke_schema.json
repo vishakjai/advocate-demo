@@ -1,0 +1,320 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "content_type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "correlation_id",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "container_id",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "docker",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "domain",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "duration_ms",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "environment",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "error",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "host",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "container_image",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "container_image_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "container_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "host",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "app",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "chart",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "deployment",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "heritage",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "pod_template_hash",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "release",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "shard",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "stage",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "tier",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "type",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "master_url",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "namespace_id",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "name",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "namespace_labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "namespace_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "pod_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "pod_name",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "kubernetes",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "kubernetes_region",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "level",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "message",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "method",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "msg",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pages_domain",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pages_host",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pages_https",
+    "type": "BOOLEAN"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pages_project_id",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pages_project_prefix",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pages_project_serving_type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "path",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "proto",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "public_gitlab_server",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "referrer",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_addr",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "remote_ip",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "shard",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "stage",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "state",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "status",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "system",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "tag",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "tier",
+    "type": "STRING"
+  },
+  {
+    "mode": "REQUIRED",
+    "name": "time",
+    "type": "TIMESTAMP"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "ttfb_ms",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "uri",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "user_agent",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "written_bytes",
+    "type": "INTEGER"
+  }
+]

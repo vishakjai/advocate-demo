@@ -1,0 +1,629 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gitlab.com/gitlab-com/runbooks/-/blob/master/services/service-catalog-schema.json",
+  "title": "GitLab Service Catalog Schema",
+  "description": "A catalog of services and teams for GitLab SaaS platforms",
+  "type": "object",
+  "definitions": {
+    "TeamDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The unique name of the team",
+          "type": "string"
+        },
+        "url": {
+          "description": "The handbook URL of the team",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product_stage_group": {
+          "description": "The product stage group of the team. Must match `group` key in https://gitlab.com/gitlab-com/www-gitlab-com/-/blob/master/data/stages.yml",
+          "type": "string"
+        },
+        "slack_alerts_channel": {
+          "description": "The name of the Slack channel to receive alerts for the team. Must omit `#` prefix",
+          "type": "string",
+          "pattern": "^(?!#.*$).*"
+        },
+        "send_slo_alerts_to_team_slack_channel": {
+          "description": "The setting to enable/disable receiving alerts in the team's Slack alert channel",
+          "type": "boolean"
+        },
+        "alerts": {
+          "description": "The list of environments for alerts for the team introduced in https://gitlab.com/gitlab-com/runbooks/-/merge_requests/5176",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "ignored_components": {
+          "description": "The list of components that should not feed into the team's error budget",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "slack_error_budget_channel": {
+          "description": "The name of the Slack channel to receive weekly error budget reports for the team. Must omit `#` prefix",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "send_error_budget_weekly_to_slack": {
+          "description": "The setting to enable/disable receiving weekly error budget reports in the team's Slack error budget channel",
+          "type": "boolean"
+        },
+        "manager": {
+          "description": "The GitLab username for manager of team. Must omit `@` prefix",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?!@.*$).*"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manager_slack": {
+          "description": "The slack username or user ID for the manager of team for use in the incident.io catalog",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?!@.*$).*"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "label": {
+          "description": "The label of the team. Must omit `~` prefix",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?!~.*$).*"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assign_capacity_planning_issues": {
+          "description": "The setting to enable/disable assignment of capacity planning issues to the team. Disabled by default",
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "engagement_policy": {
+          "description": "DEPRECATED: The engagement policy of the team",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "oncall_schedule": {
+          "description": "DEPRECATED: The on-call schedule of the team",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "slack_group": {
+          "description": "Team Slack group ID",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "slack_channel": {
+          "description": "DEPRECATED: The Slack channel of the team",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pagerduty_service": {
+          "description": "The PagerDuty Service name or ID used to escalate to the team.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cloud_cost": {
+          "description": "Cloud cost attribution metadata",
+          "type": "object",
+          "properties": {
+            "cost_owner": {
+              "description": "Cost owner. Use a Workday team code (e.g. 'SUP-ORG-476') or 'NOT_ASSIGNED' if unresolved.",
+              "type": "string",
+              "pattern": "^(SUP-ORG-.+|NOT_ASSIGNED)$"
+            }
+          },
+          "required": [
+            "cost_owner"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "dependencies": {
+        "ignored_components": [
+          "product_stage_group"
+        ],
+        "send_error_budget_weekly_to_slack": [
+          "slack_error_budget_channel"
+        ],
+        "alerts": [
+          "slack_alerts_channel"
+        ],
+        "assign_capacity_planning_issues": [
+          "label",
+          "manager"
+        ]
+      },
+      "required": [
+        "name",
+        "cloud_cost"
+      ],
+      "additionalProperties": false
+    },
+    "ServiceDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The unique name of the service",
+          "type": "string"
+        },
+        "friendly_name": {
+          "description": "The user friendly name of the service",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/definitions/TierEnumDefinition"
+        },
+        "owner": {
+          "description": "The owner of the service",
+          "type": "string"
+        },
+        "label": {
+          "description": "The unique label of the service. Must start with scope `Service::`",
+          "type": "string"
+        },
+        "business": {
+          "type": "object",
+          "properties": {
+            "SLA": {
+              "type": "object",
+              "properties": {
+                "overall_sla_weighting": {
+                  "description": "The value to use as a weighted average to include the service in overall SLA",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "technical": {
+          "type": "object",
+          "properties": {
+            "project": {
+              "description": "The list of project links for the service",
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "documents": {
+              "type": "object",
+              "properties": {
+                "design": {
+                  "description": "The link to design document for the service",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "description": "The link to architecture document for the service",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "readiness_review": {
+                  "description": "The link to production readiness review document for the service",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sre_guide": {
+                  "description": "The link to SRE guide document for the service",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "developer_guide": {
+                  "description": "The link to developer guide document for the service",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "service": {
+                  "description": "The list of links for the service",
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "uniqueItems": true
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "security": {
+                  "description": "The link to security document for the service",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            "logging": {
+              "description": "The list of logging links for the service",
+              "oneOf": [
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "The name of logging link for the service",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "permalink": {
+                        "description": "The URL of logging link for the service",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "dependencies": {
+              "description": "DEPRECATED: The list of dependencies for the service",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "description": "DEPRECATED: The name of the dependency for the service",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "type": {
+                        "description": "DEPRECATED: The type of the dependency for the service",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "description": "DEPRECATED: The list of components for the service",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sub_components": {
+              "description": "DEPRECATED: The list of components for the service",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "observability": {
+          "type": "object",
+          "properties": {
+            "monitors": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "primary_grafana_dashboard": {
+                      "description": "The primary Grafana dashboard for the service. Must be relative for appending to Grafana base URL",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^(?!https?://)"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "grafana_folder": {
+                      "description": "The Grafana folder for the service",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "sentry_slug": {
+                      "description": "The Sentry slug for the service",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "gitlab_dashboard": {
+                      "description": "The GitLab dashboard for the service",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "alerts": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "alert_link": {
+                        "description": "The link of the alert for a service",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "teams": {
+          "description": "DEPRECATED: The list of the teams associated with the service",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "friendly_name",
+        "tier",
+        "label",
+        "owner"
+      ],
+      "additionalProperties": false
+    },
+    "TierDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/TierEnumDefinition"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "TierEnumDefinition": {
+      "description": "The unique name of the service tier",
+      "type": "string",
+      "enum": [
+        "sv",
+        "lb",
+        "stor",
+        "db",
+        "inf"
+      ]
+    }
+  },
+  "$comment": "The `required` keyword has been omitted for top-level properties due to multiple YAML files sharing same JSON schema",
+  "properties": {
+    "teams": {
+      "description": "The list of teams",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/TeamDefinition"
+      }
+    },
+    "services": {
+      "description": "The list of services",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/ServiceDefinition"
+      }
+    },
+    "tiers": {
+      "description": "The list of service tiers",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/TierDefinition"
+      }
+    }
+  },
+  "additionalProperties": false
+}

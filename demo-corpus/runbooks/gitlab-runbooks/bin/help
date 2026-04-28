@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -efo pipefail
+
+# RUNBOOKS_PATH is exported by glsh.sh
+BIN_DIR="${RUNBOOKS_PATH:?}/bin"
+
+find "${BIN_DIR}" -type f -not -path '*/.*' -exec basename {} \;

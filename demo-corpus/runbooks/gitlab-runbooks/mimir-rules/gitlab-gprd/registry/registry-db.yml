@@ -1,0 +1,117 @@
+groups:
+  - name: Container Registry Database
+    rules:
+      - alert: ContainerRegistryDBConnPoolSaturationTooHigh
+        expr: >
+          avg (
+            sum by (pod) (go_sql_dbstats_connections_open{app="registry", env="gprd"})
+            /
+            sum by (pod) (go_sql_dbstats_connections_max_open{app="registry", env="gprd"})
+          ) > 70
+        for: 30m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "The Container Registry database connection pool saturation is too high"
+          description: "The average application-side database connection pool saturation in env {{ $labels.environment }} {{ $labels.stage }} stage has been above 70% for the last 30 minutes."
+          grafana_dashboard_id: registry-database/registry-database-detail
+          runbook: registry/app-db-conn-pool-saturation/
+      - alert: ContainerRegistryDBHighReplicaPoolChurnRate
+        expr: |
+          (
+            sum(rate(registry_database_lb_pool_events_total{env="gprd", event="replica_added", reason="discovered"}[10m]))
+            +
+            sum(rate(registry_database_lb_pool_events_total{env="gprd", event="replica_removed", reason="removed_from_dns"}[10m]))
+          ) > 0.1
+        for: 15m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Container Registry database replica pool experiencing DNS instability"
+          description: |
+            The database load balancer is experiencing sustained replica DNS changes.
+            Current rate: {{ $value | humanize }} events/sec
+            This may indicate DNS instability, network issues, or service discovery problems.
+            Note: One-time deployments are expected to cause brief spikes that should not trigger this alert.
+      - alert: ContainerRegistryDBHighReplicaConnectivityQuarantineRate
+        expr: |
+          sum(rate(registry_database_lb_pool_events_total{env="gprd", event="replica_quarantined", reason="connectivity"}[15m])) > 0.05
+        for: 10m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Container Registry database replicas experiencing connectivity issues"
+          description: |
+            Multiple replicas are being quarantined due to connection failures or flapping.
+            Current rate: {{ $value | humanize }} quarantines/sec
+            This may indicate network issues, replica instability, or infrastructure problems.
+      - alert: ContainerRegistryDBHighReplicaLagQuarantineRate
+        expr: |
+          sum(rate(registry_database_lb_pool_events_total{env="gprd", event="replica_quarantined", reason="replication_lag"}[10m])) > 0.05
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "High rate of Container Registry database replica quarantines due to replication lag"
+          description: |
+            Multiple replicas are being quarantined due to replication lag exceeding thresholds.
+            Current rate: {{ $value | humanize }} quarantines/sec
+            This may indicate primary database load, replication issues, or replica performance problems.
+      - alert: ContainerRegistryDBReplicaPoolSizeInstability
+        expr: |
+          avg(stddev_over_time(registry_database_lb_pool_size{env="gprd"}[15m])) > 1
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Container Registry replica pool size is unstable"
+          description: |
+            The replica pool size has been fluctuating significantly (stddev: {{ $value | humanize }}).
+            This indicates instability in replica availability.
+      - alert: ContainerRegistryDBReplicaPoolDegraded
+        expr: |
+          avg(registry_database_lb_pool_size{env="gprd"}) / avg_over_time(avg(registry_database_lb_pool_size{env="gprd"})[1d:]) < 0.5
+        for: 5m
+        labels:
+          severity: s3
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "Container Registry database replica pool degraded"
+          description: |
+            The replica pool size has dropped below 50% of the 1-day average.
+            Current ratio: {{ $value | humanizePercentage }} of normal capacity.
+            This may indicate widespread replica failures, network issues, or infrastructure problems.
+            Increased load on remaining replicas and primary database is expected.
+      - alert: ContainerRegistryDBNoReplicasAvailable
+        expr: |
+          avg(registry_database_lb_pool_size{env="gprd"}) == 0
+        for: 2m
+        labels:
+          severity: s2
+          pager: pagerduty
+          alert_type: symptom
+          team: container_registry
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          title: "No Container Registry database replicas available"
+          description: |
+            All database replicas are unavailable/unreachable (from the application) or quarantined.
+            All read queries are being routed to the primary database, significantly increasing primary load.
+            Check for DNS issues, network connectivity problems, or widespread replica failures.

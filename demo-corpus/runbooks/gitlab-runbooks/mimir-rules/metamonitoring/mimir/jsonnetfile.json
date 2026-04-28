@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "https://gitlab.com/gitlab-com/gl-infra/monitoring-mixins.git",
+          "subdir": "mixins/mimir"
+        }
+      },
+      "version": "main"
+    }
+  ],
+  "legacyImports": true
+}

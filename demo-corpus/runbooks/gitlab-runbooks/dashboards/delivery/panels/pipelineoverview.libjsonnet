@@ -1,0 +1,333 @@
+{
+  datasource: {
+    type: 'prometheus',
+    uid: 'PA258B30F88C30650',
+  },
+  fieldConfig: {
+    defaults: {
+      custom: {
+        align: 'center',
+        cellOptions: {
+          type: 'auto',
+        },
+        inspect: false,
+      },
+      mappings: [],
+      thresholds: {
+        mode: 'absolute',
+        steps: [
+          {
+            color: 'green',
+            value: null,
+          },
+          {
+            color: 'red',
+            value: 80,
+          },
+        ],
+      },
+      color: {
+        mode: 'thresholds',
+      },
+    },
+    overrides: [
+      {
+        matcher: {
+          id: 'byName',
+          options: 'Value',
+        },
+        properties: [
+          {
+            id: 'custom.cellOptions',
+            value: {
+              mode: 'gradient',
+              type: 'gauge',
+            },
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'Status',
+        },
+        properties: [
+          {
+            id: 'custom.width',
+            value: 91,
+          },
+          {
+            id: 'custom.cellOptions',
+            value: {
+              mode: 'basic',
+              type: 'color-background',
+            },
+          },
+          {
+            id: 'mappings',
+            value: [
+              {
+                options: {
+                  failed: {
+                    color: 'red',
+                    index: 1,
+                  },
+                  success: {
+                    color: 'green',
+                    index: 0,
+                  },
+                },
+                type: 'value',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'Project',
+        },
+        properties: [
+          {
+            id: 'custom.width',
+            value: 216,
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'Pipeline',
+        },
+        properties: [
+          {
+            id: 'links',
+            value: [
+              {
+                targetBlank: true,
+                title: 'Show details',
+                url: '${__data.fields.web_url}',
+              },
+            ],
+          },
+          {
+            id: 'custom.width',
+            value: 556,
+          },
+          {
+            id: 'custom.align',
+            value: 'auto',
+          },
+          {
+            id: 'custom.cellOptions',
+            value: {
+              type: 'auto',
+            },
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'web_url',
+        },
+        properties: [
+          {
+            id: 'custom.hidden',
+            value: true,
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'Duration',
+        },
+        properties: [
+          {
+            id: 'unit',
+            value: 's',
+          },
+          {
+            id: 'thresholds',
+            value: {
+              mode: 'absolute',
+              steps: [
+                {
+                  color: 'green',
+                  value: null,
+                },
+                {
+                  color: 'red',
+                  value: 3600,
+                },
+              ],
+            },
+          },
+          {
+            id: 'custom.cellOptions',
+            value: {
+              mode: 'basic',
+              type: 'gauge',
+            },
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'target_env',
+        },
+        properties: [
+          {
+            id: 'custom.width',
+            value: 89,
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'target_stage',
+        },
+        properties: [
+          {
+            id: 'custom.width',
+            value: 85,
+          },
+        ],
+      },
+      {
+        matcher: {
+          id: 'byName',
+          options: 'Environment',
+        },
+        properties: [
+          {
+            id: 'custom.width',
+            value: 103,
+          },
+        ],
+      },
+    ],
+  },
+  gridPos: {
+    h: 10,
+    w: 19,
+    x: 0,
+    y: 1,
+  },
+  id: 10,
+  options: {
+    showHeader: true,
+    footer: {
+      show: false,
+      reducer: [
+        'sum',
+      ],
+      countRows: false,
+      fields: '',
+    },
+    sortBy: [
+      {
+        desc: true,
+        displayName: 'Duration',
+      },
+    ],
+  },
+  pluginVersion: '9.4.7',
+  targets: [
+    {
+      datasource: {
+        type: 'prometheus',
+        uid: 'PA258B30F88C30650',
+      },
+      editorMode: 'code',
+      exemplar: false,
+      expr: 'last_over_time(delivery_deployment_pipeline_duration_seconds{deploy_version="16.0.202304280320-e20d745c2fc.a175ce27071", pipeline_name!="Coordinator pipeline"}[$__range])',
+      format: 'table',
+      instant: true,
+      legendFormat: '{{label_name}}',
+      range: false,
+      refId: 'A',
+    },
+  ],
+  title: 'Pipelines overview',
+  transformations: [
+    {
+      id: 'organize',
+      options: {
+        excludeByName: {
+          Time: true,
+          __name__: true,
+          cluster: true,
+          container: true,
+          deploy_version: true,
+          endpoint: true,
+          env: true,
+          environment: true,
+          instance: true,
+          job: true,
+          monitor: true,
+          namespace: true,
+          pipeline_id: true,
+          pod: true,
+          prometheus: true,
+          provider: true,
+          region: true,
+          service: true,
+          shard: true,
+          stage: true,
+          target_env: false,
+          target_stage: false,
+          tier: true,
+          type: true,
+          web_url: false,
+        },
+        indexByName: {
+          Time: 7,
+          Value: 5,
+          __name__: 8,
+          cluster: 9,
+          container: 10,
+          deploy_version: 11,
+          endpoint: 12,
+          env: 13,
+          environment: 14,
+          instance: 15,
+          job: 16,
+          monitor: 17,
+          namespace: 18,
+          pipeline_id: 19,
+          pipeline_name: 0,
+          pipeline_status: 4,
+          pod: 20,
+          project_name: 3,
+          prometheus: 21,
+          provider: 22,
+          region: 23,
+          service: 24,
+          shard: 25,
+          stage: 26,
+          target_env: 1,
+          target_stage: 2,
+          tier: 27,
+          type: 28,
+          web_url: 6,
+        },
+        renameByName: {
+          Time: '',
+          Value: 'Duration',
+          __name__: '',
+          pipeline_name: 'Pipeline',
+          pipeline_status: 'Status',
+          project_name: 'Project',
+          target_env: 'Environment',
+          target_stage: 'Stage',
+        },
+      },
+    },
+  ],
+  type: 'table',
+}

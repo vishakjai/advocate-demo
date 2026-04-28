@@ -1,0 +1,86 @@
+{
+    "receiver": "slack_bridge",
+    "status": "firing",
+    "alerts": [
+      {
+        "status": "resolved",
+        "labels": {
+          "alertname": "service_ops_out_of_bounds_upper_2sigma_5m",
+          "bound": "upper",
+          "environment": "gstg",
+          "metric": "gitlab_service_ops",
+          "monitor": "gstg-default",
+          "period": "5m",
+          "provider": "gcp",
+          "region": "us-east",
+          "replica": "02",
+          "rules_domain": "general",
+          "severity": "warn",
+          "threshold_sigma": "2.5",
+          "tier": "sv",
+          "type": "web"
+        },
+        "annotations": {
+          "description": "Server is running outside of normal operation rate parameters\n",
+          "grafana_dashboard_id": "general-service/service-platform-metrics",
+          "grafana_panel_id": "9",
+          "grafana_variables": "environment,type",
+          "grafana_datasource_id": "mimir-gitlab-gstg",
+          "runbook": "troubleshooting/service-redis.md",
+          "title": "redis service operation rate alert"
+        },
+        "startsAt": "2020-07-17T08:00:05.09866521Z",
+        "endsAt": "2020-07-17T08:00:50.09866521Z",
+        "generatorURL": "https://prometheus.gstg.gitlab.net/graph?g0.expr=gitlab_service_ops%3Arate+%3E+gitlab_service_ops%3Arate%3Aavg_over_time_1w+%2B+2.5+%2A+gitlab_service_ops%3Arate%3Astddev_over_time_1w%7Benv%3D%22gstg%22%7D&g0.tab=1"
+      }
+    ],
+    "groupLabels": {
+      "alertname": "service_ops_out_of_bounds_upper_2sigma_5m",
+      "environment": "gstg",
+      "tier": "db",
+      "type": "redis"
+    },
+    "commonLabels": {
+      "alertname": "service_ops_out_of_bounds_upper_2sigma_5m",
+      "bound": "upper",
+      "environment": "gstg",
+      "metric": "gitlab_service_ops",
+      "monitor": "gstg-default",
+      "period": "5m",
+      "provider": "gcp",
+      "region": "us-east",
+      "replica": "02",
+      "rules_domain": "general",
+      "severity": "warn",
+      "threshold_sigma": "2.5",
+      "tier": "sv",
+      "type": "web",
+      "something": "else",
+      "e": "em-see-squared",
+      "there": "are",
+      "lots": "of",
+      "common": "labels",
+      "all": "the",
+      "best": "labels",
+      "so": "many labels"
+    },
+    "commonAnnotations": {
+      "description": "Server `web` is running outside of normal operation rate parameters\n",
+      "grafana_dashboard_id": "general-service/service-platform-metrics",
+      "grafana_panel_id": "9",
+      "grafana_variables": "environment,type",
+      "runbook": "troubleshooting/service-redis.md",
+      "title": "`redis` service operation rate alert",
+      "link1_title": "Definition",
+      "link1_url": "https://gitlab.com/gitlab-com/runbooks/blob/master/troubleshooting/definition-service-apdex.md",
+      "grafana_link1_title": "Components",
+      "grafana_link1_path": "VE4pXc1iz/general-triage-components",
+      "grafana_link1_vars": "environment,type",
+      "grafana_min_zoom_hours": "24",
+      "promql_template_1": "gitlab_workhorse_git_http_sessions_active:total{stage=\"$stage\"}",
+      "promql_template_2": "avg_over_time(gitlab_workhorse_git_http_sessions_active{type=\"git\", tier=\"sv\", stage=\"$stage\"}[1m])"
+    },
+    "externalURL": "http://alerts-01-inf-gstg:9093",
+    "version": "4",
+    "groupKey": "{}/{rules_domain=\"general\"}:{alertname=\"service_ops_out_of_bounds_upper_2sigma_5m\", environment=\"gstg\", tier=\"db\", type=\"redis\"}"
+  }

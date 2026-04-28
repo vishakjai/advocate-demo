@@ -1,0 +1,34 @@
+groups:
+  - name: cloudflare.rules
+    rules:
+      - alert: CloudflareExporterStaleData
+        expr: sum without (pod, instance)  (time() - cloudflare_graphql_last_success_timestamp_seconds) > 600
+        labels:
+          severity: s4
+          alert_type: cause
+        annotations:
+          title: Scrape errors in Cloudflare exporter
+          description: >
+            The cloudflare exporter has failed to scrape Cloudflare for 10
+            minutes. Note that this refers to a background scrape loop in the
+            exporter itself, and that prometheus may be successfully scraping
+            the exporter.
+      - alert: CloudflareCloudConnectorRateLimitExhaustion
+        for: 5m
+        expr: |
+          sum by (zone, env) (
+            rate(cloudflare_zone_firewall_events_count{zone=~"cloud.gitlab.com|cloud.staging.gitlab.com", source="ratelimit", action="block"}[5m])
+          ) > 5
+        labels:
+          severity: s4
+          alert_type: cause
+          team: runway
+        annotations:
+          title: Clients are being rate limited on {{ $labels.zone }}
+          description: >
+            One or more clients consuming features delivered through Cloud Connector was blocked by
+            our rate limit rules in Cloudflare for 5 minutes or more. This could be OK but should
+            be investigated for false positives.
+          runbook: cloud_connector/alerts/CloudflareCloudConnectorRateLimitExhaustion/
+          grafana_datasource_id: mimir-gitlab-ops
+          grafana_dashboard_link: https://dashboards.gitlab.net/alerting/Mimir%20-%20Gitlab%20Ops/CloudflareCloudConnectorRateLimitExhaustion/find

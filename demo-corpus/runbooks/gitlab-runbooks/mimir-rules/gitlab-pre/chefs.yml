@@ -1,0 +1,57 @@
+groups:
+- name: chef.rules
+  rules:
+  - alert: ChefClientError
+    expr: chef_client_error{env="pre"} == 1 and on (instance) (chef_client_enabled{env="pre"} == 1)
+    for: 5h
+    labels:
+      severity: s4
+      alert_type: cause
+      type: fleet
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      description: Check failed chef executions on host {{ $labels.fqdn }}
+      grafana_dashboard_id: "000000231/chef-client"
+      runbook: fleet-management/config_management/chef-troubleshooting/
+      title: Chef client failed for more than 5hs
+  - alert: ChefClientErrorCritical
+    expr: avg(chef_client_error{env="pre"}) by (env) * 100 > 10
+    for: 1h
+    labels:
+      severity: s4
+      alert_type: cause
+      type: fleet
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      description: >
+        At least 10% of chef-runs are failing for the {{ $labels.env }} environment, this likely points to a configuration
+        error. Check the syslog of the failing hosts to see the reasons
+      grafana_dashboard_id: "000000231/chef-client"
+      runbook: fleet-management/config_management/alerts/ChefClientErrorCritical/
+      title: Chef client failures have reached critical levels
+  - alert: ChefClientStale
+    expr: (time() - chef_client_last_run_timestamp_seconds{env="pre"} > 5 * 3600) and on (instance) (chef_client_enabled offset 1h == 1)
+    labels:
+      severity: s4
+      alert_type: cause
+      type: fleet
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      description: Last Chef run for {{ $labels.fqdn }} was over {{ $value | humanizeDuration }} ago
+      grafana_dashboard_id: "000000231/chef-client"
+      runbook: fleet-management/config_management/chef-troubleshooting/
+      title: Chef client hasn't converged successfully in the past 5 hours
+  - alert: ChefClientDisabled
+    expr: sum by (type, env, environment) (chef_client_enabled{type!~"ci-runners", env="pre"} == 0)
+    for: 24h
+    labels:
+      severity: s4
+      alert_type: cause
+      type: fleet
+      team: runway
+    annotations:
+      grafana_datasource_id: mimir-gitlab-pre
+      description: Chef client has been disabled for type {{ $labels.type }} in env {{ $labels.environment }}
+      grafana_dashboard_id: "000000231/chef-client"
+      runbook: fleet-management/config_management/chef-troubleshooting/
+      title: Chef client has been disabled for the past 24 hours

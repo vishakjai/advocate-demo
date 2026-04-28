@@ -1,0 +1,25 @@
+#!/bin/bash
+# shellcheck disable=SC2155
+set -eo pipefail
+
+collect_instances() {
+  local project="$1"
+
+  local all_instances="$(gcloud compute instances list --project "$project" | awk '!/NAME/ {print $1","$4","$5}')"
+
+  for instance in $all_instances; do
+    local name="$(awk -F, '{print $1}' <<<"$instance")"
+    local internal="$(awk -F, '{print $2}' <<<"$instance")"
+    local external="$(awk -F, '{print $3}' <<<"$instance")"
+    if [[ $external =~ ^[0-9]+.* ]]; then
+      ips="$internal,$external"
+    else
+      ips="$internal"
+    fi
+    echo "$project|$name|$ips"
+  done
+}
+
+export -f collect_instances
+
+gcloud projects list --filter "name=gitlab-gitaly.*" | awk '!/PROJECT_ID/ {print $1}' | xargs -P15 -I {} bash -c 'collect_instances "{}"'

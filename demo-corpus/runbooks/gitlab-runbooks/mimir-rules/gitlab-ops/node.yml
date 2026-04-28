@@ -1,0 +1,124 @@
+groups:
+- name: CPU rules
+  interval: 1m
+  rules:
+  # The count of CPUs per node, useful for getting CPU time as a percent of total.
+  - record: instance:node_cpus:count
+    expr: >
+      count without (cpu, mode) (
+        node_cpu_seconds_total{mode="idle", env="gprd"}
+      )
+  # CPU in use by CPU.
+  - record: instance_cpu:node_cpu_seconds_not_idle:rate1m
+    expr: >
+      sum without (mode) (
+        1 - rate(node_cpu_seconds_total{mode="idle", env="gprd"}[1m])
+      )
+  # CPU in use by mode.
+  # Split recording for iowait to avoid reset bugs.
+  - record: instance_mode:node_cpu_seconds:rate1m
+    expr: >
+      sum without (cpu) (
+        rate(node_cpu_seconds_total{mode!="iowait", env="gprd"}[1m])
+      )
+  - record: instance_mode:node_cpu_seconds:rate1m
+    expr: >
+      sum without (cpu) (
+        deriv(node_cpu_seconds_total{mode="iowait", env="gprd"}[1m]) > 0
+      )
+  # CPU in use ratio.
+  - record: instance:node_cpu_utilization:ratio
+    expr: >
+      avg without (cpu) (
+        instance_cpu:node_cpu_seconds_not_idle:rate1m{env="gprd"}
+      )
+  # CPU summaries
+  - record: job:node_cpu_utilization:min_ratio
+    expr: >
+      min without (fqdn,instance,node,pod) (
+        instance:node_cpu_utilization:ratio{env="gprd"}
+      )
+  - record: job:node_cpu_utilization:avg_ratio
+    expr: >
+      avg without (fqdn,instance,node,pod) (
+        instance:node_cpu_utilization:ratio{env="gprd"}
+      )
+  - record: job:node_cpu_utilization:max_ratio
+    expr: >
+      max without (fqdn,instance,node,pod) (
+        instance:node_cpu_utilization:ratio{env="gprd"}
+      )
+
+# Rules for calculating and alerting on long-term node utilization issues.
+- name: Utilization
+  interval: 300s
+  rules:
+  - record: instance:cpu_utilization:ratio_max
+    expr: max_over_time(instance:node_cpu_utilization:ratio{env="gprd"}[300s])
+  - record: instance:cpu_utilization:ratio_avg
+    expr: avg_over_time(instance:node_cpu_utilization:ratio{env="gprd"}[300s])
+  - record: instance:cpu_utilization:ratio_q95
+    expr: quantile_over_time(0.95, instance:node_cpu_utilization:ratio{env="gprd"}[300s])
+  - record: instance:memory_utilization:ratio_max
+    expr: max_over_time(instance:node_memory_utilization:ratio{env="gprd"}[300s])
+  - record: instance:memory_utilization:ratio_avg
+    expr: avg_over_time(instance:node_memory_utilization:ratio{env="gprd"}[300s])
+  - record: instance:memory_utilization:ratio_q95
+    expr: quantile_over_time(0.95, instance:node_memory_utilization:ratio{env="gprd"}[300s])
+
+- name: Node memory
+  rules:
+  - record: instance:node_memory_available:ratio
+    expr: >
+      (
+        node_memory_MemAvailable_bytes{env="gprd"} or
+        (
+          node_memory_Buffers_bytes{env="gprd"} +
+          node_memory_Cached_bytes{env="gprd"} +
+          node_memory_MemFree_bytes{env="gprd"} +
+          node_memory_Slab_bytes{env="gprd"}
+        )
+      ) /
+      node_memory_MemTotal_bytes
+  - record: instance:node_memory_utilization:ratio
+    expr: 1 - instance:node_memory_available:ratio{env="gprd"}
+
+- name: Node filesystem rules
+  rules:
+  - record: instance:node_filesystem_avail:ratio
+    expr: node_filesystem_avail_bytes{device=~"(/dev/.+|tank/dataset)", env="gprd"} / node_filesystem_size_bytes{device=~"(/dev/.+|tank/dataset)", env="gprd"}
+  - record: instance:node_disk_writes_completed:irate1m
+    expr: sum(irate(node_disk_writes_completed_total{device=~"sd.*", env="gprd"}[1m])) WITHOUT (device)
+  - record: instance:node_disk_reads_completed:irate1m
+    expr: sum(irate(node_disk_reads_completed_total{device=~"sd.*", env="gprd"}[1m])) WITHOUT (device)
+  - expr: |-
+      avg by (node, cluster, env, environment, monitor, prometheus, provider, region) (
+        irate(node_disk_io_time_seconds_total{job="node-exporter",device=~"nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+", env="gprd"}[1m])
+      * on (cluster, namespace, pod) group_left(node)
+        node_namespace_pod:kube_pod_info:
+      )
+    record: node:node_disk_utilisation:avg_irate
+  - expr: |-
+      avg by (cluster, env, environment, monitor, prometheus, provider, region) (
+        irate(node_disk_io_time_weighted_seconds_total{job="node-exporter",device=~"nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+", env="ops"}[1m])
+      )
+    record: ':node_disk_saturation:avg_irate'
+  - expr: |-
+      avg by (node, cluster, env, environment, monitor, prometheus, provider, region) (
+        irate(node_disk_io_time_weighted_seconds_total{job="node-exporter",device=~"nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+", env="gprd"}[1m])
+      * on (cluster, namespace, pod) group_left(node)
+        node_namespace_pod:kube_pod_info:
+      )
+    record: node:node_disk_saturation:avg_irate
+  - expr: |-
+      max by (node, instance, namespace, device, cluster, env, environment, monitor, prometheus, provider, region) ((node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs", env="gprd"}
+      - node_filesystem_avail_bytes{fstype=~"ext[234]|btrfs|xfs|zfs", env="gprd"})
+      / node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs", env="gprd"})
+    record: 'node:node_filesystem_usage:'
+  - expr: max by (node, instance, namespace, device, cluster, env, environment, monitor, prometheus, provider, region) (node_filesystem_avail_bytes{fstype=~"ext[234]|btrfs|xfs|zfs", env="gprd"} / node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs", env="gprd"})
+    record: 'node:node_filesystem_avail:'
+
+- name: Misc rules
+  rules:
+  - record: instance:up:count
+    expr: count(up{job="scrapeConfig/monitoring/prometheus-agent-node-exporter-gce",type!="", env="gprd"} == 1) WITHOUT (instance, fqdn)

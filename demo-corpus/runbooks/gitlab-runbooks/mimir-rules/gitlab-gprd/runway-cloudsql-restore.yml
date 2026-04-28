@@ -1,0 +1,31 @@
+groups:
+- name: Runway CloudSQL Restore Validation
+  rules:
+  - alert: NoRestorePipelineStarted
+    for: 10m
+    expr: max(time() - runway_csql_restore_start) by (env, type, resource) > 86400
+    labels:
+      alert_type: symptom
+      severity: s4
+      team: runway
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      title: No restore validation pipeline is triggered
+      description: >
+        No pipelines for {{ $labels.resource }} running since 24 hours.
+      runbook: runway/cloudsql_restore_pipeline_troubleshooting/
+  - alert: RestorePipelineNotSuccessful
+    expr: |
+      max(time() - runway_csql_restore_start) by (env, type, resource) > 7200
+      and
+      max(runway_csql_restore_finish - runway_csql_restore_start) by (env, type, resource) < 0
+    labels:
+      alert_type: symptom
+      severity: s4
+      team: runway
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      title: Failing restore validation pipeline
+      description: >
+        Pipeline for {{ $labels.resource }} has not completed after 2 hours.
+      runbook: runway/cloudsql_restore_pipeline_troubleshooting/

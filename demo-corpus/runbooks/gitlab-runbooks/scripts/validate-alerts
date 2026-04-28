@@ -1,0 +1,208 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+require_relative '../lib/jsonnet_wrapper'
+
+ValidationError = Class.new(StandardError)
+
+class Validator
+  def initialize
+    @context = []
+    @failures = []
+
+    @service_catalog = JsonnetWrapper.new.parse(File.join(__dir__, "..", "services", "raw-catalog.jsonnet"))
+    @service_catalog_teams = @service_catalog["teams"].to_h { |team| [team["name"], team] }
+  end
+
+  # Validates Prometheus and Mimir rules
+  # Returns true if validation succeeded
+  def validate
+    # Check Mimir rules
+    directory_path = File.join(__dir__, "..", "mimir-rules")
+    mimir_alert_files = Dir.glob(File.join(directory_path, "**", "*.{yml,yaml}"))
+    mimir_alert_files.each do |file|
+      dir = File.dirname(file)
+
+      # Check if the file lives in a mixin directory for now and skip.
+      # This can be removed once the mixins conform to our standards.
+      mixin_file = File.join(dir, "mixin.libsonnet")
+
+      next if File.exist?(mixin_file)
+
+      validate_file File.expand_path(file)
+    end
+
+    errors = []
+    @failures.each do |failure|
+      errors << failure if failure[:level] == :error
+
+      warn "#{failure[:level]}: #{failure[:context].join(', ')}: #{failure[:message]}"
+    end
+
+    errors
+  end
+
+  private
+
+  # Add a validation warning
+  def validation_warning(message)
+    @failures << { context: @context.dup, level: :warn, message: }
+  end
+
+  # Add a validation error
+  def validation_error(message)
+    @failures << { context: @context.dup, level: :error, message: }
+  end
+
+  # Add a validation failure and abort the current validation
+  def validation_fatal(message)
+    @failures << ({ context: @context.dup, level: :error, message: })
+    raise ValidationError
+  end
+
+  # Ensures that the rule has valid annotations
+  def validate_alert_rule_annotations(rule)
+    annotations = rule["annotations"]
+    validation_fatal("rules must contain a `title` annotation") unless annotations["title"]
+
+    if annotations["description"]
+      validation_error("Don't repeat yourself. Description contains a repeat of the title. Title is #{annotations['title']}") if annotations["description"].include? annotations["title"]
+    else
+      validation_warning("rules should contain a `description` annotation")
+    end
+
+    if annotations["runbook"]
+      runbook_relative_link = annotations["runbook"].gsub(/#.*$/, "")
+      # We can't validate files that include template values eg: "{{ $labels.type }}"
+      # but for other files, ensure that they exist
+      unless runbook_relative_link.include?("{{")
+        runbook_files = [
+          File.join(__dir__, "..", "docs", "#{runbook_relative_link}.md"),
+          File.join(__dir__, "..", "docs", runbook_relative_link, "README.md")
+        ]
+        validation_error("rule references a non-existent runbook #{runbook_relative_link}") unless runbook_files.any? { |file| !File.file?(file) }
+      end
+    else
+      validation_warning("alerts should reference a runbook")
+    end
+
+    # Check that all label attributes are strings since non-string values, while being technically valid,
+    # will trip-up the Prometheus Operator, leading to downstream failures.
+    # Validate this here to catch this exception early
+    annotations.each do |key, value|
+      validation_error("All attribute values must be strings. labels.#{key} is a #{value.class}") unless value.is_a?(String)
+    end
+
+    validation_error("channel annotations have been removed in favour of team labels, please use a team label instead") if annotations["channel"]
+  end
+
+  def validate_pager_severity_labels(rule)
+    labels = rule["labels"]
+
+    if labels["pager"]
+      validation_error("rules contains an invalid `pager` label: #{labels['pager']}") unless %w[pagerduty platform_insights_pagerduty database_operations_pagerduty].include?(labels["pager"])
+      validation_error("only severity s1 and s2 errors should page") unless (labels["severity"] == "s1") || (labels["severity"] == "s2")
+    elsif (labels["severity"] == "s1") || (labels["severity"] == "s2")
+      validation_error("s1 and s2 alerts must be configured to send to pagerduty") unless labels["pager"] == "pagerduty"
+    end
+  end
+
+  def validate_label_team(rule)
+    labels = rule["labels"]
+    team = @service_catalog_teams[labels["team"]]
+
+    validation_error("Team labels should refer to valid teams in the service catalog. No #{labels['team']} team was found") unless team
+  end
+
+  # Ensures that the rule conforms to our labeling rules
+  def validate_alert_rule_labels(rule)
+    labels = rule["labels"]
+
+    if labels.nil? || labels.empty?
+      validation_error("rules must contain labels")
+      return
+    end
+
+    validation_error("rules must contain a `severity` label") unless labels["severity"]
+    validation_error("rules contains an invalid `severity` label: #{labels['severity']}") unless %w[s1 s2 s3 s4].include?(labels["severity"])
+    validation_error("alerts must include an alert_type label. This label should either be 'cause' or 'symptom'. For more information on cause and symptom-based alerts, review http://landing.google.com/sre/sre-book/chapters/monitoring-distributed-systems/#symptoms-versus-causes-g0sEi4") unless %w[cause heartbeat symptom].include?(labels["alert_type"])
+
+    validate_pager_severity_labels(rule)
+
+    # Check that all label values are strings since non-string values, while being technically valid,
+    # will trip-up the Prometheus Operator, leading to downstream failures.
+    # Validate this here to catch this exception early
+    labels.each do |key, value|
+      validation_error("All label values must be strings. labels.#{key} is a #{value.class}") unless value.is_a?(String)
+    end
+
+    validation_error("channels have been removed in favour of teams, please use a team label instead") if labels["channel"]
+
+    validate_label_team(rule) if labels["team"]
+  end
+
+  def validate_rule(rule)
+    return if rule["record"] # Don't validate recordings
+
+    alert = rule["alert"]
+    validation_fatal("Rules must contain an `alert` attribute") unless alert
+
+    @context << "alert: #{alert}"
+    begin
+      validate_alert_rule_annotations(rule)
+      validate_alert_rule_labels(rule)
+    ensure
+      @context.pop
+    end
+  end
+
+  def validate_group(group)
+    name = group["name"]
+    @context << "group: #{name}"
+
+    begin
+      rules = group["rules"]
+      rules.each do |rule|
+        validate_rule rule
+      rescue ValidationError
+        # Continue onto next rule after validation failure
+      end
+
+    ensure
+      @context.pop
+    end
+  end
+
+  def validate_file(alert_file_path)
+    @context << "file: #{alert_file_path}"
+    begin
+      alert_yaml = YAML.load_file(alert_file_path)
+      raise "Invalid configuration" unless alert_yaml
+
+      groups = alert_yaml["groups"]
+      groups.each do |group|
+        validate_group group
+      rescue ValidationError
+        # Continue onto next group after validation failure
+      end
+    ensure
+      @context.pop
+    end
+  end
+end
+
+begin
+  failures = Validator.new.validate
+
+  if failures.any?
+    warn "\n\nFound the following breaking errors:"
+    warn failures.join("\n")
+
+    exit 1
+  end
+rescue StandardError => e
+  warn "error: #{e.message}"
+  warn e.backtrace.join("\n")
+  exit 1
+end

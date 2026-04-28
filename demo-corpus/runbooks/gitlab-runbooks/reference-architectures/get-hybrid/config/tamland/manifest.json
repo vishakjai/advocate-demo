@@ -1,0 +1,1987 @@
+{
+  "defaults": {
+    "prometheus": {
+      "baseURL": "http://kube-prometheus-stack-prometheus.monitoring:9090",
+      "defaultSelectors": {},
+      "queryTemplates": {
+        "quantile95_1h": "max(gitlab_component_saturation:ratio_quantile95_1h{%s})",
+        "quantile95_1w": "max(gitlab_component_saturation:ratio_quantile95_1w{%s})",
+        "quantile99_1h": "max(gitlab_component_saturation:ratio_quantile99_1h{%s})",
+        "quantile99_1w": "max(gitlab_component_saturation:ratio_quantile99_1w{%s})"
+      },
+      "serviceLabel": "type"
+    }
+  },
+  "report": {
+    "pages": [
+      {
+        "path": "all.md",
+        "service_pattern": ".*",
+        "title": "All components"
+      }
+    ]
+  },
+  "saturationPoints": {
+    "cpu": {
+      "appliesTo": [
+        "gitaly",
+        "consul",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "This resource measures average CPU utilization across an all cores in a service fleet.\nIf it is becoming saturated, it may indicate that the fleet needs\nhorizontal or vertical scaling.\n",
+      "horizontallyScalable": true,
+      "raw_query": "1 - avg by (shard) (\n  rate(node_cpu_seconds_total{mode=\"idle\", %(selector)s}[5m])\n)\n",
+      "severity": "s3",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Average Service CPU Utilization"
+    },
+    "disk_inodes": {
+      "appliesTo": [
+        "gitaly",
+        "consul",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Disk inode utilization per device per node.\n\nIf this is too high, its possible that a directory is filling up with\nfiles. Consider logging in an checking temp directories for large numbers\nof files\n",
+      "horizontallyScalable": true,
+      "raw_query": "1 - (\n  node_filesystem_files_free{fstype=~\"(ext.|xfs)\", %(selector)s}\n  /\n  node_filesystem_files{fstype=~\"(ext.|xfs)\", %(selector)s}\n)\n",
+      "severity": "s2",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.8,
+        "soft": 0.75
+      },
+      "title": "Disk inode Utilization per Device per Node"
+    },
+    "disk_space": {
+      "appliesTo": [
+        "gitaly",
+        "consul",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Disk space utilization per device per node.\n",
+      "horizontallyScalable": true,
+      "raw_query": "(\n  1 - node_filesystem_avail_bytes{fstype=~\"ext.|xfs\", %(selector)s} / node_filesystem_size_bytes{fstype=~\"ext.|xfs\", %(selector)s}\n)\n",
+      "severity": "s2",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.85
+      },
+      "title": "Disk Space Utilization per Device per Node"
+    },
+    "excluded_sidekiq_kube_container_rss_request": {
+      "appliesTo": [
+        "sidekiq"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "Records the total anonymous (unevictable) memory utilization for containers for this\nservice, as a percentage of the memory request as configured through Kubernetes.\n\nThis is computed using the container's resident set size (RSS), as opposed to\nkube_container_memory which uses the working set size. For our purposes, RSS is the\nbetter metric as cAdvisor's working set calculation includes pages from the\nfilesystem cache that can (and will) be evicted before the OOM killer kills the\ncgroup.\n\nA container's RSS (anonymous memory usage) is still not precisely what the OOM\nkiller will use, but it's a better approximation of what the container's workload is\nactually using. RSS metrics can, however, be dramatically inflated if a process in\nthe container uses MADV_FREE (lazy-free) memory. RSS will include the memory that is\navailable to be reclaimed without a page fault, but not currently in use.\n\nThe most common case of OOM kills is for anonymous memory demand to overwhelm the\ncontainer's memory request. On swapless hosts, anonymous memory cannot be evicted from\nthe page cache, so when a container's memory usage is mostly anonymous pages, the\nonly remaining option to relieve memory pressure may be the OOM killer.\n\nAs container RSS approaches container memory request, OOM kills become much more\nlikely. Consequently, this ratio is a good leading indicator of memory saturation\nand OOM risk.\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  container_memory_rss:labeled{container!=\"\", container!=\"POD\", shard=\"gitaly-throttled\", %(selector)s}\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_rss_request([.].*|$)\", %(selector)s}\n  )\n)\n/ on(container,deployment,pod) group_left()\nmax by(container,deployment,pod) (\n  kube_pod_container_resource_requests:labeled{container!=\"\", resource=\"memory\", shard=\"gitaly-throttled\", %(selector)s} \u003e 0\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Excluded Sidekiq Kube Container Memory Utilization (RSS)"
+    },
+    "go_goroutines": {
+      "appliesTo": [
+        "gitaly",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Go goroutines utilization per node.\n\nGoroutines leaks can cause memory saturation which can cause service degradation.\n\nA limit of 250k goroutines is very generous, so if a service exceeds this limit,\nit's a sign of a leak and it should be dealt with.\n",
+      "horizontallyScalable": true,
+      "raw_query": "sum by (fqdn,instance,region) (\n  go_goroutines{%(selector)s}\n)\n/\n250000\n",
+      "severity": "s2",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.98,
+        "soft": 0.9
+      },
+      "title": "Go goroutines Utilization per Node"
+    },
+    "go_memory": {
+      "appliesTo": [
+        "gitaly",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Go's memory allocation strategy can make it look like a Go process is saturating memory when measured using RSS, when in fact\nthe process is not at risk of memory saturation. For this reason, we measure Go processes using the `go_memstat_alloc_bytes`\n",
+      "horizontallyScalable": true,
+      "raw_query": "max by (fqdn) (\n  go_memstats_alloc_bytes{%(selector)s}\n)\n/\nsum by (fqdn) (\n  node_memory_MemTotal_bytes{%(selector)s}\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.98,
+        "soft": 0.9
+      },
+      "title": "Go Memory Utilization per Node"
+    },
+    "kube_container_cpu_limit": {
+      "appliesTo": [
+        "consul",
+        "gitlab-shell",
+        "nginx",
+        "registry",
+        "sidekiq",
+        "webservice"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "Kubernetes containers can have a limit configured on how much CPU they can consume in\na burst. If we are at this limit, exceeding the allocated requested resources, we\nshould consider revisting the container's HPA configuration.\n\nWhen a container is utilizing CPU resources up-to it's configured limit for\nextended periods of time, this could cause it and other running containers to be\nthrottled.\n",
+      "horizontallyScalable": true,
+      "raw_query": "sum by (container,pod) (\n  rate(container_cpu_usage_seconds_total:labeled{container!=\"\", container!=\"POD\", %(selector)s}[5m])\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_cpu_limit([.].*|$)\", %(selector)s}\n  )\n)\n/\nsum by(container,pod) (\n  container_spec_cpu_quota:labeled{container!=\"\", container!=\"POD\", %(selector)s}\n  /\n  container_spec_cpu_period:labeled{container!=\"\", container!=\"POD\", %(selector)s}\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.99,
+        "soft": 0.9
+      },
+      "title": "Kube Container CPU over-utilization"
+    },
+    "kube_container_memory_limit": {
+      "appliesTo": [
+        "consul",
+        "gitlab-shell",
+        "registry"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "This uses the working set size from cAdvisor for the cgroup's memory usage. That may\nnot be a good measure as it includes filesystem cache pages that are not necessarily\nattributable to the application inside the cgroup, and are permitted to be evicted\ninstead of being OOM killed.\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  container_memory_working_set_bytes:labeled{container!=\"\", container!=\"POD\", %(selector)s}\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_memory_limit([.].*|$)\", %(selector)s}\n  )\n)\n/ on(container,deployment,pod) group_left()\nmax by(container,deployment,pod) (\n  kube_pod_container_resource_limits:labeled{container!=\"\", resource=\"memory\", %(selector)s} \u003e 0\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Kube Container Memory Over-Utilization"
+    },
+    "kube_container_memory_request": {
+      "appliesTo": [
+        "consul",
+        "gitlab-shell",
+        "registry",
+        "sidekiq"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "saturation_dimension_dynamic_lookup_limit": 100,
+        "saturation_dimension_dynamic_lookup_query": "count by(deployment) (\n  last_over_time(container_memory_working_set_bytes:labeled{deployment!=\"\", %(selector)s}[1w:1d] @ end())\n)\n",
+        "strategy": "quantile99_1h"
+      },
+      "description": "This uses the working set size from cAdvisor for the cgroup's memory usage. That may\nnot be a good measure as it includes filesystem cache pages that are not necessarily\nattributable to the application inside the cgroup, and are permitted to be evicted\ninstead of being OOM killed.\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  container_memory_working_set_bytes:labeled{container!=\"\", container!=\"POD\", %(selector)s}\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_memory_request([.].*|$)\", %(selector)s}\n  )\n)\n/ on(container,deployment,pod) group_left()\nmax by(container,deployment,pod) (\n  kube_pod_container_resource_requests:labeled{container!=\"\", resource=\"memory\", %(selector)s} \u003e 0\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Kube Container Memory Utilization"
+    },
+    "kube_container_rss_limit": {
+      "appliesTo": [
+        "nginx",
+        "sidekiq",
+        "webservice"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "Records the total anonymous (unevictable) memory utilization for containers for this\nservice, as a percentage of the memory limit as configured through Kubernetes.\n\nThis is computed using the container's resident set size (RSS), as opposed to\nkube_container_memory which uses the working set size. For our purposes, RSS is the\nbetter metric as cAdvisor's working set calculation includes pages from the\nfilesystem cache that can (and will) be evicted before the OOM killer kills the\ncgroup.\n\nA container's RSS (anonymous memory usage) is still not precisely what the OOM\nkiller will use, but it's a better approximation of what the container's workload is\nactually using. RSS metrics can, however, be dramatically inflated if a process in\nthe container uses MADV_FREE (lazy-free) memory. RSS will include the memory that is\navailable to be reclaimed without a page fault, but not currently in use.\n\nThe most common case of OOM kills is for anonymous memory demand to overwhelm the\ncontainer's memory limit. On swapless hosts, anonymous memory cannot be evicted from\nthe page cache, so when a container's memory usage is mostly anonymous pages, the\nonly remaining option to relieve memory pressure may be the OOM killer.\n\nAs container RSS goes over the container memory request and approaches\ncontainer memory limit, OOM kills become much more likely. Consequently,\nthis ratio is a good leading indicator of memory saturation and OOM risk.\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  container_memory_rss:labeled{container!=\"\", container!=\"POD\", %(selector)s}\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_rss_limit([.].*|$)\", %(selector)s}\n  )\n)\n/ on(container,deployment,pod) group_left()\nmax by(container,deployment,pod) (\n  kube_pod_container_resource_limits:labeled{container!=\"\", resource=\"memory\", %(selector)s} \u003e 0\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Kube Container Memory Over-Utilization (RSS)"
+    },
+    "kube_container_rss_request": {
+      "appliesTo": [
+        "nginx",
+        "webservice"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "saturation_dimension_dynamic_lookup_limit": 100,
+        "saturation_dimension_dynamic_lookup_query": "count by(deployment) (\n  last_over_time(container_memory_rss:labeled{deployment!=\"\", %(selector)s}[1w:1d] @ end())\n)\n",
+        "strategy": "quantile99_1h"
+      },
+      "description": "Records the total anonymous (unevictable) memory utilization for containers for this\nservice, as a percentage of the memory request as configured through Kubernetes.\n\nThis is computed using the container's resident set size (RSS), as opposed to\nkube_container_memory which uses the working set size. For our purposes, RSS is the\nbetter metric as cAdvisor's working set calculation includes pages from the\nfilesystem cache that can (and will) be evicted before the OOM killer kills the\ncgroup.\n\nA container's RSS (anonymous memory usage) is still not precisely what the OOM\nkiller will use, but it's a better approximation of what the container's workload is\nactually using. RSS metrics can, however, be dramatically inflated if a process in\nthe container uses MADV_FREE (lazy-free) memory. RSS will include the memory that is\navailable to be reclaimed without a page fault, but not currently in use.\n\nThe most common case of OOM kills is for anonymous memory demand to overwhelm the\ncontainer's memory request. On swapless hosts, anonymous memory cannot be evicted from\nthe page cache, so when a container's memory usage is mostly anonymous pages, the\nonly remaining option to relieve memory pressure may be the OOM killer.\n\nAs container RSS approaches container memory request, OOM kills become much more\nlikely. Consequently, this ratio is a good leading indicator of memory saturation\nand OOM risk.\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  container_memory_rss:labeled{container!=\"\", container!=\"POD\", %(selector)s}\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_rss_request([.].*|$)\", %(selector)s}\n  )\n)\n/ on(container,deployment,pod) group_left()\nmax by(container,deployment,pod) (\n  kube_pod_container_resource_requests:labeled{container!=\"\", resource=\"memory\", %(selector)s} \u003e 0\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Kube Container Memory Utilization (RSS)"
+    },
+    "kube_persistent_volume_claim_disk_space": {
+      "appliesTo": [
+        "kube"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "saturation_dimensions": [
+          {
+            "label": "zoekt",
+            "selector": "persistentvolumeclaim=~\"zoekt-.*\""
+          },
+          {
+            "label": "rest-aggregated",
+            "selector": "persistentvolumeclaim!~\"zoekt-.*\""
+          }
+        ],
+        "saturation_dimensions_keep_aggregate": false,
+        "strategy": "quantile95_1h"
+      },
+      "description": "disk space utilization on persistent volume claims.\n",
+      "horizontallyScalable": true,
+      "raw_query": "kubelet_volume_stats_used_bytes\n/\nkubelet_volume_stats_capacity_bytes\n",
+      "severity": "s2",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.9,
+        "soft": 0.85
+      },
+      "title": "Kube Persistent Volume Claim Space Utilisation"
+    },
+    "kube_persistent_volume_claim_inodes": {
+      "appliesTo": [
+        "kube"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "inode utilization on persistent volume claims.\n",
+      "horizontallyScalable": true,
+      "raw_query": "kubelet_volume_stats_inodes_used\n/\nkubelet_volume_stats_inodes\n",
+      "severity": "s2",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.9,
+        "soft": 0.85
+      },
+      "title": "Kube Persistent Volume Claim inode Utilisation"
+    },
+    "memory": {
+      "appliesTo": [
+        "gitaly",
+        "consul",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Memory utilization per device per node.\n",
+      "horizontallyScalable": true,
+      "raw_query": "instance:node_memory_utilization:ratio{%(selector)s} or instance:node_memory_utilisation:ratio{%(selector)s}\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.98,
+        "soft": 0.9
+      },
+      "title": "Memory Utilization per Node"
+    },
+    "memory_redis_cache": {
+      "appliesTo": [
+        "redis-cluster-cache"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "Memory utilization per device per node.\n\n\nredis-cluster-cache has a separate saturation point for this to exclude it from capacity planning calculations.\n",
+      "horizontallyScalable": true,
+      "raw_query": "instance:node_memory_utilization:ratio{%(selector)s} or instance:node_memory_utilisation:ratio{%(selector)s}\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.98,
+        "soft": 0.9
+      },
+      "title": "Memory Utilization per Node"
+    },
+    "node_group_cpu": {
+      "appliesTo": [
+        "kube"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "This resource measures average CPU utilization across an all cores in a node group\n\nIf it is becoming saturated, it may indicate that the node group needs resizing.\n",
+      "horizontallyScalable": true,
+      "raw_query": "1 - avg by () (\n  rate(node_cpu_seconds_total{mode=\"idle\", type=~\".*pool\"}[5m])\n)\n",
+      "severity": "s3",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Average Node Pool CPU Utilization"
+    },
+    "node_schedstat_waiting": {
+      "appliesTo": [
+        "consul",
+        "gitaly",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "Measures the amount of scheduler waiting time that processes are waiting\nto be scheduled, according to [`CPU Scheduling Metrics`](https://www.robustperception.io/cpu-scheduling-metrics-from-the-node-exporter).\n\nA high value indicates that a node has more processes to be run than CPU time available\nto handle them, and may lead to degraded responsiveness and performance from the application.\n\nAdditionally, it may indicate that the fleet is under-provisioned.\n",
+      "horizontallyScalable": true,
+      "raw_query": "avg without (cpu) (rate(node_schedstat_waiting_seconds_total{%(selector)s}[1h]))\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "90m",
+        "hard": 0.15,
+        "soft": 0.1
+      },
+      "title": "Node Scheduler Waiting Time"
+    },
+    "opensearch_cpu": {
+      "appliesTo": [
+        "logging"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Average CPU utilization.\n\nThis resource measures the CPU utilization for the selected cluster or domain. If it is becoming saturated, it may indicate that the fleet needs horizontal or\nvertical scaling. The metrics are coming from cloudwatch_exporter.\n",
+      "horizontallyScalable": true,
+      "raw_query": "avg_over_time(aws_es_cpuutilization_average[5m])/100\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.8,
+        "soft": 0.65
+      },
+      "title": "Average CPU Utilization for Opensearch"
+    },
+    "opensearch_disk_space": {
+      "appliesTo": [
+        "logging"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Disk utilization for Opensearch\n",
+      "horizontallyScalable": true,
+      "raw_query": "aws_es_cluster_used_space_average/(aws_es_free_storage_space_average+aws_es_cluster_used_space_average)\n",
+      "severity": "s3",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.75,
+        "soft": 0.6
+      },
+      "title": "Disk Utilization Overall"
+    },
+    "pg_btree_bloat": {
+      "appliesTo": [],
+      "capacityPlanning": {
+        "changepoints_count": 5,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "This estimates the total bloat in Postgres Btree indexes, as a percentage of total index size.\n\nIMPORTANT: bloat estimates are rough and depending on table/index structure, can be off for individual indexes,\nin some cases significantly (10-50%).\n\nThe larger this measure, the more pages will unnecessarily be retrieved during index scans.\n",
+      "horizontallyScalable": false,
+      "raw_query": "sum by (fqdn) (last_over_time(gitlab_database_bloat_btree_bloat_size{%(selector)s}[1h]))\n/\nsum by (fqdn) (last_over_time(gitlab_database_bloat_btree_real_size{%(selector)s}[1h]))\n",
+      "severity": "s3",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.7,
+        "soft": 0.5
+      },
+      "title": "Postgres btree bloat"
+    },
+    "pg_table_bloat": {
+      "appliesTo": [],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "This measures the total bloat in Postgres Table pages, as a percentage of total size. This includes bloat in TOAST tables,\nand excludes extra space reserved due to fillfactor.\n",
+      "horizontallyScalable": false,
+      "raw_query": "sum by (fqdn) (avg_over_time(gitlab_database_bloat_table_bloat_size{%(selector)s}[58m]))\n/\nsum by (fqdn) (avg_over_time(gitlab_database_bloat_table_real_size{%(selector)s}[58m]))\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.4,
+        "soft": 0.3
+      },
+      "title": "Postgres Table Bloat"
+    },
+    "pg_vacuum_activity": {
+      "appliesTo": [],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "This measures the total saturation of autovacuum workers, as a percentage of total autovacuum capacity.\n",
+      "horizontallyScalable": true,
+      "raw_query": "pg_stat_activity_autovacuum_active{%(selector)s}\n/\npg_settings_autovacuum_max_workers{%(selector)s}\n",
+      "severity": "s3",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.9,
+        "soft": 0.6
+      },
+      "title": "Postgres Autovacuum Activity"
+    },
+    "pg_xid_wraparound": {
+      "appliesTo": [],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Risk of DB shutdown in the near future, approaching transaction ID wraparound.\n\nThis is a critical situation.\n\nThis saturation metric measures how close the database is to Transaction ID wraparound.\n\nWhen wraparound occurs, the database will automatically shutdown to prevent data loss, causing a full outage.\n\nRecovery would require entering single-user mode to run vacuum, taking the site down for a potentially multi-hour maintenance session.\n\nTo avoid reaching the db shutdown threshold, consider the following short-term actions:\n\n1. Escalate to the SRE Datastores team, and then,\n\n2. Find and terminate any very old transactions. The runbook for this alert has details.  Do this first.  It is the most critical step and may be all that is necessary to let autovacuum do its job.\n\n3. Run a manual vacuum on tables with oldest relfrozenxid.  Manual vacuums run faster than autovacuum.\n\n4. Add autovacuum workers or reduce autovacuum cost delay, if autovacuum is chronically unable to keep up with the transaction rate.\n\nLong running transaction dashboard: \u003chttps://dashboards.gitlab.net/d/alerts-long_running_transactions/alerts-long-running-transactions?orgId=1\u003e\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  max (\n    pg_database_wraparound_age_datfrozenxid_seconds{%(selector)s}\n    or\n    pg_database_wraparound_age_datminmxid_seconds{%(selector)s}\n  )\n)\n/\n(2^31 - 3000000)\n",
+      "severity": "s1",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.7,
+        "soft": 0.6
+      },
+      "title": "Transaction ID Wraparound"
+    },
+    "puma_workers": {
+      "appliesTo": [
+        "webservice"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "quantile95_1h"
+      },
+      "description": "Puma thread utilization.\n\nPuma uses a fixed size thread pool to handle HTTP requests. This metric shows how many threads are busy handling requests. When this resource is saturated,\nwe will see puma queuing taking place. Leading to slowdowns across the application.\n\nPuma saturation is usually caused by latency problems in downstream services: usually Gitaly or Postgres, but possibly also Redis.\nPuma saturation can also be caused by traffic spikes.\n",
+      "horizontallyScalable": true,
+      "raw_query": "sum by() (avg_over_time(sum without (pid,worker) (puma_active_connections{%(selector)s})[5m:]))\n/\nsum by() (sum without (pid,worker) (puma_max_threads{pid=\"puma_master\", %(selector)s}))\n",
+      "severity": "s2",
+      "slos": {
+        "alertTriggerDuration": "5m",
+        "hard": 0.9,
+        "soft": 0.85
+      },
+      "title": "Puma Worker Saturation"
+    },
+    "sidekiq_kube_container_rss_request": {
+      "appliesTo": [
+        "sidekiq"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "saturation_dimension_dynamic_lookup_limit": 100,
+        "saturation_dimension_dynamic_lookup_query": "count by(deployment) (\n  last_over_time(container_memory_rss:labeled{deployment!=\"\", shard!~\"gitaly-throttled\", %(selector)s}[1w:1d] @ end())\n)\n",
+        "strategy": "quantile99_1h"
+      },
+      "description": "Records the total anonymous (unevictable) memory utilization for containers for this\nservice, as a percentage of the memory request as configured through Kubernetes.\n\nThis is computed using the container's resident set size (RSS), as opposed to\nkube_container_memory which uses the working set size. For our purposes, RSS is the\nbetter metric as cAdvisor's working set calculation includes pages from the\nfilesystem cache that can (and will) be evicted before the OOM killer kills the\ncgroup.\n\nA container's RSS (anonymous memory usage) is still not precisely what the OOM\nkiller will use, but it's a better approximation of what the container's workload is\nactually using. RSS metrics can, however, be dramatically inflated if a process in\nthe container uses MADV_FREE (lazy-free) memory. RSS will include the memory that is\navailable to be reclaimed without a page fault, but not currently in use.\n\nThe most common case of OOM kills is for anonymous memory demand to overwhelm the\ncontainer's memory request. On swapless hosts, anonymous memory cannot be evicted from\nthe page cache, so when a container's memory usage is mostly anonymous pages, the\nonly remaining option to relieve memory pressure may be the OOM killer.\n\nAs container RSS approaches container memory request, OOM kills become much more\nlikely. Consequently, this ratio is a good leading indicator of memory saturation\nand OOM risk.\n",
+      "horizontallyScalable": false,
+      "raw_query": "(\n  container_memory_rss:labeled{container!=\"\", container!=\"POD\", shard!~\"gitaly-throttled\", %(selector)s}\n  unless on(pod) (\n    kube_pod_labels:labeled{label_gitlab_com_exclude_saturation_point=~\"(^|.*[.])kube_container_rss_request([.].*|$)\", %(selector)s}\n  )\n)\n/ on(container,deployment,pod) group_left()\nmax by(container,deployment,pod) (\n  kube_pod_container_resource_requests:labeled{container!=\"\", resource=\"memory\", shard!~\"gitaly-throttled\", %(selector)s} \u003e 0\n)\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "15m",
+        "hard": 0.9,
+        "soft": 0.8
+      },
+      "title": "Sidekiq Kube Container Memory Utilization (RSS)"
+    },
+    "single_node_cpu": {
+      "appliesTo": [
+        "gitaly",
+        "consul",
+        "praefect",
+        "secrets-manager"
+      ],
+      "capacityPlanning": {
+        "changepoints_count": 25,
+        "forecast_days": 90,
+        "historical_days": 400,
+        "strategy": "exclude"
+      },
+      "description": "Average CPU utilization per Node.\n\nIf average CPU is saturated, it may indicate that a fleet is in need to horizontal or vertical scaling. It may also indicate\nimbalances in load in a fleet.\n",
+      "horizontallyScalable": true,
+      "raw_query": "avg without(cpu, mode) (1 - rate(node_cpu_seconds_total{mode=\"idle\", %(selector)s}[5m]))\n",
+      "severity": "s4",
+      "slos": {
+        "alertTriggerDuration": "10m",
+        "hard": 0.95,
+        "soft": 0.9
+      },
+      "title": "Average CPU Utilization per Node"
+    }
+  },
+  "services": {
+    "consul": {
+      "capacityPlanning": {},
+      "name": "consul",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "gitaly": {
+      "capacityPlanning": {},
+      "name": "gitaly",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "gitlab-shell": {
+      "capacityPlanning": {},
+      "name": "gitlab-shell",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "kube": {
+      "capacityPlanning": {},
+      "name": "kube",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "logging": {
+      "capacityPlanning": {},
+      "name": "logging",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "nginx": {
+      "capacityPlanning": {},
+      "name": "nginx",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "praefect": {
+      "capacityPlanning": {},
+      "name": "praefect",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "redis-cluster-cache": {
+      "capacityPlanning": {},
+      "name": "redis-cluster-cache",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "registry": {
+      "capacityPlanning": {},
+      "name": "registry",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "secrets-manager": {
+      "capacityPlanning": {},
+      "name": "secrets-manager",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "sidekiq": {
+      "capacityPlanning": {},
+      "name": "sidekiq",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    },
+    "webservice": {
+      "capacityPlanning": {},
+      "name": "webservice",
+      "overviewDashboard": {
+        "name": "",
+        "url": ""
+      },
+      "resourceDashboard": {
+        "cpu": {
+          "name": "cpu",
+          "url": ""
+        },
+        "disk_inodes": {
+          "name": "disk_inodes",
+          "url": ""
+        },
+        "disk_space": {
+          "name": "disk_space",
+          "url": ""
+        },
+        "excluded_sidekiq_kube_container_rss_request": {
+          "name": "excluded_sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "go_goroutines": {
+          "name": "go_goroutines",
+          "url": ""
+        },
+        "go_memory": {
+          "name": "go_memory",
+          "url": ""
+        },
+        "kube_container_cpu_limit": {
+          "name": "kube_container_cpu_limit",
+          "url": ""
+        },
+        "kube_container_memory_limit": {
+          "name": "kube_container_memory_limit",
+          "url": ""
+        },
+        "kube_container_memory_request": {
+          "name": "kube_container_memory_request",
+          "url": ""
+        },
+        "kube_container_rss_limit": {
+          "name": "kube_container_rss_limit",
+          "url": ""
+        },
+        "kube_container_rss_request": {
+          "name": "kube_container_rss_request",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_disk_space": {
+          "name": "kube_persistent_volume_claim_disk_space",
+          "url": ""
+        },
+        "kube_persistent_volume_claim_inodes": {
+          "name": "kube_persistent_volume_claim_inodes",
+          "url": ""
+        },
+        "memory": {
+          "name": "memory",
+          "url": ""
+        },
+        "memory_redis_cache": {
+          "name": "memory_redis_cache",
+          "url": ""
+        },
+        "node_group_cpu": {
+          "name": "node_group_cpu",
+          "url": ""
+        },
+        "node_schedstat_waiting": {
+          "name": "node_schedstat_waiting",
+          "url": ""
+        },
+        "opensearch_cpu": {
+          "name": "opensearch_cpu",
+          "url": ""
+        },
+        "opensearch_disk_space": {
+          "name": "opensearch_disk_space",
+          "url": ""
+        },
+        "pg_btree_bloat": {
+          "name": "pg_btree_bloat",
+          "url": ""
+        },
+        "pg_table_bloat": {
+          "name": "pg_table_bloat",
+          "url": ""
+        },
+        "pg_vacuum_activity": {
+          "name": "pg_vacuum_activity",
+          "url": ""
+        },
+        "pg_xid_wraparound": {
+          "name": "pg_xid_wraparound",
+          "url": ""
+        },
+        "puma_workers": {
+          "name": "puma_workers",
+          "url": ""
+        },
+        "sidekiq_kube_container_rss_request": {
+          "name": "sidekiq_kube_container_rss_request",
+          "url": ""
+        },
+        "single_node_cpu": {
+          "name": "single_node_cpu",
+          "url": ""
+        }
+      }
+    }
+  },
+  "teams": []
+}

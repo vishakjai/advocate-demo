@@ -1,0 +1,18 @@
+groups:
+  - name: "Custom Websocket Alerts"
+    rules:
+      - alert: websocket_slow_broken_upgrades
+        for: 10m
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gstg
+          description: |
+            A large increase in workhorse request durations can indicate that websocket requests are not being
+            upgraded.
+          runbook: websockets/slow-broken-upgrades/
+          title: Websocket Upgrades may be slow
+        labels:
+          severity: s3
+          alert_type: symptom
+        expr: |
+          quantile(0.95, (rate(gitlab_workhorse_http_request_duration_seconds_bucket{deployment='websockets', env="gstg", route='^/-/cable\\z'}[10m])))
+          by (env, cluster) > 10

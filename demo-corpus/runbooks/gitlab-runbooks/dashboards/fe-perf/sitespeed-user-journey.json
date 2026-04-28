@@ -1,0 +1,849 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "target": {
+            "limit": 100,
+            "matchAny": false,
+            "tags": [],
+            "type": "dashboard"
+          },
+          "type": "dashboard"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "enable": true,
+          "hide": false,
+          "iconColor": "green",
+          "name": "Go to result",
+          "tags": "$base $path $group $page $browser $connectivity $testname $journey"
+        }
+      ]
+    },
+    "description": "Dashboards for monitoring User Journey metrics that are reported by our Sitespeed setup.",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+      {
+        "fieldConfig": {
+          "defaults": {},
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 278,
+        "options": {
+          "code": {
+            "language": "plaintext",
+            "showLineNumbers": false,
+            "showMiniMap": false
+          },
+          "content": "<div style=\"display:flex; flex-direction:column; gap:8px; padding:6px 2px; font-family:Inter,-apple-system,sans-serif;\">\n\n  <div style=\"display:flex; align-items:center; gap:8px; flex-wrap:wrap;\">\n    <span style=\"font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#8a8a8a; display:inline-block; width:82px;\">Resources</span>\n    <a href=\"https://sitespeed.runway.gitlab.net/search/\" target=\"_blank\"\n       style=\"display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:3px 9px; border-radius:4px; border:1px solid #3a3a3a; background:#1f1f2e; color:#c8d0e0; text-decoration:none; font-size:12px; width:185px;\">\n      📊 Sitespeed Results\n    </a>\n    <a href=\"https://gitlab.com/gitlab-org/frontend/sitespeed-measurement-setup/-/tree/master/gitlab/desktop/workflows?ref_type=heads\" target=\"_blank\"\n       style=\"display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:3px 9px; border-radius:4px; border:1px solid #3a3a3a; background:#1f1f2e; color:#c8d0e0; text-decoration:none; font-size:12px; width:185px;\">\n      📁 Measurement Project\n    </a>\n    <a href=\"https://gitlab.com/gitlab-org/frontend/sitespeed-measurement-setup/-/work_items/23\" target=\"_blank\"\n       style=\"display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:3px 9px; border-radius:4px; border:1px solid #3a3a3a; background:#1f1f2e; color:#c8d0e0; text-decoration:none; font-size:12px; width:185px;\">\n      📝 Share Feedback\n    </a>\n  </div>\n\n  <div style=\"display:flex; align-items:center; gap:8px; flex-wrap:wrap;\">\n    <span style=\"font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#8a8a8a; display:inline-block; width:82px;\">Dashboards</span>\n    <a href=\"https://dashboards.gitlab.net/d/fe-perf-sitespeed-page-metrics/fe-perf3a-sitespeed-page-metrics?var-function=median&orgId=1&from=now-7d&to=now&timezone=browser&var-path=desktop&var-testname=gitlab&var-group=gitlab_com&var-page=SourceCode_Blob_Large&var-browser=chrome&var-connectivity=cable\" target=\"_blank\"\n       style=\"display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:3px 9px; border-radius:4px; border:1px solid #3a3a3a; background:#1f1f2e; color:#c8d0e0; text-decoration:none; font-size:12px; width:185px;\">\n      📈 Page Summary\n    </a>\n    <a href=\"https://dashboards.gitlab.net/d/fe-perf-sitespeed-user-timings/fe-perf3a-sitespeed-user-timings?var-function=median&orgId=1&from=now-7d&to=now&timezone=browser&var-path=desktop&var-testname=gitlab&var-group=staging_gitlab_com&var-page=SourceCode_Commit_Rapid_Diffs_Disabled&var-browser=chrome&var-connectivity=cable\" target=\"_blank\"\n       style=\"display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:3px 9px; border-radius:4px; border:1px solid #3a3a3a; background:#1f1f2e; color:#c8d0e0; text-decoration:none; font-size:12px; width:185px;\">\n      ⏱️ User Timings\n    </a>\n  </div>\n\n</div>",
+          "mode": "html"
+        },
+        "pluginVersion": "12.4.0",
+        "title": "",
+        "transparent": true,
+        "type": "text"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 3
+        },
+        "id": 273,
+        "panels": [],
+        "title": "Stopwatch timings",
+        "type": "row"
+      },
+      {
+        "description": "Use the View dropdown above to switch between Delta and Cumulative timings.",
+        "fieldConfig": {
+          "defaults": {},
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 24,
+          "x": 0,
+          "y": 4
+        },
+        "id": 269,
+        "options": {
+          "code": {
+            "language": "plaintext",
+            "showLineNumbers": false,
+            "showMiniMap": false
+          },
+          "content": "**You're currently viewing ${view:text} timings**\n\n| View | Description | Best used for |\n|------|-------------|---------------|\n| **Cumulative** | Total elapsed time from journey start to each step | Understanding the full end-to-end user experience timeline |\n| **Delta** | Time taken for each individual step in isolation | Identifying which specific steps are slow and need optimization |\n",
+          "mode": "markdown"
+        },
+        "pluginVersion": "12.4.0",
+        "title": "",
+        "transparent": true,
+        "type": "text"
+      },
+      {
+        "datasource": {
+          "type": "graphite",
+          "uid": "P5B95A3EF3B49B188"
+        },
+        "description": "Stopwatch timings that are collected in our user journey scrips.",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "showValues": false,
+              "spanNulls": true,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "ms"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 14,
+          "w": 24,
+          "x": 0,
+          "y": 9
+        },
+        "id": 266,
+        "options": {
+          "legend": {
+            "calcs": [
+              "mean",
+              "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "right",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "desc"
+          }
+        },
+        "pluginVersion": "12.4.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "graphite",
+              "uid": "P5B95A3EF3B49B188"
+            },
+            "refCount": 0,
+            "refId": "F",
+            "target": "grep(sortByName(grep(aliasByNode(interpolate(sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.extras.*.$function, inf), 11), '^(?!.*_delta)'), false, true), '$view')"
+          },
+          {
+            "datasource": {
+              "type": "graphite",
+              "uid": "P5B95A3EF3B49B188"
+            },
+            "refCount": 0,
+            "refId": "A",
+            "target": "grep(sortByName(grep(aliasByNode(interpolate(sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.extras.*.$function, inf), 11), '^[0-9]+_.*_delta'), false, false), '$view')"
+          }
+        ],
+        "title": "$journey - Stopwatch Timings",
+        "transformations": [
+          {
+            "id": "renameByRegex",
+            "options": {
+              "regex": "^[0-9]+_(.*)_delta$",
+              "renamePattern": "$1"
+            }
+          }
+        ],
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "graphite",
+          "uid": "P5B95A3EF3B49B188"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "green",
+              "mode": "palette-classic"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "ms"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 24,
+          "x": 0,
+          "y": 23
+        },
+        "id": 268,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "vertical",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {},
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "12.4.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "graphite",
+              "uid": "P5B95A3EF3B49B188"
+            },
+            "refCount": 0,
+            "refId": "A",
+            "target": "grep(sortBy(grep(aliasByNode(interpolate(sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.extras.*.$function, inf), 11), '^(?!.*_delta)'), 'max', false), '$view')"
+          },
+          {
+            "datasource": {
+              "type": "graphite",
+              "uid": "P5B95A3EF3B49B188"
+            },
+            "refCount": 0,
+            "refId": "B",
+            "target": "grep(sortByName(grep(aliasByNode(interpolate(sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.extras.*.$function, inf), 11), '^[0-9]+_.*_delta$')), '$view')"
+          }
+        ],
+        "title": "$journey - Stopwatch Timings (last run)",
+        "transformations": [
+          {
+            "id": "renameByRegex",
+            "options": {
+              "regex": "^([0-9]+)_(.*)_delta$",
+              "renamePattern": "$1 | $2"
+            }
+          }
+        ],
+        "type": "stat"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 29
+        },
+        "id": 274,
+        "panels": [],
+        "title": "User timing marks/measures",
+        "type": "row"
+      },
+      {
+        "fieldConfig": {
+          "defaults": {},
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 30
+        },
+        "id": 277,
+        "options": {
+          "code": {
+            "language": "plaintext",
+            "showLineNumbers": false,
+            "showMiniMap": false
+          },
+          "content": "",
+          "mode": "markdown"
+        },
+        "pluginVersion": "12.4.0",
+        "title": "ℹ️ Performance marks and measures emitted by GitLab's frontend via the browser's User Timing API. ",
+        "transparent": true,
+        "type": "text"
+      },
+      {
+        "datasource": {
+          "type": "graphite",
+          "uid": "P5B95A3EF3B49B188"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "always",
+              "showValues": false,
+              "spanNulls": true,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "ms"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 31
+        },
+        "id": 271,
+        "options": {
+          "legend": {
+            "calcs": [
+              "mean",
+              "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "right",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "12.4.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "graphite",
+              "uid": "P5B95A3EF3B49B188"
+            },
+            "refCount": 0,
+            "refId": "A",
+            "target": "aliasByNode(sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.timings.userTimings.marks.*.$function, 13)"
+          }
+        ],
+        "title": "User Timing Marks",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "graphite",
+          "uid": "P5B95A3EF3B49B188"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "always",
+              "showValues": false,
+              "spanNulls": true,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "ms"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 39
+        },
+        "id": 272,
+        "options": {
+          "legend": {
+            "calcs": [
+              "mean",
+              "lastNotNull"
+            ],
+            "displayMode": "table",
+            "placement": "right",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "12.4.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "graphite",
+              "uid": "P5B95A3EF3B49B188"
+            },
+            "refCount": 0,
+            "refId": "A",
+            "target": "aliasByNode(sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.timings.userTimings.measures.*.$function, 13)"
+          }
+        ],
+        "title": "User Timing Measures",
+        "type": "timeseries"
+      },
+      {
+        "collapsed": true,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 47
+        },
+        "id": 275,
+        "panels": [
+          {
+            "fieldConfig": {
+              "defaults": {},
+              "overrides": []
+            },
+            "gridPos": {
+              "h": 26,
+              "w": 24,
+              "x": 0,
+              "y": 68
+            },
+            "id": 270,
+            "options": {
+              "code": {
+                "language": "plaintext",
+                "showLineNumbers": false,
+                "showMiniMap": false
+              },
+              "content": "<video width=\"100%\" controls src=\"https://storage.googleapis.com/sitespeed-results-production/gitlab-workflows/${group}.${journey}.chrome.cable.mp4\"></video>",
+              "mode": "html"
+            },
+            "pluginVersion": "12.4.0",
+            "title": "",
+            "type": "text"
+          }
+        ],
+        "title": "🎥 Last Run Recording",
+        "type": "row"
+      }
+    ],
+    "preload": false,
+    "refresh": "",
+    "schemaVersion": 42,
+    "tags": [
+      "unmanaged"
+    ],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "text": "sitespeed_io",
+            "value": "sitespeed_io"
+          },
+          "hide": 2,
+          "label": "sitespeed_io",
+          "name": "base",
+          "query": "sitespeed_io",
+          "skipUrlSync": true,
+          "type": "constant"
+        },
+        {
+          "current": {
+            "text": "desktop",
+            "value": "desktop"
+          },
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "definition": "$base.*",
+          "hide": 2,
+          "includeAll": false,
+          "name": "path",
+          "options": [],
+          "query": "$base.*",
+          "refresh": 1,
+          "regex": "",
+          "regexApplyTo": "value",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "gitlab-workflows",
+            "value": "gitlab-workflows"
+          },
+          "hide": 2,
+          "name": "testname",
+          "query": "gitlab-workflows",
+          "skipUrlSync": true,
+          "type": "constant"
+        },
+        {
+          "current": {
+            "text": "gitlab_com",
+            "value": "gitlab_com"
+          },
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "definition": "$base.$path.$testname.pageSummary.*",
+          "includeAll": false,
+          "name": "group",
+          "options": [],
+          "query": "$base.$path.$testname.pageSummary.*",
+          "refresh": 1,
+          "regex": "",
+          "regexApplyTo": "value",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "RepoJourneyLarge",
+            "value": "RepoJourneyLarge"
+          },
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "definition": "$base.$path.$testname.pageSummary.$group.*",
+          "includeAll": false,
+          "name": "journey",
+          "options": [],
+          "query": "$base.$path.$testname.pageSummary.$group.*",
+          "refresh": 1,
+          "regex": "",
+          "regexApplyTo": "value",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "chrome",
+            "value": "chrome"
+          },
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "definition": "$base.$path.$testname.pageSummary.$group.$journey.*",
+          "hide": 2,
+          "includeAll": false,
+          "name": "browser",
+          "options": [],
+          "query": "$base.$path.$testname.pageSummary.$group.$journey.*",
+          "refresh": 1,
+          "regex": "",
+          "regexApplyTo": "value",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "cable",
+            "value": "cable"
+          },
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "definition": "$base.$path.$testname.pageSummary.$group.$journey.$browser.*",
+          "hide": 2,
+          "includeAll": false,
+          "name": "connectivity",
+          "options": [],
+          "query": "$base.$path.$testname.pageSummary.$group.$journey.$browser.*",
+          "refresh": 1,
+          "regex": "",
+          "regexApplyTo": "value",
+          "type": "query"
+        },
+        {
+          "auto": false,
+          "auto_count": 30,
+          "auto_min": "10s",
+          "current": {
+            "text": "median",
+            "value": "median"
+          },
+          "name": "function",
+          "options": [
+            {
+              "selected": false,
+              "text": "min",
+              "value": "min"
+            },
+            {
+              "selected": false,
+              "text": "mean",
+              "value": "mean"
+            },
+            {
+              "selected": true,
+              "text": "median",
+              "value": "median"
+            },
+            {
+              "selected": false,
+              "text": "p90",
+              "value": "p90"
+            },
+            {
+              "selected": false,
+              "text": "max",
+              "value": "max"
+            },
+            {
+              "selected": false,
+              "text": "stddev",
+              "value": "stddev"
+            }
+          ],
+          "query": "min,mean,median,p90,max,stddev",
+          "refresh": 2,
+          "type": "interval"
+        },
+        {
+          "current": {
+            "text": "https://storage.googleapis.com/sitespeed-results-gitlab",
+            "value": "https://storage.googleapis.com/sitespeed-results-gitlab"
+          },
+          "hide": 2,
+          "name": "resulturl",
+          "query": "https://storage.googleapis.com/sitespeed-results-gitlab",
+          "skipUrlSync": true,
+          "type": "constant"
+        },
+        {
+          "current": {
+            "text": "jpg",
+            "value": "jpg"
+          },
+          "hide": 2,
+          "name": "screenshottype",
+          "query": "jpg",
+          "skipUrlSync": true,
+          "type": "constant"
+        },
+        {
+          "current": {
+            "text": "All",
+            "value": [
+              "$__all"
+            ]
+          },
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "definition": "sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.extras.*",
+          "hide": 2,
+          "includeAll": true,
+          "multi": true,
+          "name": "timings",
+          "options": [],
+          "query": "sitespeed_io.$path.$testname.pageSummary.gitlab_com.$journey.$browser.$connectivity.browsertime.statistics.extras.*",
+          "refresh": 1,
+          "regex": "/^([0-9]+_.*|(?!.*_delta).*)$/",
+          "regexApplyTo": "value",
+          "sort": 1,
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "^(?!.*_delta)",
+            "value": "^(?!.*_delta)"
+          },
+          "description": "Switch between cumulative stopwatch timings and per-step delta durations",
+          "label": "View",
+          "name": "view",
+          "options": [],
+          "query": "Cumulative : ^(?!.*_delta),Delta : ^[0-9]+_.*_delta",
+          "type": "custom",
+          "valuesFormat": "csv"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-7d",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ]
+    },
+    "timezone": "utc",
+    "title": "fe-perf: Sitespeed - User Journey",
+    "uid": "jegpwkh",
+    "version": 48,
+    "weekStart": ""
+  }

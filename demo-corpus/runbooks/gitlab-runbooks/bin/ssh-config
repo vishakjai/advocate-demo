@@ -1,0 +1,125 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'fileutils'
+require 'json'
+
+opts = {}
+
+allowed_opts = ['--dry-run', '--help', '--user']
+while ARGV.size > 0
+  arg = ARGV.shift
+  unless allowed_opts.include?(arg)
+    warn "glsh: error: unsupported option #{arg}, must be one of #{allowed_opts.join(', ')}"
+    exit 1
+  end
+
+  case arg
+  when '--dry-run'
+    opts[:dry_run] = true
+  when '--user'
+    opts[:user] = ARGV.shift
+  when '--help'
+    opts[:help] = true
+  end
+end
+
+glsh_user_name_path = File.expand_path('~/.ssh/glsh_user_name')
+if File.exist?(glsh_user_name_path) && !opts[:user]
+  cached_user = File.read(glsh_user_name_path).strip
+  if cached_user != ""
+    warn "⚠️ Using cached user name from ~/.ssh/glsh_user_name"
+    opts[:user] = cached_user
+  end
+end
+
+user_config = {}
+user_config['User'] = opts[:user] if opts[:user]
+
+# mappings from env name to project name
+# i.e. from lb-bastion.{env}.gitlab.com to *.c.{project}.internal
+# this is generated from config-mgmt by running:
+#   gcloud projects list --filter="labels.chef_environment:*" --format=json | jq --sort-keys 'reduce .[] as $p ({}; .[$p.labels.chef_environment] |= . + [$p.projectId])' | ruby -rjson -e 'puts JSON.parse(STDIN.read).map { |env, project_ids| matches, rest = project_ids.partition { |project_id| /^gitlab-gitaly-#{env}-.*$/.match(project_id) }; if matches.size > 0; project_ids = rest + ["gitlab-gitaly-#{env}-*"]; end; [env, project_ids] }.to_h.to_json' | jq > .glsh_ssh_config.mappings.json
+env_mappings = JSON.parse(File.read("#{__dir__}/../.glsh_ssh_config.mappings.json"))
+
+configs = {
+  'gprd-console' => {
+    'HostName' => 'console-01-sv-gprd.c.gitlab-production.internal',
+    'ProxyJump' => 'lb-bastion.gprd.gitlab.com'
+  }.merge(user_config),
+  'gstg-console' => {
+    'HostName' => 'console-01-sv-gstg.c.gitlab-staging-1.internal',
+    'ProxyJump' => 'lb-bastion.gstg.gitlab.com'
+  }.merge(user_config),
+  '*.internal *.gitlab.com' => {
+    'ControlMaster' => 'auto',
+    'ControlPath' => '~/.ssh/master-%C',
+    'ControlPersist' => '30m',
+    'ServerAliveInterval' => '30'
+  }.merge(user_config),
+  'haproxy-*.internal' => {
+    'Port' => '2222'
+  }
+}
+
+if opts[:help]
+  warn "Usage: glsh ssh-config [--dry-run] [--help] [--user USER]"
+  warn "  --dry-run - Print the resulting config without making changes"
+  warn "  --user USER - Configure a custom SSH user for all entries"
+  warn "  --help - Display this help message"
+  exit 0
+end
+
+rendered = []
+
+rendered << '# This config is managed by glsh and will be overwritten!'
+rendered << '# To re-generate it, run: glsh ssh-config'
+rendered << ''
+
+configs.each do |host, props|
+  rendered << "Host #{host}"
+  props.each do |key, val|
+    rendered << "  #{key} #{val}"
+  end
+  rendered << ''
+end
+
+env_mappings.each do |env, projects|
+  projects.each do |project|
+    rendered << "Host *.#{project}.internal"
+    rendered << "  ProxyJump lb-bastion.#{env}.gitlab.com"
+    rendered << ''
+  end
+end
+
+if opts[:dry_run]
+  puts rendered.join("\n")
+  exit 0
+end
+
+if File.exist?(glsh_user_name_path) && File.read(glsh_user_name_path).strip != opts[:user].to_s
+  warn "⚠️ Replacing user name in ~/.ssh/glsh_user_name"
+  File.write(glsh_user_name_path, opts[:user].to_s)
+end
+
+File.write(glsh_user_name_path, opts[:user].to_s) if !File.exist?(glsh_user_name_path) && opts[:user]
+
+FileUtils.mkdir_p(File.expand_path('~/.ssh/config.d'))
+File.write(File.expand_path('~/.ssh/config.d/glsh'), rendered.join("\n"))
+
+File.write(glsh_user_name_path, opts[:user].to_s) if opts[:user]
+
+ssh_config_path = File.expand_path('~/.ssh/config')
+existing_config = File.read(ssh_config_path)
+unless existing_config.include?("Include config.d/*\n")
+  if File.exist?("#{ssh_config_path}.bak")
+    warn '🚨 Existing backup file found at ~/.ssh/config.bak, please remove or rename it before running this script again'
+    exit 1
+  end
+
+  warn '⚠️ Backing up existing SSH config to ~/.ssh/config.bak'
+  FileUtils.cp(ssh_config_path, "#{ssh_config_path}.bak")
+  File.write(ssh_config_path, "\nMatch all\n  Include config.d/*\n", mode: 'a')
+end
+
+warn '✅ Config written to ~/.ssh/config.d/glsh'

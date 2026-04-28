@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "coordinator",
+    actual = "//projects/coordinator/src/main/java/org/batfish/coordinator",
+)

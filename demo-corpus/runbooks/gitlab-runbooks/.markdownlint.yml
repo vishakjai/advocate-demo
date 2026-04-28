@@ -1,0 +1,23 @@
+---
+# From https://gitlab.com/gitlab-org/gitlab/-/blob/master/.markdownlint.yml
+header-style:
+  style: "atx"
+line-length: false
+no-inline-html: false
+first-line-h1: false
+emphasis-style: false
+commands-show-output: false
+descriptive-link-text: false
+no-multiple-blanks: false
+
+# TODO:
+code-block-style: false
+fenced-code-language: false
+no-blanks-blockquote: false
+no-space-in-code: false
+ol-prefix: false
+no-empty-links: false
+no-alt-text: false
+no-emphasis-as-heading: false
+single-h1: false
+no-duplicate-heading: false

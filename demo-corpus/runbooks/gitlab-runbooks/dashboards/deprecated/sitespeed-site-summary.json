@@ -1,0 +1,3257 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "#8AB8FF",
+        "limit": 100,
+        "name": "sitespeed.io",
+        "showIn": 0,
+        "tags": [
+          "sitespeed.io"
+        ],
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [
+            "sitespeed.io"
+          ],
+          "type": "tags"
+        },
+        "type": "tags"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1009,
+  "links": [
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "leaderboard"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "page summary"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "page timings"
+      ],
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 73,
+      "panels": [],
+      "title": "Visual Metrics",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The first visual change is when something for the first time is painted within the current viewport. It is calculated by analyzing a video recording of the screen.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "hiddenSeries": false,
+      "id": 75,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "max",
+          "fillBelowTo": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.FirstVisualChange.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.FirstVisualChange.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.FirstVisualChange.min)"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "First Visual Change",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "ms",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The Speed Index is the average time at which visible parts of the page are displayed. It is expressed in milliseconds and dependent on size of the view port. It was created by Pat Meenan and you can checkout the full documentation [here](https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index).",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "hiddenSeries": false,
+      "id": 76,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "max",
+          "fillBelowTo": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.SpeedIndex.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.SpeedIndex.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.SpeedIndex.min)"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Speed Index",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "ms",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The largest image is the time when the largest image within the viewport is painted and on its final position. It is calculated by analyzing a video recording of the screen.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "hiddenSeries": false,
+      "id": 77,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "max",
+          "fillBelowTo": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LargestImage.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LargestImage.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LargestImage.min)"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Largest image",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "ms",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The last visual change is when something for the last time is changing within the current viewport. It is calculated by analyzing a video recording of the screen.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "hiddenSeries": false,
+      "id": 78,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "max",
+          "fillBelowTo": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        },
+        {
+          "alias": "min",
+          "lines": false
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LastVisualChange.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LastVisualChange.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LastVisualChange.min)"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Last Visual Change",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "ms",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 58,
+      "panels": [],
+      "title": "Visual Metrics [$function]",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 3,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "exclude(aliasByNode($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.*.$function, 8), 'videoRecordingStart')",
+          "textEditor": false
+        }
+      ],
+      "title": "Visual Metrics ",
+      "type": "stat"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 68,
+      "panels": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {},
+              "mappings": [],
+              "max": 4000,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "index": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "index": 1,
+                    "value": 1000
+                  },
+                  {
+                    "color": "red",
+                    "index": 2,
+                    "value": 2000
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 0,
+            "y": 33
+          },
+          "id": 70,
+          "options": {
+            "displayMode": "lcd",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "7.0.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "graphite",
+                "uid": "P5B95A3EF3B49B188"
+              },
+              "refId": "A",
+              "target": "aliasByNode(sitespeed_io.$path.pageSummary.$group.*.$browser.$connectivity.browsertime.statistics.visualMetrics.FirstVisualChange.$function, 3, 4)"
+            }
+          ],
+          "title": "First Visual Change",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {},
+              "mappings": [],
+              "max": 4000,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "index": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "index": 1,
+                    "value": 1000
+                  },
+                  {
+                    "color": "red",
+                    "index": 2,
+                    "value": 2000
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 12,
+            "y": 33
+          },
+          "id": 71,
+          "options": {
+            "displayMode": "lcd",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "7.0.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "graphite",
+                "uid": "P5B95A3EF3B49B188"
+              },
+              "refId": "A",
+              "target": "aliasByNode(sitespeed_io.$path.pageSummary.$group.*.$browser.$connectivity.browsertime.statistics.visualMetrics.SpeedIndex.$function, 3, 4)"
+            }
+          ],
+          "title": "Speed Index",
+          "type": "bargauge"
+        }
+      ],
+      "title": "Visual Metrics all pages",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 62,
+      "panels": [],
+      "title": "History Visual Metrics",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The history of First Visual Change (when something for the first time is painted within the current viewport) showing the current median value, the average median per day and the average median per week for all tested pages.",
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "hiddenSeries": false,
+      "id": 45,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.FirstVisualChange.$function, 9)",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "B",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.FirstVisualChange.$function, '24h', 'avg', false), 'Daily')",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "C",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.FirstVisualChange.$function, '7d', 'avg', false), 'Weekly')",
+          "textEditor": false
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": "30d",
+      "timeRegions": [],
+      "title": "History First Visual Change [$function]",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The history of [Speed Index](https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index) showing the current median value, the average median per day and the average median per week for all tested pages.",
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "hiddenSeries": false,
+      "id": 52,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "11.6.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.SpeedIndex.$function, 9)",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "B",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.SpeedIndex.$function, '24h', 'avg', false), 'Daily')",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "C",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.SpeedIndex.$function, '7d', 'avg', false), 'Weekly')",
+          "textEditor": false
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": "30d",
+      "timeRegions": [],
+      "title": "History Speed Index  [$function]",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The history of Visual Complete 85%  (when 85% or more is ready within the current viewport) showing the current median value, the average median per day and the average median per week for all tested pages.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 45
+      },
+      "id": 53,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.VisualComplete85.$function, 9)",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "B",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.VisualComplete85.$function, '24h', 'avg', false), 'Daily')",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "C",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.VisualComplete85.$function, '7d', 'avg', false), 'Weekly')",
+          "textEditor": false
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "History Visual Complete 85%  [$function]",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The history of Last Visual Change (when something for the last time is changing within the current viewport) showing the current median value, the average median per day and the average median per week for all tested pages.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 45
+      },
+      "id": 55,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LastVisualChange.$function, 9)",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "B",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LastVisualChange.$function, '24h', 'avg', false), 'Daily')",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "C",
+          "target": "alias(summarize($base.$path.summary.$group.$browser.$connectivity.browsertime.visualMetrics.LastVisualChange.$function, '7d', 'avg', false), 'Weekly')",
+          "textEditor": false
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "History Last Visual Change [$function]",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 55
+      },
+      "id": 85,
+      "panels": [],
+      "title": "CPU Long Tasks",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The average number of CPU Long Tasks per page. A CPU long Task is by default a CPU task that takes longer than 50 ms to run. This metrics is Chrome only at the moment.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      },
+      "id": 87,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.longTasks.tasks.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.longTasks.tasks.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.longTasks.tasks.min)"
+        }
+      ],
+      "title": "Number of CPU Long Tasks",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 56
+      },
+      "id": 88,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.longTasks.totalDuration.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.longTasks.totalDuration.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.longTasks.totalDuration.min)"
+        }
+      ],
+      "title": "CPU Long Tasks total duration",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 90,
+      "panels": [],
+      "title": "CPU Time Spent",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 66
+      },
+      "id": 91,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.scriptEvaluation.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.scriptEvaluation.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.scriptEvaluation.min)"
+        }
+      ],
+      "title": "Script evaluation",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 66
+      },
+      "id": 93,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.scriptParseCompile.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.scriptParseCompile.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.scriptParseCompile.min)"
+        }
+      ],
+      "title": "Script parse compile",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 76
+      },
+      "id": 94,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.paintCompositeRender.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.paintCompositeRender.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.paintCompositeRender.min)"
+        }
+      ],
+      "title": "Paint composite render",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 76
+      },
+      "id": 92,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.styleLayout.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.styleLayout.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.browsertime.cpu.categories.styleLayout.min)"
+        }
+      ],
+      "title": "Style Layout",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 86
+      },
+      "id": 80,
+      "panels": [],
+      "title": "Technical Metrics",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 87
+      },
+      "id": 82,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.pagexray.requests.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.pagexray.requests.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.pagexray.requests.min)"
+        }
+      ],
+      "title": "Requests",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 87
+      },
+      "id": 83,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.pagexray.transferSize.median)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.pagexray.transferSize.max)"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "aliasByMetric(sitespeed_io.$path.summary.$group.$browser.$connectivity.pagexray.transferSize.min)"
+        }
+      ],
+      "title": "Total page transfer size",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgba(245, 54, 54, 0.9)"
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 80
+              },
+              {
+                "color": "rgba(50, 172, 45, 0.97)",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 97
+      },
+      "id": 6,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.coach.score.$function, 'total')",
+          "textEditor": false
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "B",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.coach.*.score.$function, 7)",
+          "textEditor": false
+        }
+      ],
+      "title": "Coach score [$function]",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 103
+      },
+      "id": 59,
+      "panels": [],
+      "title": "Technical Metrics [$function]",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function total transfer size over the wire (compressed size if your asset is compressed) of all assets on a page.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Total Transfer Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 104
+      },
+      "id": 9,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.transferSize.$function, 'Total Transfer Size')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Total Content Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 104
+      },
+      "id": 95,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.contentSize.$function, 'Total Content Size')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of requests for all the analyzed pages.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Requests",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 8,
+        "y": 104
+      },
+      "id": 11,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.requests.$function, 'Requests')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of JavaScript requests for all the analyzed pages.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "JavaScript Requests",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 12,
+        "y": 104
+      },
+      "id": 15,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.contentTypes.javascript.requests.$function, 'JavaScript Requests')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of CSS requests for all the analyzed pages.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "CSS requests",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 104
+      },
+      "id": 14,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.contentTypes.css.requests.$function, 'CSS Requests')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of image requests for all the analyzed pages.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Image requests",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 104
+      },
+      "id": 16,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.contentTypes.image.requests.$function, 'Image Requests')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The size of the largest image on all the analyzed pages.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Largest Image Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 0,
+        "y": 109
+      },
+      "id": 42,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "firstNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.largestassets.image.0.transferSize, 'Largest Image Size')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function transfer size over the wire of all images on all analyzed page.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Images Transfer Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 4,
+        "y": 109
+      },
+      "id": 13,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.contentTypes.image.contentSize.$function, 'Images Transfer Size')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function transfer size over the wire of all images on all analyzed page.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "JavaScript Transfer Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 8,
+        "y": 109
+      },
+      "id": 96,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.contentTypes.javascript.contentSize.$function, 'JavaScript Transfer Size')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of domains used for all the analyzed pages.",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Domains",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 12,
+        "y": 109
+      },
+      "id": 17,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.domains.$function, 'Domains')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function value for the response expire time of all assets. Compare this with the $function last modified $function value to understand how good you configured the cache settings on your site.",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "displayName": "Response Expire Time",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 16,
+        "y": 109
+      },
+      "id": 18,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.expireStats.$function, 'Response Expire Time')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function value for the last modified time of all assets. Compare this with the $function cache time to know how smart you have configured the cache settings.",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "displayName": "Last Modified Time",
+          "mappings": [
+            {
+              "options": {
+                "-1": {
+                  "text": "N/A"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 20,
+        "y": 109
+      },
+      "id": 19,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.lastModifiedStats.$function, 'Last Modified Time')",
+          "textEditor": false
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 115
+      },
+      "id": 63,
+      "panels": [],
+      "title": "",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "[Navigation Timing API](https://www.w3.org/TR/navigation-timing/) metrics.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 116
+      },
+      "id": 1,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.*.$function, 8)",
+          "textEditor": false
+        }
+      ],
+      "title": "Summary Navigation Timings [$function]",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 127
+      },
+      "id": 64,
+      "panels": [],
+      "title": "",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The max time spent in frontend vs backend time. \n\nThe backend time is the time it takes for the network and the server to generate and start sending the HTML. It is collected using the Navigation Timing API taking the responseStart minus navigationStart.\n\nThe frontend time is the time it takes for the browser to parse and create the page.  It is collected using the Navigation Timing API by taking the loadEventStart minus responseEnd.",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 128
+      },
+      "id": 27,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "B",
+          "target": "alias(asPercent($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.backEndTime.$function, #C), 'Backend')",
+          "targetFull": "alias(asPercent($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.backEndTime.$function, sumSeries($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.backEndTime.median,$base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.frontEndTime.median)), 'Backend')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias(asPercent($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.frontEndTime.$function, #C), 'Frontend')",
+          "targetFull": "alias(asPercent($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.frontEndTime.$function, sumSeries($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.backEndTime.median,$base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.frontEndTime.median)), 'Frontend')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "hide": true,
+          "refId": "C",
+          "target": "sumSeries($base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.backEndTime.$function,$base.$path.summary.$group.$browser.$connectivity.browsertime.pageTimings.frontEndTime.$function)",
+          "textEditor": true
+        }
+      ],
+      "title": "Time spent in backend vs frontend [$function]",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 128
+      },
+      "id": 35,
+      "options": {},
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode($base.$path.summary.$group.$browser.$connectivity.pagexray.responseCodes.*.$function, 8)"
+        }
+      ],
+      "title": "Response codes [$function]",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 140
+      },
+      "id": 65,
+      "panels": [],
+      "title": "1st vs 3rd party (enable by --firstParty REGEX)  [$function]",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function transfer size of all your first party responses.  \n\nThe first party content (content you serve your self ) are defined by the requests that  match the regexp you supply with the parameter *--firstParty*",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "First Party Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 141
+      },
+      "id": 37,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.firstParty.contentSize.$function, 'First Party Size')"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function transfer size of all your third party responses.  \n\nThe third party content (content other companies/organizations serve like advertisement, social media buttons etc) are defined by the requests that doesn't match the regexp you supply with the parameter *--firstParty*",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Third Party Size",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 141
+      },
+      "id": 38,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.thirdParty.contentSize.$function, 'Third Party Size')"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of requests for all your first party responses.  \n\nThe first party content (content you serve your self ) are defined by the requests that match the regexp you supply with the parameter *--firstParty*",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "First Party Requests",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 141
+      },
+      "id": 40,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.firstParty.requests.$function, 'First Party Requests')"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "The $function number of requests for all your third party responses.  \n\nThe third party content (content other companies/organizations serve like advertisement, social media buttons etc) are defined by the requests that doesn't match the regexp you supply with the parameter *--firstParty*",
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Third Party Requests",
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 141
+      },
+      "id": 41,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "firstNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "alias($base.$path.summary.$group.$browser.$connectivity.pagexray.thirdParty.requests.$function, 'Third Party Requests')"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "site summary",
+    "unmanaged"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "sitespeed_io",
+          "value": "sitespeed_io"
+        },
+        "hide": 2,
+        "label": "sitespeed_io",
+        "name": "base",
+        "query": "sitespeed_io",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": "sitespeed",
+        "definition": "",
+        "includeAll": false,
+        "name": "path",
+        "options": [],
+        "query": "$base.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": "sitespeed",
+        "definition": "",
+        "includeAll": false,
+        "label": "domain",
+        "name": "group",
+        "options": [],
+        "query": "$base.$path.summary.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": "sitespeed",
+        "definition": "",
+        "includeAll": false,
+        "name": "browser",
+        "options": [],
+        "query": "$base.$path.summary.$group.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": "sitespeed",
+        "definition": "",
+        "includeAll": false,
+        "name": "connectivity",
+        "options": [],
+        "query": "$base.$path.summary.$group.$browser.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "text": "median",
+          "value": "median"
+        },
+        "name": "function",
+        "options": [
+          {
+            "selected": false,
+            "text": "min",
+            "value": "min"
+          },
+          {
+            "selected": false,
+            "text": "mean",
+            "value": "mean"
+          },
+          {
+            "selected": true,
+            "text": "median",
+            "value": "median"
+          },
+          {
+            "selected": false,
+            "text": "p90",
+            "value": "p90"
+          },
+          {
+            "selected": false,
+            "text": "max",
+            "value": "max"
+          }
+        ],
+        "query": "min,mean,median,p90,max",
+        "refresh": 2,
+        "type": "interval"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Sitespeed - Site summary",
+  "uid": "000000045",
+  "version": 13
+}

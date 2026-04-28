@@ -1,0 +1,173 @@
+#!/bin/sh
+# shellcheck disable=SC2320,SC2181,SC3043,SC2155
+
+set -e
+#set -x
+
+VAULT_ADDR="https://vault.ops.gke.gitlab.net"
+if [ -z "$VAULT_PROXY_ADDR" ]; then
+  VAULT_PROXY_ADDR="socks5://localhost:18200"
+  export VAULT_PROXY_ADDR
+fi
+BASTION_HOST="lb-bastion.ops.gitlab.com"
+
+usage() {
+  echo >&2 "USAGE:"
+  echo >&2 "    glsh vault [SUBCOMMAND]"
+  echo >&2
+  echo >&2 "SUBCOMMANDS: "
+  echo >&2 "    init    Initialize the shell environment for Vault"
+  echo >&2 "    login   Login into Vault"
+  echo >&2 "    proxy   Start a SOCKS5 proxy for Vault through the ops bastion"
+  echo >&2 "    show-secret MOUNT PATH - Retrieves and show a secret from Vault"
+  echo >&2 "    edit-secret MOUNT PATH - Modify and create a new secret version from Vault"
+}
+
+init() {
+  if [ "$1" = '-' ]; then
+    cat <<EOF
+VAULT_ADDR="${VAULT_ADDR}"; export VAULT_ADDR
+vault-proxy() { eval "\$(glsh vault proxy "\$@")"; }
+EOF
+  else
+    cat >&2 <<'EOF'
+# Initialize your Vault environment automatically by appending the following
+# to ~/.bashrc or ~/.zshrc:
+
+eval "$(glsh vault init -)"
+
+# Restart your shell for the changes to take effect.
+EOF
+  fi
+}
+
+login() {
+  role="${1:-user}"
+
+  echo "[vault] Logging into Vault at ${VAULT_ADDR} with role \"${role}\"..."
+  vault login -no-print -method=oidc role="${role}"
+
+  if command -v safe >/dev/null 2>&1; then
+    vault print token | safe auth token 2>/dev/null
+  fi
+}
+
+proxy() {
+  port="${1:-18200}"
+  proxy_addr="socks5://localhost:${port}"
+
+  msg="[vault] Starting SOCKS5 proxy on port ${port} through ${BASTION_HOST}..."
+
+  if [ -n "${TMUX}" ]; then
+    echo "VAULT_PROXY_ADDR=\"${proxy_addr}\"; export VAULT_PROXY_ADDR"
+    if command -v safe >/dev/null 2>&1; then
+      echo "HTTPS_PROXY=\"${VAULT_PROXY_ADDR}\"; export HTTPS_PROXY"
+      safe target ${VAULT_ADDR} ops 2>/dev/null
+    fi
+    tmux split-pane -d -v -l 3 "echo \"${msg}\"; exec ssh -D \"${port}\" \"${BASTION_HOST}\" 'echo \"Connected! Press Enter to disconnect.\"; read disconnect'"
+  else
+    echo >&2 "Open a new shell and run the following before using Vault:"
+    echo >&2
+    echo >&2 "export VAULT_PROXY_ADDR=\"${proxy_addr}\""
+    echo >&2
+    echo >&2 "${msg}"
+    ssh -D "${port}" "${BASTION_HOST}" 'echo "Connected! Press Enter to disconnect."; read disconnect' >&2
+  fi
+}
+
+cleanup() {
+  rm -f "$tmpfile"
+}
+
+get_secret() {
+  mount=$1
+  path=$2
+  tmpfile=$3
+  vault kv get -format=json -mount="$mount" "$path" | jq '.data.data' >"$tmpfile"
+}
+
+show_secret() {
+  mount=$1
+  path=$2
+  tmpfile=$(mktemp /tmp/vault-secret.XXXXXX)
+
+  get_secret "$mount" "$path" "$tmpfile"
+
+  cat "$tmpfile"
+
+  cleanup
+}
+
+edit_secret() {
+  mount=$1
+  path=$2
+  tmpfile=$(mktemp /tmp/vault-secret.XXXXXX)
+
+  echo "Retrieving secret from Vault"
+  get_secret "$mount" "$path" "$tmpfile"
+
+  if [ -z "${EDITOR}" ]; then
+    EDITOR="$(which vim)"
+    export EDITOR
+  fi
+
+  BEFORE_SUM=$(sha256sum "$tmpfile" | cut -d" " -f1)
+  $EDITOR "$tmpfile"
+  AFTER_SUM=$(sha256sum "$tmpfile" | cut -d" " -f1)
+
+  if [ "$BEFORE_SUM" = "$AFTER_SUM" ]; then
+    echo "No changes; not uploading to Vault" 1>&2
+    exit
+  fi
+
+  echo "Checking file is valid json"
+  check_json "$tmpfile"
+
+  echo "Creating new $path version in Vault"
+  cat "$tmpfile" | vault kv put -mount="$mount" "$path" -
+
+  echo "Updated secret:"
+  show_secret "$mount" "$path"
+
+  cleanup
+}
+
+check_json() {
+  local tempfile="$(mktemp)"
+  if ! jq . "$1" >"$tempfile"; then
+    echo "Aborting, invalid json." 1>&2
+    rm -f "${tempfile}"
+    cleanup
+    exit 1
+  else
+    mv "${tempfile}" "$1"
+    rm -f "${tempfile}"
+  fi
+}
+
+case $1 in
+init)
+  shift
+  init "$@"
+  ;;
+login)
+  shift
+  login "$@"
+  ;;
+proxy)
+  shift
+  proxy "$@"
+  ;;
+show-secret)
+  shift
+  show_secret "$@"
+  ;;
+edit-secret)
+  shift
+  edit_secret "$@"
+  ;;
+*)
+  usage
+  exit 2
+  ;;
+esac

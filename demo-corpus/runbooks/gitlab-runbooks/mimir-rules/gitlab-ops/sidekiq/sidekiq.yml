@@ -1,0 +1,14 @@
+groups:
+- name: sidekiq.rules
+  rules:
+  - record: ci_sidekiq_jobs_inflight:rate_5m
+    expr: >
+      (
+        sum by (environment, stage, feature_category, worker) (
+          sli_aggregations:sidekiq_enqueued_jobs_total:rate_5m{feature_category=~"continuous_integration|runner", environment="ops"}
+        )
+        -
+        sum by (environment, stage, feature_category, worker) (
+          application_sli_aggregation:sidekiq_execution:ops:rate_5m{feature_category=~"continuous_integration|runner", environment="ops"}
+        )
+      )

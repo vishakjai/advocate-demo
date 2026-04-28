@@ -1,0 +1,122 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+require 'erb'
+require 'ostruct'
+require 'open3'
+require 'pathname'
+require 'fileutils'
+require_relative 'reconcile_service_catalog_labels'
+
+START_MARKER = "<!-- MARKER: do not edit this section directly. Edit services/service-catalog.yml then run scripts/generate-docs -->"
+STOP_MARKER = "<!-- END_MARKER -->"
+
+def replace_header(file, header)
+  lines = File.readlines(file)
+  start = lines.find_index { |line| line.chomp == START_MARKER }
+
+  throw "Unable to find start marker for #{file}" if start.nil?
+
+  stop = lines.find_index { |line| line.chomp == STOP_MARKER }
+  throw "Unable to find stop marker for #{file}" if stop.nil?
+
+  lines.slice! start, stop - start + 1
+  lines.insert start, header
+
+  IO.write(file, lines.join)
+end
+
+def generate_header(service, tier)
+  service_name = service["name"]
+  template = <<-MARKDOWN_EOF
+#{START_MARKER}
+
+# <%= service["friendly_name"] %><%= service["friendly_name"].downcase.include?("service") ? "" : " Service" %>
+
+<% if service&.dig("observability", "monitors", "primary_grafana_dashboard") -%>
+* [Service Overview](https://dashboards.gitlab.net/d/<%=service["observability"]["monitors"]["primary_grafana_dashboard"]%>)
+<% end -%>
+* **Alerts**: <https://alerts.gitlab.net/#/alerts?filter=%7Btype%3D%22<%= service_name %>%22%2C%20tier%3D%22<%= service["tier"] %>%22%7D>
+<% if service["label"] -%>
+* **Label**: gitlab-com/gl-infra/production~"<%= ReconcileServiceCatalogLabels::SERVICE_LABEL_SCOPE + service["label"] %>"
+<% end -%>
+<% if service["sentry_slug"] -%>
+* **Sentry**: https://sentry.gitlab.net/<%= service["sentry_slug"] %>
+<% end -%>
+<%- if service["grafana_folder"] -%>
+* **Grafana Folder**: https://dashboards.gitlab.net/dashboards/f/<%= service["grafana_folder"] %>
+<% end -%>
+
+<%- if service.dig("technical", "logging")&.any? -%>
+## Logging
+
+<%- service.dig("technical", "logging").each do |logging_location| -%>
+* [<%= logging_location["name"] %>](<%= logging_location["permalink"] %>)
+<%- end -%>
+<%- end -%>
+
+#{STOP_MARKER}
+  MARKDOWN_EOF
+
+  data = OpenStruct.new(
+    service:,
+    tier:
+  )
+
+  ERB.new(template, trim_mode: "-").result(data.instance_eval { binding })
+end
+
+def generate_docs
+  service_mapping_yaml = YAML.load_file(File.join(__dir__, "..", "services", "service-catalog.yml"))
+  services = service_mapping_yaml["services"]
+  tier_map = service_mapping_yaml["tiers"].each_with_object({}) { |tier, map| map[tier["name"]] = tier }
+
+  services.each do |service|
+    service_name = service["name"]
+    tier = tier_map[service["tier"]]
+
+    troubleshooting_doc = File.join(__dir__, "..", "docs", service_name.to_s, "README.md")
+    details = generate_header(service, tier)
+    if File.exist?(troubleshooting_doc)
+      replace_header(troubleshooting_doc, details)
+    else
+      toc = <<-TOC_EOF
+
+<!-- ## Summary -->
+
+<!-- ## Architecture -->
+
+<!-- ## Performance -->
+
+<!-- ## Scalability -->
+
+<!-- ## Availability -->
+
+<!-- ## Durability -->
+
+<!-- ## Security/Compliance -->
+
+<!-- ## Monitoring/Alerting -->
+
+<!-- ## Links to further Documentation -->
+      TOC_EOF
+
+      FileUtils.mkdir_p(File.dirname(troubleshooting_doc))
+      File.write(troubleshooting_doc, details + toc)
+    end
+  end
+
+  # hp: we can't savely remove READMEs, as we have some dirs which are not maching
+  # service-catalog entries... And also, each service is supposed to have a README.md
+  # from now on.
+  #
+  # service_map = service_mapping_yaml["services"].each_with_object({}) { |service, map| map[service["name"]] = service; }
+  #
+  # Dir.glob(File.join(__dir__, "..", "docs", "*", "README.md")).each do |file|
+  #   referred_service_name = File.dirname(file).split('/').last
+  #   File.delete(file) unless service_map[referred_service_name]
+  # end
+end
+
+generate_docs

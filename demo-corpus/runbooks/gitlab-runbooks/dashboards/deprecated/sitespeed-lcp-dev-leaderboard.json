@@ -1,0 +1,1065 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1470,
+  "links": [
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "page timings"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "page summary"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "site summary"
+      ],
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "text": ""
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 0,
+        "y": 0
+      },
+      "id": 62,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refCount": 0,
+          "refId": "A",
+          "target": "asPercent(countSeries(currentBelow($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function, 2500)), countSeries($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function))",
+          "textEditor": true
+        }
+      ],
+      "title": "Routes with good LCP (<2.5s)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "text": ""
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 5,
+        "y": 0
+      },
+      "id": 64,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "countSeries($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function)",
+          "textEditor": true
+        }
+      ],
+      "title": "Measured Routes",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "text": ""
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 2500
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 10,
+        "y": 0
+      },
+      "id": 66,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "averageSeries($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function)",
+          "textEditor": true
+        }
+      ],
+      "title": "Average LCP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "LCP of all monitored routes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "target": {
+                  "text": "a"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 10000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 2500
+              },
+              {
+                "color": "red",
+                "value": 4000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 44,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 60,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "text": {},
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "LCP Leaderboard",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "LCP History of all monitored routes",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 44,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 67,
+      "options": {
+        "alertThreshold": true
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "LCP History",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "LCP History of all monitored routes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "cellOptions": {
+              "mode": "gradient",
+              "type": "color-background"
+            },
+            "filterable": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "target": {
+                  "text": "a"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 10000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 2500
+              },
+              {
+                "color": "red",
+                "value": 4000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Field"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Difference"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "light-blue",
+                      "value": 0
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 500
+                    },
+                    {
+                      "color": "dark-orange",
+                      "value": 1000
+                    },
+                    {
+                      "color": "dark-red",
+                      "value": 1500
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 44,
+        "w": 24,
+        "x": 0,
+        "y": 95
+      },
+      "id": 68,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.largestContentfulPaint.renderTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "LCP Numbers",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "reducers": [
+              "mean",
+              "firstNotNull",
+              "lastNotNull",
+              "diff"
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "P5B95A3EF3B49B188"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "target": {
+                  "text": "Target"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 3000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 750
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 41,
+        "w": 24,
+        "x": 0,
+        "y": 139
+      },
+      "id": 30,
+      "options": {
+        "displayMode": "lcd",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "text": {}
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "P5B95A3EF3B49B188"
+          },
+          "refId": "A",
+          "target": "aliasByNode(sortBy($namespace.$path.$testname.pageSummary.$domains.$pages.$browser.$connectivity.browsertime.statistics.timings.pageTimings.serverResponseTime.$function),  5)",
+          "textEditor": true
+        }
+      ],
+      "title": "Time to First Byte (BE Duration)",
+      "type": "bargauge"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "leaderboard",
+    "pages",
+    "unmanaged"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "sitespeed_io",
+          "value": "sitespeed_io"
+        },
+        "hide": 2,
+        "label": "sitespeed_io",
+        "name": "namespace",
+        "query": "sitespeed_io",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "text": [
+            "desktop"
+          ],
+          "value": [
+            "desktop"
+          ]
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.*",
+        "includeAll": false,
+        "label": "path",
+        "multi": true,
+        "name": "path",
+        "options": [],
+        "query": "$namespace.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "gitlab",
+          "value": "gitlab"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.*",
+        "includeAll": false,
+        "name": "testname",
+        "options": [],
+        "query": "$namespace.$path.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.*",
+        "includeAll": true,
+        "label": "domains",
+        "multi": true,
+        "name": "domains",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "includeAll": true,
+        "label": "pages",
+        "multi": true,
+        "name": "pages",
+        "options": [
+          {
+            "selected": false,
+            "text": "Access_Group_List",
+            "value": "Access_Group_List"
+          },
+          {
+            "selected": false,
+            "text": "Import_Importer_BitBucketServer",
+            "value": "Import_Importer_BitBucketServer"
+          },
+          {
+            "selected": false,
+            "text": "Import_Importer_Fogbugz",
+            "value": "Import_Importer_Fogbugz"
+          },
+          {
+            "selected": false,
+            "text": "Import_Importer_Gitea",
+            "value": "Import_Importer_Gitea"
+          },
+          {
+            "selected": false,
+            "text": "Import_Importer_Github",
+            "value": "Import_Importer_Github"
+          },
+          {
+            "selected": false,
+            "text": "Import_Importer_Manifest",
+            "value": "Import_Importer_Manifest"
+          },
+          {
+            "selected": false,
+            "text": "Editor_Snippet_Dashboard",
+            "value": "Editor_Snippet_Dashboard"
+          },
+          {
+            "selected": false,
+            "text": "Project_Management_ToDos",
+            "value": "Project_Management_ToDos"
+          },
+          {
+            "selected": false,
+            "text": "Import_Project_Creation",
+            "value": "Import_Project_Creation"
+          },
+          {
+            "selected": false,
+            "text": "Editor_Snippets_Explore",
+            "value": "Editor_Snippets_Explore"
+          },
+          {
+            "selected": false,
+            "text": "ProjectManagement_Milestone_Small",
+            "value": "ProjectManagement_Milestone_Small"
+          },
+          {
+            "selected": false,
+            "text": "SourceCode_Repo_Small",
+            "value": "SourceCode_Repo_Small"
+          },
+          {
+            "selected": false,
+            "text": "GitLab_Issue_list",
+            "value": "GitLab_Issue_list"
+          },
+          {
+            "selected": false,
+            "text": "_gitlab-org_gitlab_-_commit_247042bc4c13e45cc1bb97592b53fb78f098a19b",
+            "value": "_gitlab-org_gitlab_-_commit_247042bc4c13e45cc1bb97592b53fb78f098a19b"
+          },
+          {
+            "selected": false,
+            "text": "_explore",
+            "value": "_explore"
+          },
+          {
+            "selected": false,
+            "text": "_groups_gitlab-com_support_-_epics",
+            "value": "_groups_gitlab-com_support_-_epics"
+          },
+          {
+            "selected": false,
+            "text": "SourceCode_MR_Small",
+            "value": "SourceCode_MR_Small"
+          },
+          {
+            "selected": false,
+            "text": "_gitlab-org_gitlab",
+            "value": "_gitlab-org_gitlab"
+          },
+          {
+            "selected": false,
+            "text": "_gitlab-org_gitlab_blob_master_app_assets_javascripts_main_js",
+            "value": "_gitlab-org_gitlab_blob_master_app_assets_javascripts_main_js"
+          },
+          {
+            "selected": false,
+            "text": "Knowledge_Wiki_History",
+            "value": "Knowledge_Wiki_History"
+          },
+          {
+            "selected": false,
+            "text": "PortfolioManagement_Roadmaps_Large",
+            "value": "PortfolioManagement_Roadmaps_Large"
+          },
+          {
+            "selected": false,
+            "text": "GitLab_Merge_List",
+            "value": "GitLab_Merge_List"
+          },
+          {
+            "selected": false,
+            "text": "_gnachman_iterm2_-_tree_master_tools",
+            "value": "_gnachman_iterm2_-_tree_master_tools"
+          },
+          {
+            "selected": false,
+            "text": "Knowledge_Wiki_AsciiDoc",
+            "value": "Knowledge_Wiki_AsciiDoc"
+          },
+          {
+            "selected": false,
+            "text": "_groups_gitlab-org_-_epics",
+            "value": "_groups_gitlab-org_-_epics"
+          },
+          {
+            "selected": false,
+            "text": "SourceCode_MR_Large",
+            "value": "SourceCode_MR_Large"
+          },
+          {
+            "selected": false,
+            "text": "Editor_WebIDE_about_repo",
+            "value": "Editor_WebIDE_about_repo"
+          },
+          {
+            "selected": false,
+            "text": "GitLab_Project_Home",
+            "value": "GitLab_Project_Home"
+          },
+          {
+            "selected": false,
+            "text": "SourceCode_MR_List",
+            "value": "SourceCode_MR_List"
+          },
+          {
+            "selected": false,
+            "text": "Access_Group_View",
+            "value": "Access_Group_View"
+          },
+          {
+            "selected": false,
+            "text": "Editor_Snippet_new",
+            "value": "Editor_Snippet_new"
+          },
+          {
+            "selected": false,
+            "text": "SourceCode_Repo_Large",
+            "value": "SourceCode_Repo_Large"
+          },
+          {
+            "selected": false,
+            "text": "Certify_Requirements_List",
+            "value": "Certify_Requirements_List"
+          },
+          {
+            "selected": false,
+            "text": "GitLab_Merge_Detail",
+            "value": "GitLab_Merge_Detail"
+          },
+          {
+            "selected": false,
+            "text": "Editor_Snippets_Markdown",
+            "value": "Editor_Snippets_Markdown"
+          },
+          {
+            "selected": false,
+            "text": "Editor_Snippets_Textual",
+            "value": "Editor_Snippets_Textual"
+          },
+          {
+            "selected": false,
+            "text": "_gitlab-org_gitlab-foss_issues_1",
+            "value": "_gitlab-org_gitlab-foss_issues_1"
+          },
+          {
+            "selected": false,
+            "text": "_sytses_test-2_issues_1",
+            "value": "_sytses_test-2_issues_1"
+          },
+          {
+            "selected": false,
+            "text": "ProjectManagement_Issues_Detail_Large",
+            "value": "ProjectManagement_Issues_Detail_Large"
+          },
+          {
+            "selected": false,
+            "text": "GitLab_Issue_Detail",
+            "value": "GitLab_Issue_Detail"
+          },
+          {
+            "selected": false,
+            "text": "ProjectManagement_Issues_Detail_Small",
+            "value": "ProjectManagement_Issues_Detail_Small"
+          },
+          {
+            "selected": false,
+            "text": "Knowledge_Wiki_Markdown",
+            "value": "Knowledge_Wiki_Markdown"
+          },
+          {
+            "selected": false,
+            "text": "Editor_Snippets_Multifile",
+            "value": "Editor_Snippets_Multifile"
+          },
+          {
+            "selected": false,
+            "text": "PortfolioManagement_Roadmaps_Small",
+            "value": "PortfolioManagement_Roadmaps_Small"
+          },
+          {
+            "selected": false,
+            "text": "ProjectManagement_Issues_List",
+            "value": "ProjectManagement_Issues_List"
+          },
+          {
+            "selected": false,
+            "text": "Analytics_Value_Stream",
+            "value": "Analytics_Value_Stream"
+          },
+          {
+            "selected": false,
+            "text": "Knowledge_Design_Collection",
+            "value": "Knowledge_Design_Collection"
+          },
+          {
+            "selected": false,
+            "text": "ProjectManagement_Milestone_Large",
+            "value": "ProjectManagement_Milestone_Large"
+          },
+          {
+            "selected": false,
+            "text": "Editor_SingleFile_team_page",
+            "value": "Editor_SingleFile_team_page"
+          },
+          {
+            "selected": false,
+            "text": "Knowledge_Design_Single",
+            "value": "Knowledge_Design_Single"
+          },
+          {
+            "selected": false,
+            "text": "PortfolioManagement_Epics",
+            "value": "PortfolioManagement_Epics"
+          },
+          {
+            "selected": false,
+            "text": "ProjectManagement_Boards",
+            "value": "ProjectManagement_Boards"
+          },
+          {
+            "selected": false,
+            "text": "Editor_WebIDE_team_page",
+            "value": "Editor_WebIDE_team_page"
+          }
+        ],
+        "query": "Access_Group_List, Import_Importer_BitBucketServer, Import_Importer_Fogbugz, Import_Importer_Gitea, Import_Importer_Github, Import_Importer_Manifest, Editor_Snippet_Dashboard, Project_Management_ToDos, Import_Project_Creation, Editor_Snippets_Explore, ProjectManagement_Milestone_Small, SourceCode_Repo_Small, GitLab_Issue_list, _gitlab-org_gitlab_-_commit_247042bc4c13e45cc1bb97592b53fb78f098a19b, _explore, _groups_gitlab-com_support_-_epics, SourceCode_MR_Small, _gitlab-org_gitlab, _gitlab-org_gitlab_blob_master_app_assets_javascripts_main_js, Knowledge_Wiki_History, PortfolioManagement_Roadmaps_Large, GitLab_Merge_List, _gnachman_iterm2_-_tree_master_tools, Knowledge_Wiki_AsciiDoc, _groups_gitlab-org_-_epics, SourceCode_MR_Large, Editor_WebIDE_about_repo, GitLab_Project_Home, SourceCode_MR_List, Access_Group_View, Editor_Snippet_new, SourceCode_Repo_Large, Certify_Requirements_List, GitLab_Merge_Detail, Editor_Snippets_Markdown, Editor_Snippets_Textual, _gitlab-org_gitlab-foss_issues_1, _sytses_test-2_issues_1, ProjectManagement_Issues_Detail_Large, GitLab_Issue_Detail, ProjectManagement_Issues_Detail_Small, Knowledge_Wiki_Markdown, Editor_Snippets_Multifile, PortfolioManagement_Roadmaps_Small, ProjectManagement_Issues_List, Analytics_Value_Stream, Knowledge_Design_Collection, ProjectManagement_Milestone_Large, Editor_SingleFile_team_page, Knowledge_Design_Single, PortfolioManagement_Epics, ProjectManagement_Boards, Editor_WebIDE_team_page",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "chrome",
+          "value": "chrome"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.$domains.$pages.*",
+        "includeAll": false,
+        "label": "browser",
+        "name": "browser",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.$domains.$pages.*",
+        "refresh": 1,
+        "regex": "(chrome||firefox)",
+        "type": "query"
+      },
+      {
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "text": "median",
+          "value": "median"
+        },
+        "name": "function",
+        "options": [
+          {
+            "selected": false,
+            "text": "min",
+            "value": "min"
+          },
+          {
+            "selected": false,
+            "text": "mean",
+            "value": "mean"
+          },
+          {
+            "selected": true,
+            "text": "median",
+            "value": "median"
+          },
+          {
+            "selected": false,
+            "text": "p90",
+            "value": "p90"
+          },
+          {
+            "selected": false,
+            "text": "max",
+            "value": "max"
+          }
+        ],
+        "query": "min,mean,median,p90,max",
+        "refresh": 2,
+        "type": "interval"
+      },
+      {
+        "current": {
+          "text": "cable",
+          "value": "cable"
+        },
+        "datasource": "sitespeed",
+        "definition": "$namespace.$path.$testname.pageSummary.$domains.$pages.$browser.*",
+        "includeAll": false,
+        "name": "connectivity",
+        "options": [],
+        "query": "$namespace.$path.$testname.pageSummary.$domains.$pages.$browser.*",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Sitespeed - LCP Dev Leaderboard",
+  "uid": "BxlP7whMk",
+  "version": 10
+}

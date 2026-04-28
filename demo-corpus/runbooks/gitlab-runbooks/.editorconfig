@@ -1,0 +1,56 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[Makefile]
+indent_style = tab
+
+[.copier-*.yml]
+insert_final_newline = unset
+indent_size = unset
+
+[*.md]
+indent_size = unset
+
+[*.go]
+indent_style = tab
+
+[go.mod]
+indent_size = unset
+indent_style = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+
+[*.jq]
+indent_size = unset
+
+[*.md]
+indent_size = unset
+
+[{*.yml,*.yaml}]
+indent_size = unset
+
+[{*.rb,Gemfile.lock}]
+indent_size = unset
+
+[{*.jsonnet,*.libsonnet}]
+indent_size = unset
+
+# Ignored
+[{spec/fixtures/redis_trace/**,**/*.afdesign,**/*.excalidraw,**/*.drawio,**/*.html,**/*.graphml,reference-architectures/get-hybrid/config/**,mixins-monitoring/**/reference-architectures/get-hybrid/config/**,mimir-rules/**/dashboards/*.json,dashboards/**/*.json,.git/**}]
+charset = unset
+end_of_line = unset
+indent_size = unset
+indent_style = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

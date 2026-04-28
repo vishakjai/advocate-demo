@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+
+set -eufo pipefail
+
+CLUSTERS_JSON="${RUNBOOKS_PATH:?}/kubernetes/clusters.json"
+
+trap close_tunnel INT
+
+close_tunnel() {
+  echo "Tunnel is now closed, switching to empty context..."
+  kubectl config use-context empty
+}
+
+notify_shell() {
+  echo "Spinning up a tunnel, this will NOT drop you into a shell prompt, open a new terminal after connection is made..."
+}
+
+print_help() {
+  echo >&2 '"kube" is used to help you setup and interect with our kubernetes clusters'
+  echo >&2 "USAGE: "
+  echo >&2 "    glsh kube [SUBCOMMAND]"
+  echo >&2
+  echo >&2 "SUBCOMMANDS: "
+  echo >&2 "    setup [--no-proxy]                  Configure the local machine with all cluster contexts, set --no-proxy to skip setting (or unset) the SOCKS5 proxy URL"
+  echo >&2 "    use-cluster <cluster> [--no-proxy]  Select which cluster to use and start a SOCKS5 proxy via SSH unless --no-proxy is set"
+}
+
+print_setup_help() {
+  echo >&2 "glsh kube setup [--no-proxy]"
+}
+
+print_use_cluster_help() {
+  echo >&2 "glsh kube use-cluster <cluster> [--no-proxy]"
+  echo >&2
+  echo >&2 "Choose one of the following clusters:"
+  for cluster in $(all_clusters); do
+    echo >&2 "    ${cluster}"
+  done
+}
+
+setup() {
+  local context no_proxy=0 proxy_set
+
+  while [[ $# -ne 0 ]]; do
+    case $1 in
+    --no-proxy)
+      no_proxy=1
+      ;;
+    *)
+      print_setup_help
+      exit 1
+      ;;
+    esac
+    shift
+  done
+
+  echo "Running gcloud commands to create kube contexts"
+  jq -r '.[] | "\(.name) --project \(.project) --region \(.region)"' "${CLUSTERS_JSON}" | while read -r cluster_params; do
+    # shellcheck disable=SC2086
+    gcloud container clusters get-credentials ${cluster_params} || true
+  done
+
+  if [[ ${no_proxy} -eq 1 ]]; then
+    echo "Removing SOCKS5 proxy from all clusters"
+    for cluster in $(all_clusters); do
+      context="$(get_kube_context "${cluster}")"
+      kubectl config unset "clusters.${context}.proxy-url"
+    done
+  else
+    local socks_port=1080
+    echo "Setting up SOCKS5 proxy for each cluster"
+    for cluster in $(all_clusters); do
+      context="$(get_kube_context "${cluster}")"
+
+      proxy_set=$(jq -r .[\""${cluster}\""].ssh_proxy "${CLUSTERS_JSON}")
+      if [[ ${proxy_set} == "null" ]]; then
+        echo "WARNING: Proxy is not configured for ${cluster}.  You must use NordLayer VPN to connect to this cluster!"
+        kubectl config unset "clusters.${context}.proxy-url"
+        continue
+      fi
+
+      kubectl config set "clusters.${context}.proxy-url" "socks5://localhost:${socks_port}"
+      ((socks_port = socks_port + 1))
+    done
+  fi
+
+  echo "Creating empty cluster context for fallback purposes"
+  kubectl config set-context empty
+}
+
+use_cluster() {
+  local cluster="" context no_proxy=0 proxy_set proxy_url
+
+  while [[ $# -ne 0 ]]; do
+    case $1 in
+    --no-proxy)
+      no_proxy=1
+      ;;
+    -*)
+      print_use_cluster_help
+      exit 1
+      ;;
+    *)
+      if [[ -n ${cluster} ]]; then
+        print_use_cluster_help
+        exit 1
+      fi
+      cluster="$1"
+      ;;
+    esac
+    shift
+  done
+
+  if [[ -z ${cluster} ]] || ! has_cluster "${cluster}"; then
+    print_use_cluster_help
+    exit 1
+  fi
+
+  context="$(get_kube_context "${cluster}")"
+
+  kubectx "${context}"
+
+  if [[ ${no_proxy} -eq 1 ]]; then
+    exit 0
+  fi
+
+  proxy_set=$(jq -r .[\""${cluster}\""].ssh_proxy "${CLUSTERS_JSON}")
+  proxy_url="$(kubectl config view -o jsonpath="{.clusters[?(@.name == \"${context}\")].cluster.proxy-url}")"
+  if [ -z "${proxy_url}" ] && [ "${proxy_set}" != "null" ]; then
+    # shellcheck disable=SC2016
+    echo >&2 'glsh: proxy-url not set in $KUBECONFIG, run glsh kube setup'
+    exit 1
+  fi
+
+  if [[ ${proxy_set} == "null" ]]; then
+    echo "You must use NordLayer VPN to access this cluster. https://handbook.gitlab.com/handbook/security/corporate/systems/vpn/"
+    exit 0
+  fi
+
+  ssh_proxy="$(get_ssh_proxy "${cluster}")"
+
+  proxy_port=$(echo "${proxy_url}" | awk -F: '{print $3}')
+
+  msg="[kube] Starting SOCKS5 proxy on port ${proxy_port} through ${ssh_proxy}..."
+
+  if [ -n "${TMUX:-}" ]; then
+    tmux split-pane -d -v -l 3 "echo \"${msg}\"; exec ssh -D \"${proxy_port}\" \"${ssh_proxy}\" 'echo \"Connected! Press Enter to disconnect.\"; read disconnect'"
+  else
+    notify_shell
+    ssh -D "${proxy_port}" "${ssh_proxy}" 'echo "Connected! Press Enter to disconnect."; read disconnect' >&2
+    close_tunnel
+  fi
+}
+
+all_clusters() {
+  jq -r 'keys[]' "${CLUSTERS_JSON}"
+}
+
+has_cluster() {
+  jq --arg cluster "$1" -e 'has($cluster)' "${CLUSTERS_JSON}" >/dev/null
+}
+
+get_kube_context() {
+  jq --arg cluster "$1" -r '.[$cluster] | "gke_\(.project)_\(.region)_\(.name)"' "${CLUSTERS_JSON}"
+}
+
+get_ssh_proxy() {
+  jq --arg cluster "$1" -r '.[$cluster].ssh_proxy' "${CLUSTERS_JSON}"
+}
+
+check_command() {
+  if ! command -v "$1" >/dev/null; then
+    echo >&2 "glsh: \"$1\" could not be found, please follow $2"
+    exit 1
+  fi
+}
+
+check_command "gcloud" "https://cloud.google.com/sdk/docs/install"
+check_command "jq" "https://stedolan.github.io/jq/download/"
+check_command "kubectl" "https://kubernetes.io/docs/tasks/tools/"
+check_command "kubectx" "https://github.com/ahmetb/kubectx#installation"
+
+if (("$(kubectl version --client -o json | jq -r '.clientVersion.minor | match("\\d+").string')" < "24")); then
+  echo >&2 "glsh: kubectl 1.24 or higher is required"
+  exit 1
+fi
+
+if [[ $# -eq 0 ]]; then
+  print_help
+  exit 1
+fi
+
+case $1 in
+setup)
+  shift
+  setup "$@"
+  ;;
+use-cluster)
+  shift
+  use_cluster "$@"
+  ;;
+*)
+  print_help
+  exit 1
+  ;;
+esac

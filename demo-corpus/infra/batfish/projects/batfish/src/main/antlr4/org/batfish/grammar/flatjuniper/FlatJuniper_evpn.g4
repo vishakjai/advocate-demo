@@ -1,0 +1,135 @@
+parser grammar FlatJuniper_evpn;
+
+import FlatJuniper_common;
+
+options {
+   tokenVocab = FlatJuniperLexer;
+}
+
+e_default_gateway
+:
+    DEFAULT_GATEWAY NO_GATEWAY_COMMUNITY
+;
+
+e_encapsulation
+:
+    ENCAPSULATION (
+      VXLAN
+      | MPLS
+      | SRV6
+    )
+;
+
+e_ip_prefix_routes
+:
+    IP_PREFIX_ROUTES (
+        eipr_advertise
+        | eipr_encapsulation
+        | eipr_export
+        | eipr_import
+        | eipr_vni
+    )
+;
+
+eipr_advertise
+:
+    ADVERTISE (DIRECT_NEXTHOP | GATEWAY_ADDRESS)
+;
+
+eipr_encapsulation
+:
+    ENCAPSULATION (VXLAN | MPLS | SRV6)
+;
+
+eipr_export
+:
+    EXPORT name = junos_name
+;
+
+eipr_import
+:
+    IMPORT name = junos_name
+;
+
+eipr_vni
+:
+    VNI vni_number
+;
+
+e_extended_vni_list
+:
+    EXTENDED_VNI_LIST (
+        OPEN_BRACKET vni_range+ CLOSE_BRACKET
+        | ALL
+        | vni_range
+    )
+;
+
+e_duplicate_mac_detection_null
+:
+    DUPLICATE_MAC_DETECTION null_filler
+;
+
+e_multicast_mode
+:
+    MULTICAST_MODE (
+        CLIENT
+        | INGRESS_REPLICATION
+    )
+;
+
+e_vni_options
+:
+    VNI_OPTIONS VNI vni_number (
+        evo_designated_forwarder_election_hold_time
+        | evo_vrf_target
+    )+
+;
+
+evo_designated_forwarder_election_hold_time
+:
+    DESIGNATED_FORWARDER_ELECTION_HOLD_TIME secs = dec
+;
+
+evo_vrf_target
+:
+    VRF_TARGET (
+        evovt_auto
+        | evovt_community
+        | evovt_export
+        | evovt_import
+    )
+;
+
+evovt_auto
+:
+    AUTO
+;
+
+evovt_community
+:
+    comm = vrf_target_community
+;
+
+evovt_export
+:
+    EXPORT vrf_target_community
+;
+
+evovt_import
+:
+    IMPORT vrf_target_community
+;
+
+p_evpn
+:
+    EVPN (
+        e_default_gateway
+        | e_encapsulation
+        | e_extended_vni_list
+        | e_ip_prefix_routes
+        | e_multicast_mode
+        | e_vni_options
+        | e_duplicate_mac_detection_null
+    )
+;

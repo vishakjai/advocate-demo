@@ -1,0 +1,367 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "insertId",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "mode": "REPEATED",
+        "name": "api_error",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "content_length",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "content_range",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "correlation_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "db_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "elasticsearch_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "elasticsearch_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "environment",
+        "type": "STRING"
+      },
+      {
+        "mode": "REPEATED",
+        "name": "exception_backtrace",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "exception_class",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "exception_message",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "fqdn",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "gitaly_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "gitaly_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "host",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "hostname",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "meta_caller_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "meta_feature_category",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "meta_project",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "meta_root_namespace",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "meta_subscription_plan",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "meta_user",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "method",
+        "type": "STRING"
+      },
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "key",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "value",
+            "type": "STRING"
+          }
+        ],
+        "mode": "REPEATED",
+        "name": "params",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "path",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "queue_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_cache_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_cache_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_cache_read_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_cache_write_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_queues_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_queues_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_queues_read_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_queues_write_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_read_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_shared_state_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_shared_state_duration_s",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_shared_state_read_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_shared_state_write_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redis_write_bytes",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "remote_ip",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "route",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "shard",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "stage",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "status",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "tier",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "type",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "ua",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "user_id",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "username",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "view_duration_s",
+        "type": "FLOAT"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "jsonPayload",
+    "type": "RECORD"
+  },
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "compute_googleapis_com_resource_name",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "tag",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "labels",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "logName",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "receiveTimestamp",
+    "type": "STRING"
+  },
+  {
+    "fields": [
+      {
+        "fields": [
+          {
+            "mode": "NULLABLE",
+            "name": "instance_id",
+            "type": "INTEGER"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "project_id",
+            "type": "STRING"
+          },
+          {
+            "mode": "NULLABLE",
+            "name": "zone",
+            "type": "STRING"
+          }
+        ],
+        "mode": "NULLABLE",
+        "name": "labels",
+        "type": "RECORD"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "type",
+        "type": "STRING"
+      }
+    ],
+    "mode": "NULLABLE",
+    "name": "resource",
+    "type": "RECORD"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "severity",
+    "type": "STRING"
+  },
+  {
+    "mode": "REQUIRED",
+    "name": "timestamp",
+    "type": "TIMESTAMP"
+  }
+]

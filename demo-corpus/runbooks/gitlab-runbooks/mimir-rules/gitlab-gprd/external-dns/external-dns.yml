@@ -1,0 +1,20 @@
+groups:
+  - name: external-dns.rules
+    rules:
+      - alert: ExternalDNSStale
+        expr: time() - external_dns_controller_last_sync_timestamp_seconds{env="gprd"} > 300
+        for: 5m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: symptom
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gprd
+          description: |
+            ExternalDNS has not synced successfully with Google Cloud DNS in
+            cluster {{.labels.cluster}} (region {{.labels.region}}) in the last
+            five minutes. This can lead to missing or outdated DNS entries, which
+            might lead to service disruption. Check the ExternalDNS logs for more
+            information.
+          runbook: external-dns/
+          title: External DNS is stale

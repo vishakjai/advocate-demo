@@ -1,0 +1,16 @@
+groups:
+- name: canonical-livepatch.rules
+  rules:
+  - alert: UbuntuLivepatchDisabled
+    expr: |
+      ubuntu_advantage_attached{env="gprd"} == 1 and canonical_livepatch_enabled{env="gprd"} == 0 and on (fqdn, environment) time() - chef_client_last_run_timestamp_seconds < 3600 * 6
+    for: 1h
+    labels:
+      severity: s4
+      alert_type: cause
+      type: fleet
+    annotations:
+      grafana_datasource_id: mimir-gitlab-gprd
+      description: Livepatch is disabled on {{ $labels.fqdn }}
+      runbook: security-patching/alerts/UbuntuLivepatch/
+      title: Ubuntu Livepatch is disabled

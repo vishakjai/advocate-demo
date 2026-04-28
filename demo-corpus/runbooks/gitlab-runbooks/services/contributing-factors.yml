@@ -1,0 +1,119 @@
+categories:
+  - name: Technical Issues
+    external_id: technical-issues
+  - name: External Factors
+    external_id: external-factors
+  - name: Monitoring/Alerting Gaps
+    external_id: monitoring-alerting-gaps
+  - name: Process/Policy Shortcomings
+    external_id: process-policy-shortcomings
+  - name: Human Factors
+    external_id: human-factors
+  - name: Unidentified
+    external_id: unidentified
+
+factors:
+# Category: Technical Issues
+  - name: Bug in application code
+    external_id: bug-in-application-code
+    category: technical-issues
+  - name: Configuration error
+    external_id: configuration-error
+    category: technical-issues
+  - name: Feature flag enabled
+    external_id: feature-flag-enabled
+    category: technical-issues
+  - name: Feature flag missing
+    external_id: feature-flag-missing
+    category: technical-issues
+  - name: Infrastructure or hardware failure
+    external_id: infrastructure-or-hardware-failure
+    category: technical-issues
+  - name: Database/datastore failure
+    external_id: database-datastore-failure
+    category: technical-issues
+  - name: Data/Schema changes
+    external_id: data-schema-changes
+    category: technical-issues
+  - name: Network or connectivity issue
+    external_id: network-or-connectivity-issue
+    category: technical-issues
+  - name: Capacity overload/performance issues
+    external_id: capacity-overload-performance-issues
+    category: technical-issues
+  - name: Release or deployment problem
+    external_id: release-or-deployment-problem
+    category: technical-issues
+  - name: Architectural/design limitation
+    external_id: architectural-design-limitation
+    category: technical-issues
+
+# Category: Human Factors
+  - name: Information or feedback gaps
+    external_id: information-or-feedback-gaps
+    category: human-factors
+  - name: Miscommunication or coordination gap
+    external_id: miscommunication-or-coordination-gap
+    category: human-factors
+  - name: System design knowledge gaps
+    external_id: system-design-knowledge-gaps
+    category: human-factors
+  - name: Necessary workarounds
+    external_id: necessary-workarounds
+    category: human-factors
+
+# Category: Process/Policy Shortcomings
+  - name: Inadequate testing or QA
+    external_id: inadequate-testing-or-qa
+    category: process-policy-shortcomings
+  - name: Change management gap
+    external_id: change-management-gap
+    category: process-policy-shortcomings
+  - name: Lack of documentation/runbooks
+    external_id: lack-of-documentation-runbooks
+    category: process-policy-shortcomings
+  - name: Ownership or escalation gap
+    external_id: ownership-or-escalation-gap
+    category: process-policy-shortcomings
+  - name: Planned maintenance event
+    external_id: planned-maintenance
+    category: process-policy-shortcomings
+
+# Category: External Factors
+  - name: Third-party service/API outage
+    external_id: third-party-service-api-outage
+    category: external-factors
+  - name: Cloud/Infrastructure provider issue
+    external_id: cloud-infrastructure-provider-issue
+    category: external-factors
+  - name: Upstream dependency change
+    external_id: upstream-dependency-change
+    category: external-factors
+  - name: Security attack or breach
+    external_id: security-attack-or-breach
+    category: external-factors
+  - name: Naive traffic
+    external_id: naive-traffic
+    category: external-factors
+  - name: Malicious traffic
+    external_id: malicious-traffic
+    category: external-factors
+  - name: Unclassified traffic spike
+    external_id: unclassified-traffic-spike
+    category: external-factors
+
+# Category: Monitoring/Alerting Gaps
+  - name: Delayed detection (missing alert)
+    external_id: delayed-detection-missing-alert
+    category: monitoring-alerting-gaps
+  - name: Incomplete observability
+    external_id: incomplete-observability
+    category: monitoring-alerting-gaps
+  - name: Automation/tooling issue
+    external_id: automation-tooling-issue
+    category: monitoring-alerting-gaps
+
+# Category: Unidentified
+  - name: Unidentified contributing factor
+    external_id: unidentified-contributing-factor
+    category: unidentified

@@ -1,0 +1,38 @@
+groups:
+  - name: patroni-snapshot.rules
+    rules:
+      - record: gitlab_com:last_successful_patroni_gcs_snapshot_age_in_hours
+        expr: |
+          min without (instance) (
+            time()
+            -
+            (
+              gitlab_job_success_timestamp_seconds{resource="patroni-gcs-snapshot", env="gstg"} > 0
+            )
+          )
+          /
+          3600
+      - alert: PatroniGCSSnapshotDelayed
+        expr: gitlab_com:last_successful_patroni_gcs_snapshot_age_in_hours{env="gstg"} >= 6
+        for: 30m
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gstg
+          description: GCS disk snapshot has not ran successfully on {{ $labels.fqdn }}. Please follow the runbook to review the problem.
+          runbook: patroni/alerts/PatroniGCSSnapshotDelayed/
+          title: Last Patroni GCS snapshot did not run successfully
+      - alert: PatroniGCSSnapshotFailed
+        expr: gitlab_job_failed{resource="patroni-gcs-snapshot", env="gstg"} == 1
+        for: 6h
+        labels:
+          pager: pagerduty
+          severity: s1
+          alert_type: cause
+        annotations:
+          grafana_datasource_id: mimir-gitlab-gstg
+          description: GCS disk snapshot failed on {{ $labels.fqdn }}. Please follow the runbook to review the problem.
+          runbook: patroni/gcs-snapshots/
+          title: Last Patroni GCS snapshot did not run successfully

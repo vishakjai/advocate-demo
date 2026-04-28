@@ -1,0 +1,886 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "expr": "ALERTS{environment=\"$environment\", type=\"$type\"}",
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "limit": 100,
+        "name": "Annotations & Alerts",
+        "showIn": 0,
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "$type",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 631,
+  "links": [
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [
+        "general triage"
+      ],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "tags": [],
+      "targetBlank": true,
+      "title": "$type Runbook",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://gitlab.com/gitlab-com/runbooks/blob/master/troubleshooting/service-$type.md"
+    },
+    {
+      "icon": "external link",
+      "tags": [],
+      "targetBlank": true,
+      "title": "AlertManager",
+      "tooltip": "AlertManager",
+      "type": "link",
+      "url": "https://alerts.gprd.gitlab.net/#/alerts?filter=%7Benvironment%3D%22$environment%22%2C%20type%3D%22$type%22%7D"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 31,
+      "panels": [],
+      "title": "Alerts",
+      "type": "row"
+    },
+    {
+      "columns": [],
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 29,
+      "options": {},
+      "pageSize": 10,
+      "pluginVersion": "11.6.0",
+      "scroll": false,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "link": true,
+          "linkTargetBlank": true,
+          "linkTooltip": "AlertManager",
+          "linkUrl": "https://alerts.$environment.gitlab.net/#/alerts?filter=%7Benvironment%3D%22$environment%22%2C%20type%3D%22$type%22%7D",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "__name__",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "alertname",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "environment",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "bound",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "period",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "rules_domain",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "provider",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "region",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "threshold_sigma",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "tier",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "Value #A",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "type",
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "sum(ALERTS{environment=\"$environment\", type=\"$type\", alertstate=\"firing\"} > 0) without (monitor)",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "sum(ALERTS{environment=\"$environment\", type=\"$type\", alertstate=\"pending\"} > 0) without (monitor)",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "B"
+        }
+      ],
+      "title": "Alerts",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Per-Component Availability",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 4,
+      "options": {},
+      "repeat": "component_availability",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "gitlab_component_availability:ratio{environment=\"$environment\", type=\"$type\", component=\"$component_availability\"}",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "{{ component }} ({{ monitor }})",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "\"$component_availability\" Service Component Availability",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 41,
+      "panels": [],
+      "title": "Per-Component Operation Rates",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 42,
+      "options": {},
+      "repeat": "component_ops",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "sum(avg_over_time(gitlab_component_ops:rate{environment=\"$environment\", type=\"$type\", component=\"$component_ops\"}[$__interval])) by (component)",
+          "format": "time_series",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "{{ component }} component",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "sum(\ngitlab_component_ops:rate:avg_over_time_1w{service=\"\", environment=\"$environment\", type=\"$type\", component=\"$component_ops\"} + \n$sigma * gitlab_component_ops:rate:stddev_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_ops\"}\n)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "upper",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "sum(\nclamp_min(gitlab_component_ops:rate:avg_over_time_1w{service=\"\", environment=\"$environment\", type=\"$type\", component=\"$component_ops\"} \n- $sigma * gitlab_component_ops:rate:stddev_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_ops\"}, 0)\n)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "lower",
+          "refId": "C"
+        }
+      ],
+      "title": "$component_ops Service Operation Rates",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 18,
+      "panels": [],
+      "title": "Per-Component Apdex",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 19,
+      "options": {},
+      "repeat": "component_apdex",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "avg_over_time(gitlab_component_apdex:ratio{environment=\"$environment\", type=\"$type\", component=\"$component_apdex\"}[$__interval])",
+          "format": "time_series",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "{{ component }} component ({{ monitor }})",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "clamp_min(gitlab_component_apdex:ratio:avg_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_apdex\"} - $sigma * gitlab_component_apdex:ratio:stddev_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_apdex\"}, 0)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "lower",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "clamp_max(gitlab_component_apdex:ratio:avg_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_apdex\"} + $sigma * gitlab_component_apdex:ratio:stddev_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_apdex\"}, 1)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "upper",
+          "refId": "C"
+        }
+      ],
+      "title": "$component_apdex Component Apdex",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 26,
+      "panels": [],
+      "title": "Per-Component Error Rates",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "id": 27,
+      "options": {},
+      "repeat": "component_errors",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "avg_over_time(gitlab_component_errors:rate{environment=\"$environment\", type=\"$type\", component=\"$component_errors\"}[$__interval]) * 60",
+          "format": "time_series",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "{{ component }} component",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "(gitlab_component_errors:rate:avg_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_errors\"} + $sigma * gitlab_component_errors:rate:stddev_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_errors\"}) * 60",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "upper",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "clamp_min((gitlab_component_errors:rate:avg_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_errors\"} - $sigma * gitlab_component_errors:rate:stddev_over_time_1w{environment=\"$environment\", type=\"$type\", component=\"$component_errors\"}) * 60, 0)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "lower",
+          "refId": "C"
+        }
+      ],
+      "title": "$component_errors Component - Error Rates per Minute",
+      "type": "graph"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      },
+      "id": 33,
+      "panels": [],
+      "title": "Host Metrics",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 46
+      },
+      "id": 35,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "1 - avg(rate(node_cpu_seconds_total{type=\"$type\", environment=\"$environment\", mode=\"idle\"}[$__interval])) by (fqdn)",
+          "format": "time_series",
+          "interval": "20s",
+          "intervalFactor": 10,
+          "legendFormat": "{{ fqdn }} ",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU",
+      "type": "graph"
+    },
+    {
+      "datasource": {
+        "uid": "$prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 46
+      },
+      "id": 36,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$prometheus_ds"
+          },
+          "expr": "avg(\n(node_memory_MemTotal_bytes{type=\"$type\", environment=\"$environment\"} - \n(\n  node_memory_MemFree_bytes{type=\"$type\", environment=\"$environment\"} + \n  node_memory_Buffers_bytes{type=\"$type\", environment=\"$environment\"} + \n  node_memory_Cached_bytes{type=\"$type\", environment=\"$environment\"}\n) \n)\n\n/ node_memory_MemTotal_bytes{type=\"$type\", environment=\"$environment\"}\n) by (fqdn)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{ fqdn }}",
+          "refId": "B"
+        }
+      ],
+      "title": "Allocated Memory",
+      "type": "graph"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "general triage",
+    "unmanaged"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "prometheus-app-01-inf-gprd",
+          "value": "PC84C3A6298CABB57"
+        },
+        "name": "prometheus_ds",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "/(.*-gprd|Global)/",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "gprd",
+          "value": "gprd"
+        },
+        "datasource": "$prometheus_ds",
+        "includeAll": false,
+        "name": "environment",
+        "options": [],
+        "query": "label_values(up, environment)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "web",
+          "value": "web"
+        },
+        "datasource": "$prometheus_ds",
+        "includeAll": false,
+        "name": "type",
+        "options": [],
+        "query": "label_values(up{environment=\"$environment\"}, type)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "2",
+          "value": "2"
+        },
+        "includeAll": false,
+        "label": "\u03c3",
+        "name": "sigma",
+        "options": [
+          {
+            "selected": false,
+            "text": "0.5",
+            "value": "0.5"
+          },
+          {
+            "selected": false,
+            "text": "1",
+            "value": "1"
+          },
+          {
+            "selected": false,
+            "text": "1.5",
+            "value": "1.5"
+          },
+          {
+            "selected": true,
+            "text": "2",
+            "value": "2"
+          },
+          {
+            "selected": false,
+            "text": "2.5",
+            "value": "2.5"
+          },
+          {
+            "selected": false,
+            "text": "3",
+            "value": "3"
+          }
+        ],
+        "query": "0.5,1,1.5,2,2.5,3",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "$prometheus_ds",
+        "hide": 2,
+        "includeAll": true,
+        "name": "component_availability",
+        "options": [],
+        "query": "label_values(gitlab_component_availability:ratio{environment=\"$environment\", type=\"$type\"}, component)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "$prometheus_ds",
+        "hide": 2,
+        "includeAll": true,
+        "name": "component_ops",
+        "options": [],
+        "query": "label_values(gitlab_component_ops:rate{environment=\"$environment\", type=\"$type\"}, component)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "$prometheus_ds",
+        "hide": 2,
+        "includeAll": true,
+        "name": "component_apdex",
+        "options": [],
+        "query": "label_values(gitlab_component_apdex:ratio{environment=\"$environment\", type=\"$type\"}, component)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "$prometheus_ds",
+        "hide": 2,
+        "includeAll": true,
+        "name": "component_errors",
+        "options": [],
+        "query": "label_values(gitlab_component_errors:rate{environment=\"$environment\", type=\"$type\"}, component)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "General Triage: Components",
+  "uid": "VE4pXc1iz",
+  "version": 3
+}

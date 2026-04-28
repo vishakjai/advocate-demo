@@ -1,0 +1,18 @@
+locals {
+    gitaly-restore-nodes = {
+      nodes = {
+      <% @node_map.each do |existing, replacement| %>
+        "<%= replacement['name'] %>" = {
+          name = "<%= replacement['name'] %>"
+          zone = "<%= replacement['zone'] %>"
+          data_disk_snapshot_search_string = "<%= existing %>"
+          deletion_protection = <%= replacement['deletion_protection'] %>
+          <% if replacement['dr_restore'] %>
+          node_environment = "<%= replacement['environment'] %>"
+          snapshot_project = "<%= replacement['snapshot_project'] %>"
+          <% end %>
+        },
+      <% end %>
+      }
+  }
+}
